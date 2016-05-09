@@ -1,0 +1,29 @@
+VWPre
+======================
+
+### Overview
+
+This package provides tools for preprocessing and plotting Visual World Paradigm data. 
+Currently, it is built to accommodate data collected with SR Research Eyelink eye trackers. 
+However, we hope to provide functionality for other eye-tracking systems in the future. 
+
+
+
+### Installation
+
+You can install the currently released verion of the package from CRAN as follows:
+install.packages("VWPre")
+
+
+### Usage
+
+Example usage of specific functions contained in the package can be found in the vignettes. 
+There is one vignette currently available which walks users through the steps needed to preprocess and visualize data from an SR Research (Eyelink) sample report. 
+More vignettes will be included as functionality for other eye-tracking systems is added.
+You can view the available vignettes as follows:
+browseVignettes("VWPre")
+
+
+### License
+
+The **VWPre** package is licensed under the GPLv3 (<http://www.gnu.org/licenses/gpl.html>).
