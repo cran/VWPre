@@ -29,8 +29,10 @@
 #' (in milliseconds).
 #' @param SamplingRate A positive integer indicating the sampling rate (in Hertz) 
 #' used to record the gaze data.
-#' @param SamplesPerBin A positive integer indicating the number of samples in
-#' each bin.
+#' @param ObsPerBin A positive integer indicating the desired number of 
+#' observations to be used in the calculations.
+#' @param ObsOverride A logical value controlling restrictions on the value
+#' provided to ObsPerBin. Default value is FALSE.
 #' @param Constant A positive number used for the empirical logit and weights
 #' calculation; by default, 0.5 as in Barr (2008).
 #' @param Output An obligatory string containing either "ELogit" or "Binomial".
@@ -42,14 +44,15 @@
 #' df <- fasttrack(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
 #'        EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Offset = 100, 
 #'				Recording = "LandR", WhenLandR = "Right", BinSize = 20, 
-#'				SamplingRate = 1000, SamplesPerBin = 20, Constant = 0.5, 
+#'				SamplingRate = 1000, ObsPerBin = 20, Constant = 0.5, 
 #'				Output = "ELogit")
 #' }
 fasttrack = function(data = data, Subject = Subject, Item = Item, 
                         EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA,
                         Offset = Offset, Recording = Recording, 
                         WhenLandR = WhenLandR, BinSize = BinSize, SamplingRate = SamplingRate,
-                        SamplesPerBin = SamplesPerBin, Constant = 0.5, Output = Output) {
+                        ObsPerBin = ObsPerBin, ObsOverride = FALSE, 
+						Constant = 0.5, Output = Output) {
   
   dat <- data
   Subject <- Subject
@@ -61,47 +64,52 @@ fasttrack = function(data = data, Subject = Subject, Item = Item,
   WhenLandR <- WhenLandR
   BinSize <- BinSize
   SamplingRate <- SamplingRate
-  SamplesPerBin <- SamplesPerBin
+  ObsPerBin <- ObsPerBin
+  ObsOverride <- ObsOverride
   Constant <- Constant
   Output <- Output
   
-  print("Preparing data...")
+  message("Preparing data...")
   dat0 <- prep_data(data = dat, Subject = Subject, Item = Item, EventColumns = EventColumns)
 
-  print(paste("Relabelling outside of", NoIA, "interest areas...", sep = " "))
+  message(paste("Relabelling outside of", NoIA, "interest areas...", sep = " "))
   dat1 <- relabel_na(data = dat0, NoIA = NoIA)
   rm(dat0)
   
-  print(paste("Creating time series with", Offset, "ms offset...", sep = " "))
+  check_ia(data = dat1)
+  
+  message(paste("Creating time series with", Offset, "ms offset...", sep = " "))
   dat2 <- create_time_series(data = dat1, Offset = Offset)
   rm(dat1)
   
   check_time_series(data = dat2)
   check_eye_recording(data = dat2)
   
-  print(paste("Selecting recorded eye..."))
+  message(paste("Selecting recorded eye..."))
   dat3 <- select_recorded_eye(data = dat2, Recording = Recording, WhenLandR = WhenLandR)
   rm(dat2)
   
   check_samplingrate(dat3)
   
-  print(paste("Binning", SamplingRate, "Hz data into", BinSize, "ms bins..."))
-  print("Calculating proportions...")
+  message(paste("Binning", SamplingRate, "Hz data into", BinSize, "ms bins..."))
+  message("Calculating proportions...")
   dat4 <- bin_prop(dat3, NoIA = NoIA, BinSize = BinSize, SamplingRate = SamplingRate)
   rm(dat3)
   
   check_samplingrate(dat4)
   check_samples_per_bin(dat4)
   
-  print(paste("Preparing", Output, "output...", sep = " "))
+  message(paste("Preparing", Output, "output...", sep = " "))
   if (Output == "ELogit") {
-    dat5 <- transform_to_elogit(dat4, NoIA = 4, SamplesPerBin = 20, Constant = Constant)
+    dat5 <- transform_to_elogit(dat4, NoIA = NoIA, ObsPerBin = ObsPerBin, 
+                                Constant = Constant, ObsOverride = ObsOverride)
   } else if (Output == "Binomial") {
-    dat5 <- create_binomial(data = dat4, NoIA = 4)
+    dat5 <- create_binomial(data = dat4, NoIA = NoIA, ObsPerBin = ObsPerBin,
+                            ObsOverride = ObsOverride)
   }
   
   rm(dat4)
   
-  return(dat5)
+  return(ungroup(dat5))
   
 }

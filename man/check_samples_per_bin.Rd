@@ -15,8 +15,8 @@ A printed summary of the number of samples in each bin.
 \description{
 \code{check_samples_per_bin} determines the number of samples in each
 bin produced by \code{\link{bin_prop}}.
-This function is helpful for determining the obligatory parameter input to 
-\code{\link{transform_to_elogit}}.
+This function may be helpful for determining the obligatory parameter 
+`ObsPerBin` which is input to \code{\link{transform_to_elogit}}.
 }
 \examples{
 \dontrun{

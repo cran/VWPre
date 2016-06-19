@@ -1,3 +1,74 @@
+#' Check the interest area IDs and labels
+#' 
+#' \code{check_ia} examines both the interest area IDs and interest area labels
+#' (and their mapping) for both eyes. It returns a summary of the information.
+#' 
+#' @export
+#' @import dplyr
+#' @import tidyr
+#' @import lazyeval
+#' 
+#' @param data A data table object output by \code{\link{relabel_na}}.
+#' @return The value(s) and label(s) of interest areas and how they map for
+#' each eye.
+#' @examples
+#' \dontrun{
+#' library(VWPre)
+#' # Check the interest area information...
+#' check_ia(dat)
+#' }
+check_ia <- function(data = data) {
+  
+  data <- data
+  
+  Rias <-
+    data.frame(
+      ID = unique(data$RIGHT_INTEREST_AREA_ID),
+      Label = unique(data$RIGHT_INTEREST_AREA_LABEL)
+    )
+  
+  Rcnt <- 0
+  for (x in 1:nrow(Rias)) {
+    if (Rias[x, "ID"] >= 0 & Rias[x, "ID"] <= 8) {
+    } else {
+      Rcnt <- Rcnt + 1
+    }
+  }
+  
+  if (Rcnt > 0) {
+    message("Interest Area IDs for the right eye are not between 0 and 8. Please recode.")
+    message(paste(capture.output(print(Rias)), collapse = "\n"))
+  } else {
+    message("Interest Area IDs for the right eye are coded appropriately.")
+    message(paste(capture.output(print(Rias)), collapse = "\n"))
+  }
+  
+  
+  Lias <-
+    data.frame(
+      ID = unique(data$LEFT_INTEREST_AREA_ID),
+      Label = unique(data$LEFT_INTEREST_AREA_LABEL)
+    )
+  
+  Lcnt <- 0
+  for (x in 1:nrow(Lias)) {
+    if (Lias[x, "ID"] >= 0 & Lias[x, "ID"] <= 8) {
+    } else {
+      Lcnt <- Lcnt + 1
+    }
+  }
+  
+  if (Lcnt > 0) {
+    message("Interest Area IDs for the left eye are not between 0 and 8. Please recode.")
+    message(paste(capture.output(print(Lias)), collapse = "\n"))
+  } else {
+    message("Interest Area IDs for the left eye are coded appropriately.")
+    message(paste(capture.output(print(Lias)), collapse = "\n"))
+  }
+  
+}
+
+
 #' Check the new time series
 #' 
 #' \code{check_time_series} examines the first value in the Time column
@@ -19,18 +90,21 @@
 #' check_time_series(dat)
 #' }
 check_time_series = function(data = data) {
-  event_start_table = data %>%
+  event_start_table = data %>% group_by(Event) %>%
     summarise(ftime = min(Time))
-  print(unique(event_start_table$ftime))
+  message(paste(capture.output(cat(unique(event_start_table$ftime)))), collapse = "\n")
 }
+
+
+
 
 
 #' Check the number of samples in each bin
 #' 
 #' \code{check_samples_per_bin} determines the number of samples in each
 #' bin produced by \code{\link{bin_prop}}.
-#' This function is helpful for determining the obligatory parameter input to 
-#' \code{\link{transform_to_elogit}}.
+#' This function may be helpful for determining the obligatory parameter 
+#' `ObsPerBin` which is input to \code{\link{transform_to_elogit}}.
 #' 
 #' @export
 #' @import dplyr
@@ -46,11 +120,13 @@ check_time_series = function(data = data) {
 #' check_samples_per_bin(dat)
 #' }
 check_samples_per_bin <- function (data = data) {
-  samples <- max(data$IA_0_C)
+  samples <- max(data$NSamples)
   rate <- abs(data$Time[2] - data$Time[1])
-  print(paste("There are", samples, "samples in each bin."))
-  print(paste("One data point every", rate, "millisecond(s)"))
+  message(paste("There are", samples, "samples per bin."))
+  message(paste("One data point every", rate, "millisecond(s)"))
 }
+
+
 
 
 #' Determine the sampling rate present in the data 
@@ -82,14 +158,14 @@ check_samplingrate <- function(data = data, ReturnData = FALSE) {
   tmp <- data %>%
     group_by(Event) %>%
     mutate(., SamplingRate = 1000 / (Time[2] - Time[1]))
-  print(paste("Sampling rate(s) present in the data are:", unique(tmp$SamplingRate), "Hz."))
-  
+  message(paste("Sampling rate(s) present in the data are:", capture.output(cat(unique(tmp$SamplingRate))), "Hz."), collapse = "\n")
+
   if (length(unique(tmp$SamplingRate)) > 1) {
-    warning("There are multiple sampling rates present in the data. Please use the ReturnData parameter to include a sampling rate column in the dataset. This can be used to subset by sampling rate before proceeding with the remaining preprocessing operations.")
+    warning("There are multiple sampling rates present in the data. \n Please use the ReturnData parameter to include a sampling rate column in the dataset. \n This can be used to subset by sampling rate before proceeding with the remaining preprocessing operations.")
   } 
   
   if (ReturnData == TRUE) {
-  return(tmp)
+  return(ungroup(tmp))
   }
   
 }
@@ -122,7 +198,7 @@ ds_options <- function(SamplingRate=SamplingRate) {
   for (x in 1:100) {
   if (x %% (1000/SamplingRate) == 0) {
     if ((1000/x) %% 1 == 0) {
-    print(paste("Bin size:", x, "ms;", "Downsampled rate:", 1000/x, "Hz"))
+    message(paste("Bin size:", x, "ms;", "Downsampled rate:", 1000/x, "Hz"))
     }
   }
   }
@@ -154,11 +230,11 @@ ds_options <- function(SamplingRate=SamplingRate) {
 check_eye_recording <- function(data = data) {
   
   if (sum(data$LEFT_INTEREST_AREA_ID) > 0 & sum(data$RIGHT_INTEREST_AREA_ID) > 0) {
-    print("The dataset contains recordings for both eyes. If any participants had both eyes tracked, set the Recording parameter in select_recorded_eye() to 'LandR'. If participants had either the left OR the right eye tracked, set the Recording parameter in select_recorded_eye() to 'LorR'.")
+    message("The dataset contains recordings for both eyes. \n If any participants had both eyes tracked, set the Recording parameter in select_recorded_eye() to 'LandR'. \n If participants had either the left OR the right eye tracked, set the Recording parameter in select_recorded_eye() to 'LorR'.")
   } else if (sum(data$LEFT_INTEREST_AREA_ID) > 0 & sum(data$RIGHT_INTEREST_AREA_ID) == 0) {
-    print("The dataset contains recordings for ONLY the left eye. Set the Recording parameter in select_recorded_eye() to 'L'.")
+    message("The dataset contains recordings for ONLY the left eye. \n Set the Recording parameter in select_recorded_eye() to 'L'.")
   } else if (sum(data$LEFT_INTEREST_AREA_ID) == 0 & sum(data$RIGHT_INTEREST_AREA_ID) > 0) {
-    print("The dataset contains recordings for ONLY the right eye. Set the Recording parameter in select_recorded_eye() to 'R'.")
+    message("The dataset contains recordings for ONLY the right eye. \n Set the Recording parameter in select_recorded_eye() to 'R'.")
   }
   
 }
@@ -182,6 +258,7 @@ check_eye_recording <- function(data = data) {
 #' \code{\link{transform_to_elogit}}, or \code{\link{create_binomial}}.
 #' @param Labels A named character vector specifying the interest areas and the
 #' desired names to be inserted in place of the numerical labelling.
+#' @return A data table object with renamed columns.
 #' @examples
 #' \dontrun{
 #' library(VWPre)
@@ -197,7 +274,7 @@ rename_columns <- function(data = data, Labels = Labels) {
   if (length(names(Labels))>8) {
     stop("You have more than 8 interest areas.")
   } else {
-    print(paste("Renaming", length(names(Labels)), "interest areas.", sep = " "))
+    message(paste("Renaming", length(names(Labels)), "interest areas.", sep = " "))
   }
     
   Labels <- c("0" = "outside", Labels)

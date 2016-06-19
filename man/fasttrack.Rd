@@ -7,8 +7,8 @@
 fasttrack(data = data, Subject = Subject, Item = Item,
   EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA,
   Offset = Offset, Recording = Recording, WhenLandR = WhenLandR,
-  BinSize = BinSize, SamplingRate = SamplingRate,
-  SamplesPerBin = SamplesPerBin, Constant = 0.5, Output = Output)
+  BinSize = BinSize, SamplingRate = SamplingRate, ObsPerBin = ObsPerBin,
+  ObsOverride = FALSE, Constant = 0.5, Output = Output)
 }
 \arguments{
 \item{data}{A data frame object created from an Eyelink Sample Report.}
@@ -38,8 +38,11 @@ if gaze data is available for both eyes (i.e., Recording = "LandR").}
 \item{SamplingRate}{A positive integer indicating the sampling rate (in Hertz) 
 used to record the gaze data.}
 
-\item{SamplesPerBin}{A positive integer indicating the number of samples in
-each bin.}
+\item{ObsPerBin}{A positive integer indicating the desired number of 
+observations to be used in the calculations.}
+
+\item{ObsOverride}{A logical value controlling restrictions on the value
+provided to ObsPerBin. Default value is FALSE.}
 
 \item{Constant}{A positive number used for the empirical logit and weights
 calculation; by default, 0.5 as in Barr (2008).}
@@ -65,7 +68,7 @@ library(VWPre)
 df <- fasttrack(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
        EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Offset = 100, 
 			Recording = "LandR", WhenLandR = "Right", BinSize = 20, 
-			SamplingRate = 1000, SamplesPerBin = 20, Constant = 0.5, 
+			SamplingRate = 1000, ObsPerBin = 20, Constant = 0.5, 
 			Output = "ELogit")
 }
 }

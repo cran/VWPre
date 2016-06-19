@@ -31,7 +31,7 @@ interest area in a particular window of time (bin size). This function first
 checks to see if the procedure is possible given the sampling rate and 
 desired bin size. It then performs the calculation and downsampling, returning
 new columns corresponding to each interest area ID (e.g., 'IA_1_C', 'IA_1_P').
-The extention '_c' indicates the count of samples in the bin and the 
+The extention '_C' indicates the count of samples in the bin and the 
 extension '_P' indicates the proportion. N.B.: This function will work for 
 data with a maximum of 8 interest areas.
 }

@@ -238,7 +238,6 @@ plot_avg <- function(data = data, type = NA, xlim = NA, IAColumns = IAColumns,
       } + {
         if (Theme == TRUE) theme_mybw()
       }
-    
   }
   
   else if (!is.na(Condition1) & is.na(Condition2)) {

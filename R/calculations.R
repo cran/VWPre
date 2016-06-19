@@ -5,7 +5,7 @@
 #' checks to see if the procedure is possible given the sampling rate and 
 #' desired bin size. It then performs the calculation and downsampling, returning
 #' new columns corresponding to each interest area ID (e.g., 'IA_1_C', 'IA_1_P').
-#' The extention '_c' indicates the count of samples in the bin and the 
+#' The extention '_C' indicates the count of samples in the bin and the 
 #' extension '_P' indicates the proportion. N.B.: This function will work for 
 #' data with a maximum of 8 interest areas.
 #' 
@@ -31,144 +31,130 @@
 #' df <- bin_prop(dat, NoIA = 4, BinSize = 20, SamplingRate = 1000)
 #' }
 bin_prop <- function(data = data, NoIA = NoIA, BinSize = BinSize, SamplingRate = SamplingRate) {
+  
   NoIA = NoIA
   samplerate <-  data$Time[2] - data$Time[1]
   BinSize = BinSize
   SamplesPerBin <- (SamplingRate / 1000) * BinSize
-  if (BinSize %% samplerate != 0) {
-    stop("Sample frequency of data is not a multiple of the target frequency.")
-  } else {
-    print("Sampling rate OK. You're good to go!")
-  }
-  data$DS <- data$Time %/% BinSize
-  data$DS <- data$DS * BinSize 
-  if (NoIA == 0) {
+  
+    if (NoIA == 0) {
     stop("You must have at least one interest area!")
   } else if (NoIA > 8) {
     stop("You have more than 8 interest areas; you must modify this function.")
-  } else if (NoIA == 1) {
-    data %>%
+  } 
+  
+  if (BinSize %% samplerate != 0) {
+    stop("Sample frequency of data is not a multiple of the target frequency.")
+  } else {
+    message("Sampling rate OK. You're good to go!")
+  }
+  data$DS <- data$Time %/% BinSize
+  data$DS <- data$DS * BinSize 
+
+  message("Binning...")
+  # Calculate counts
+  if (NoIA >= 1) {
+    data <- data %>%
       group_by(Event, DS) %>%
-      mutate(., IA_0_C = length(IA_ID[which(IA_ID == 0)]),
-             IA_1_C = length(IA_ID[which(IA_ID == 1)])) %>% 
-      filter(., Time %in% DS) %>%
-      mutate(., IA_0_P = IA_0_C / SamplesPerBin,
-             IA_1_P = IA_1_C / SamplesPerBin)
-  } else if (NoIA == 2) {
-    data %>%
-      group_by(Event, DS) %>%
-      mutate(., IA_0_C = length(IA_ID[which(IA_ID == 0)]),
-             IA_1_C = length(IA_ID[which(IA_ID == 1)]),
-             IA_2_C = length(IA_ID[which(IA_ID == 2)])) %>% 
-      filter(., Time %in% DS) %>%
-      mutate(., IA_0_P = IA_0_C / SamplesPerBin,
-             IA_1_P = IA_1_C / SamplesPerBin,
-             IA_2_P = IA_2_C / SamplesPerBin)
-  } else if (NoIA == 3) {
-    data %>%
-      group_by(Event, DS) %>%
-      mutate(., IA_0_C = length(IA_ID[which(IA_ID == 0)]),
-             IA_1_C = length(IA_ID[which(IA_ID == 1)]),
-             IA_2_C = length(IA_ID[which(IA_ID == 2)]),
-             IA_3_C = length(IA_ID[which(IA_ID == 3)])) %>% 
-      filter(., Time %in% DS) %>%
-      mutate(., IA_0_P = IA_0_C / SamplesPerBin,
-             IA_1_P = IA_1_C / SamplesPerBin,
-             IA_2_P = IA_2_C / SamplesPerBin,
-             IA_3_P = IA_3_C / SamplesPerBin)
-  } else if (NoIA == 4) {
-    data %>%
-      group_by(Event, DS) %>%
-      mutate(., IA_0_C = length(IA_ID[which(IA_ID == 0)]),
-             IA_1_C = length(IA_ID[which(IA_ID == 1)]),
-             IA_2_C = length(IA_ID[which(IA_ID == 2)]),
-             IA_3_C = length(IA_ID[which(IA_ID == 3)]),
-             IA_4_C = length(IA_ID[which(IA_ID == 4)])) %>% 
-      filter(., Time %in% DS) %>%
-      mutate(., IA_0_P = IA_0_C / SamplesPerBin,
-             IA_1_P = IA_1_C / SamplesPerBin,
-             IA_2_P = IA_2_C / SamplesPerBin,
-             IA_3_P = IA_3_C / SamplesPerBin,
-             IA_4_P = IA_4_C / SamplesPerBin)
-  } else if (NoIA == 5) {
-    data %>%
-      group_by(Event, DS) %>%
-      mutate(., IA_0_C = length(IA_ID[which(IA_ID == 0)]),
-             IA_1_C = length(IA_ID[which(IA_ID == 1)]),
-             IA_2_C = length(IA_ID[which(IA_ID == 2)]),
-             IA_3_C = length(IA_ID[which(IA_ID == 3)]),
-             IA_4_C = length(IA_ID[which(IA_ID == 4)]),
-             IA_5_C = length(IA_ID[which(IA_ID == 5)])) %>% 
-      filter(., Time %in% DS) %>%
-      mutate(., IA_0_P = IA_0_C / SamplesPerBin,
-             IA_1_P = IA_1_C / SamplesPerBin,
-             IA_2_P = IA_2_C / SamplesPerBin,
-             IA_3_P = IA_3_C / SamplesPerBin,
-             IA_4_P = IA_4_C / SamplesPerBin,
-             IA_5_P = IA_5_C / SamplesPerBin)
-  } else if (NoIA == 6) {
-    data %>%
-      group_by(Event, DS) %>%
-      mutate(., IA_0_C = length(IA_ID[which(IA_ID == 0)]),
-             IA_1_C = length(IA_ID[which(IA_ID == 1)]),
-             IA_2_C = length(IA_ID[which(IA_ID == 2)]),
-             IA_3_C = length(IA_ID[which(IA_ID == 3)]),
-             IA_4_C = length(IA_ID[which(IA_ID == 4)]),
-             IA_5_C = length(IA_ID[which(IA_ID == 5)]),
-             IA_6_C = length(IA_ID[which(IA_ID == 6)])) %>% 
-      filter(., Time %in% DS) %>%
-      mutate(., IA_0_P = IA_0_C / SamplesPerBin,
-             IA_1_P = IA_1_C / SamplesPerBin,
-             IA_2_P = IA_2_C / SamplesPerBin,
-             IA_3_P = IA_3_C / SamplesPerBin,
-             IA_4_P = IA_4_C / SamplesPerBin,
-             IA_5_P = IA_5_C / SamplesPerBin,
-             IA_6_P = IA_6_C / SamplesPerBin)
-  } else if (NoIA == 7) {
-    data %>%
-      group_by(Event, DS) %>%
-      mutate(., IA_0_C = length(IA_ID[which(IA_ID == 0)]),
-             IA_1_C = length(IA_ID[which(IA_ID == 1)]),
-             IA_2_C = length(IA_ID[which(IA_ID == 2)]),
-             IA_3_C = length(IA_ID[which(IA_ID == 3)]),
-             IA_4_C = length(IA_ID[which(IA_ID == 4)]),
-             IA_5_C = length(IA_ID[which(IA_ID == 5)]),
-             IA_6_C = length(IA_ID[which(IA_ID == 6)]),
-             IA_7_C = length(IA_ID[which(IA_ID == 7)])) %>% 
-      filter(., Time %in% DS) %>%
-      mutate(., IA_0_P = IA_0_C / SamplesPerBin,
-             IA_1_P = IA_1_C / SamplesPerBin,
-             IA_2_P = IA_2_C / SamplesPerBin,
-             IA_3_P = IA_3_C / SamplesPerBin,
-             IA_4_P = IA_4_C / SamplesPerBin,
-             IA_5_P = IA_5_C / SamplesPerBin,
-             IA_6_P = IA_6_C / SamplesPerBin,
-             IA_7_P = IA_7_C / SamplesPerBin)
-  } else if (NoIA == 8) {
-    data %>%
-      group_by(Event, DS) %>%
-      mutate(., IA_0_C = length(IA_ID[which(IA_ID == 0)]),
-             IA_1_C = length(IA_ID[which(IA_ID == 1)]),
-             IA_2_C = length(IA_ID[which(IA_ID == 2)]),
-             IA_3_C = length(IA_ID[which(IA_ID == 3)]),
-             IA_4_C = length(IA_ID[which(IA_ID == 4)]),
-             IA_5_C = length(IA_ID[which(IA_ID == 5)]),
-             IA_6_C = length(IA_ID[which(IA_ID == 6)]),
-             IA_7_C = length(IA_ID[which(IA_ID == 7)]),
-             IA_8_C = length(IA_ID[which(IA_ID == 8)])) %>% 
-      filter(., Time %in% DS) %>%
-      mutate(., IA_0_P = IA_0_C / SamplesPerBin,
-             IA_1_P = IA_1_C / SamplesPerBin,
-             IA_2_P = IA_2_C / SamplesPerBin,
-             IA_3_P = IA_3_C / SamplesPerBin,
-             IA_4_P = IA_4_C / SamplesPerBin,
-             IA_5_P = IA_5_C / SamplesPerBin,
-             IA_6_P = IA_6_C / SamplesPerBin,
-             IA_7_P = IA_7_C / SamplesPerBin,
-             IA_8_P = IA_8_C / SamplesPerBin)
+      mutate(., NSamples = n(), 
+             IA_0_C = length(IA_ID[which(IA_ID == 0)]),
+             IA_1_C = length(IA_ID[which(IA_ID == 1)])) 
+  } 
+  if (NoIA >= 2) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_2_C = length(IA_ID[which(IA_ID == 2)])) 
+  } 
+  if (NoIA >= 3) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_3_C = length(IA_ID[which(IA_ID == 3)])) 
+  } 
+  if (NoIA >= 4) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_4_C = length(IA_ID[which(IA_ID == 4)])) 
+  } 
+  if (NoIA >= 5) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_5_C = length(IA_ID[which(IA_ID == 5)])) 
+  } 
+  if (NoIA >= 6) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_6_C = length(IA_ID[which(IA_ID == 6)])) 
+  } 
+  if (NoIA >= 7) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_7_C = length(IA_ID[which(IA_ID == 7)]))
+  } 
+  if (NoIA == 8) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_8_C = length(IA_ID[which(IA_ID == 8)]))
   }
   
+  # Downsample
+  data <- data %>%
+    group_by(Event, DS) %>%
+    filter(., Time %in% DS)
+  
+    message("Calculating proportions...")
+  # Calculate proportions
+  if (NoIA >= 1) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_0_P = IA_0_C / NSamples,
+             IA_1_P = IA_1_C / NSamples)
+  } 
+  if (NoIA >= 2) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_2_P = IA_2_C / NSamples)
+  } 
+  if (NoIA >= 3) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_3_P = IA_3_C / NSamples)
+  } 
+  if (NoIA >= 4) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_4_P = IA_4_C / NSamples)
+  } 
+  if (NoIA >= 5) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_5_P = IA_5_C / NSamples)
+  } 
+  if (NoIA >= 6) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_6_P = IA_6_C / NSamples)
+  } 
+  if (NoIA >= 7) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_7_P = IA_7_C / NSamples)
+  } 
+  if (NoIA == 8) {
+    data <- data %>%
+      #group_by(Event, DS) %>%
+      mutate(., IA_8_P = IA_8_C / NSamples)
+  }
+  
+  tmp <- data %>% filter(NSamples != SamplesPerBin) %>% group_by(Event) 
+  message(paste("There are", nrow(tmp), "data points with less than", SamplesPerBin, "samples per bin."))
+  message("These can be examined and/or removed using the column 'NSamples'.")
+  message(paste("These occur at time bin(s):", capture.output(cat(unique(tmp$Time))), collapse = "\n"))
+  message("Subsequent Empirical Logit calculations may be influenced by the number of samples (depending on the number of observations requested).")
+  
+  
+  return(ungroup(data))
 }
+
 
 
 
@@ -185,7 +171,7 @@ bin_prop <- function(data = data, NoIA = NoIA, BinSize = BinSize, SamplingRate =
 #' mean). This is important for regression analyses. N.B.: This function will 
 #' work for data with a maximum of 8 interest areas.
 #' 
-#' These calculations are taken from:
+#' These calculations were adapted from:
 #' Barr, D. J., (2008) Analyzing 'visual world' eyetracking data using 
 #' multilevel logistic regression, \emph{Journal of Memory and Language}, 
 #' \emph{59}(4), 457--474.
@@ -197,8 +183,11 @@ bin_prop <- function(data = data, NoIA = NoIA, BinSize = BinSize, SamplingRate =
 #' @param data A data table object output by \code{\link{select_recorded_eye}}.
 #' @param NoIA A positive integer indicating the number of interest areas defined 
 #' when creating the study. 
-#' @param SamplesPerBin A positive integer indicating the number of samples in
-#' each bin, which can be determines with \code{\link{check_samples_per_bin}}.
+#' @param ObsPerBin A positive integer indicating the number of observations to
+#' use in the calculation. Typically, this will be the number of samples per 
+#' bin, which can be determined with \code{\link{check_samples_per_bin}}.
+#' @param ObsOverride A logical value controlling restrictions on the value
+#' provided to ObsPerBin. Default value is FALSE.
 #' @param Constant A positive number used for the empirical logit and weights
 #' calculation; by default, 0.5 as in Barr (2008).
 #' @return A data table with additional columns (the number of which depends on 
@@ -207,129 +196,101 @@ bin_prop <- function(data = data, NoIA = NoIA, BinSize = BinSize, SamplingRate =
 #' \dontrun{
 #' library(VWPre)
 #' # Convert proportions to empirical logits and calculate weights...
-#' df <- transform_to_elogit(dat, NoIA = 4, SamplesPerBin = 20, Constant = 0.5)
+#' df <- transform_to_elogit(dat, NoIA = 4, ObsPerBin = 20, Constant = 0.5)
 #' }
-transform_to_elogit <- function(data = data, NoIA = NoIA, SamplesPerBin = SamplesPerBin,
-                                Constant = 0.5) {
+transform_to_elogit <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
+                                Constant = 0.5, ObsOverride = FALSE) {
   NoIA = NoIA
-  SamplesPerBin = SamplesPerBin
+  ObsPerBin = ObsPerBin
   Constant = Constant
+  ObsOverride = ObsOverride
   
-  if (NoIA > 8) {
-    stop("You have too many interest areas. You must modify the function.")
+  if (NoIA == 0) {
+    stop("You must have at least one interest area!")
+  } else if (NoIA > 8) {
+    stop("You have more than 8 interest areas; you must modify this function.")
+  } 
+  
+  if (ObsPerBin == max(data$NSamples)) {
+    message("Number of Observations equal to Number of Samples. \n Calculation will be based on Number of Samples.")
+    data$Obs <- data$NSamples
+  } else if (ObsPerBin == (data$Time[2] - data$Time[1])) {
+    if (ObsPerBin > max(data$NSamples) & ObsOverride == FALSE) {
+      stop("It is not advisable have a Number of Observations greater than the Number of Samples present in the data.  \n This error can be overridden with the parameter ObsOverride, though, do so with caution.")
+    } else {
+      message("Number of Observations has been user-defined and equals the Bin Size in milliseconds. \n Calculation will be based on time in milliseconds.")
+      data$Obs <- ObsPerBin
+    }
+  } else {
+    if (ObsPerBin > max(data$NSamples) & ObsOverride == FALSE) {
+      stop("It is not advisable have a Number of Observations greater than the Number of Samples present in the data.  \n This error can be overridden with the parameter ObsOverride, though, do so with caution.")
+    } else {
+      message("Number of Observations has been user-defined. \n Calculation will be based on user-defined value.")
+      data$Obs <- ObsPerBin
+    }
+  }  
+  
+  elogit = function(proportion=proportion, observations=observations, constant=constant) {
+    return(log((proportion * observations + constant)/((1 - proportion) * 
+                                                         observations + constant)))
   }
-  else if (NoIA == 1) {
-    data %>%
-      mutate(., IA_0_ELogit = log((IA_0_C + Constant) / (SamplesPerBin - IA_0_C + Constant)),
-             IA_1_ELogit = log((IA_1_C + Constant) / (SamplesPerBin - IA_1_C + Constant)),
-             IA_0_wts = 1/(IA_0_C + Constant) + 1/(SamplesPerBin - IA_0_C + Constant),
-             IA_1_wts = 1/(IA_1_C + Constant) + 1/(SamplesPerBin - IA_1_C + Constant))
+  
+  weight = function(proportion=proportion, observations=observations, constant=constant) {
+    return((1/(proportion * observations + constant)) + (1/((1 - proportion) * observations + constant)))
   }
-  else if (NoIA == 2) {
-    data %>%
-      mutate(., IA_0_ELogit = log((IA_0_C + Constant) / (SamplesPerBin - IA_0_C + Constant)),
-             IA_1_ELogit = log((IA_1_C + Constant) / (SamplesPerBin - IA_1_C + Constant)),
-             IA_2_ELogit = log((IA_2_C + Constant) / (SamplesPerBin - IA_2_C + Constant)),
-             IA_0_wts = 1/(IA_0_C + Constant) + 1/(SamplesPerBin - IA_0_C + Constant),
-             IA_1_wts = 1/(IA_1_C + Constant) + 1/(SamplesPerBin - IA_1_C + Constant),
-             IA_2_wts = 1/(IA_2_C + Constant) + 1/(SamplesPerBin - IA_2_C + Constant))
+  
+
+  if (NoIA >= 1) {
+    data <- data %>% ungroup() %>% 
+      mutate_(IA_0_ELogit = interp(~ elogit(proportion=IA_0_P, observations=Obs, constant=Constant), IA_0_P = as.name("IA_0_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_0_wts = interp(~ weight(proportion=IA_0_P, observations=Obs, constant=Constant), IA_0_P = as.name("IA_0_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_1_ELogit = interp(~ elogit(proportion=IA_1_P, observations=Obs, constant=Constant), IA_1_P = as.name("IA_1_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_1_wts = interp(~ weight(proportion=IA_1_P, observations=Obs, constant=Constant), IA_1_P = as.name("IA_1_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      )
   }
-  else if (NoIA == 3) {
-    data %>%
-      mutate(., IA_0_ELogit = log((IA_0_C + Constant) / (SamplesPerBin - IA_0_C + Constant)),
-             IA_1_ELogit = log((IA_1_C + Constant) / (SamplesPerBin - IA_1_C + Constant)),
-             IA_2_ELogit = log((IA_2_C + Constant) / (SamplesPerBin - IA_2_C + Constant)),
-             IA_3_ELogit = log((IA_3_C + Constant) / (SamplesPerBin - IA_3_C + Constant)),
-             IA_0_wts = 1/(IA_0_C + Constant) + 1/(SamplesPerBin - IA_0_C + Constant),
-             IA_1_wts = 1/(IA_1_C + Constant) + 1/(SamplesPerBin - IA_1_C + Constant),
-             IA_2_wts = 1/(IA_2_C + Constant) + 1/(SamplesPerBin - IA_2_C + Constant),
-             IA_3_wts = 1/(IA_3_C + Constant) + 1/(SamplesPerBin - IA_3_C + Constant))
+  if (NoIA >= 2) {
+    data <- data %>%
+      mutate_(IA_2_ELogit = interp(~ elogit(proportion=IA_2_P, observations=Obs, constant=Constant), IA_2_P = as.name("IA_2_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_2_wts = interp(~ weight(proportion=IA_2_P, observations=Obs, constant=Constant), IA_2_P = as.name("IA_2_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      )
   }
-  else if (NoIA == 4) {
-    data %>%
-      mutate(., IA_0_ELogit = log((IA_0_C + Constant) / (SamplesPerBin - IA_0_C + Constant)),
-             IA_1_ELogit = log((IA_1_C + Constant) / (SamplesPerBin - IA_1_C + Constant)),
-             IA_2_ELogit = log((IA_2_C + Constant) / (SamplesPerBin - IA_2_C + Constant)),
-             IA_3_ELogit = log((IA_3_C + Constant) / (SamplesPerBin - IA_3_C + Constant)),
-             IA_4_ELogit = log((IA_4_C + Constant) / (SamplesPerBin - IA_4_C + Constant)),
-             IA_0_wts = 1/(IA_0_C + Constant) + 1/(SamplesPerBin - IA_0_C + Constant),
-             IA_1_wts = 1/(IA_1_C + Constant) + 1/(SamplesPerBin - IA_1_C + Constant),
-             IA_2_wts = 1/(IA_2_C + Constant) + 1/(SamplesPerBin - IA_2_C + Constant),
-             IA_3_wts = 1/(IA_3_C + Constant) + 1/(SamplesPerBin - IA_3_C + Constant),
-             IA_4_wts = 1/(IA_4_C + Constant) + 1/(SamplesPerBin - IA_4_C + Constant))
+  if (NoIA >= 3) {
+    data <- data %>%
+      mutate_(IA_3_ELogit = interp(~ elogit(proportion=IA_3_P, observations=Obs, constant=Constant), IA_3_P = as.name("IA_3_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_3_wts = interp(~ weight(proportion=IA_3_P, observations=Obs, constant=Constant), IA_3_P = as.name("IA_3_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      )
   }
-  else if (NoIA == 5) {
-    data %>%
-      mutate(., IA_0_ELogit = log((IA_0_C + Constant) / (SamplesPerBin - IA_0_C + Constant)),
-             IA_1_ELogit = log((IA_1_C + Constant) / (SamplesPerBin - IA_1_C + Constant)),
-             IA_2_ELogit = log((IA_2_C + Constant) / (SamplesPerBin - IA_2_C + Constant)),
-             IA_3_ELogit = log((IA_3_C + Constant) / (SamplesPerBin - IA_3_C + Constant)),
-             IA_4_ELogit = log((IA_4_C + Constant) / (SamplesPerBin - IA_4_C + Constant)),
-             IA_5_ELogit = log((IA_5_C + Constant) / (SamplesPerBin - IA_5_C + Constant)),
-             IA_0_wts = 1/(IA_0_C + Constant) + 1/(SamplesPerBin - IA_0_C + Constant),
-             IA_1_wts = 1/(IA_1_C + Constant) + 1/(SamplesPerBin - IA_1_C + Constant),
-             IA_2_wts = 1/(IA_2_C + Constant) + 1/(SamplesPerBin - IA_2_C + Constant),
-             IA_3_wts = 1/(IA_3_C + Constant) + 1/(SamplesPerBin - IA_3_C + Constant),
-             IA_4_wts = 1/(IA_4_C + Constant) + 1/(SamplesPerBin - IA_4_C + Constant),
-             IA_5_wts = 1/(IA_5_C + Constant) + 1/(SamplesPerBin - IA_5_C + Constant))
+  if (NoIA >= 4) {
+    data <- data %>%
+      mutate_(IA_4_ELogit = interp(~ elogit(proportion=IA_4_P, observations=Obs, constant=Constant), IA_4_P = as.name("IA_4_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_4_wts = interp(~ weight(proportion=IA_4_P, observations=Obs, constant=Constant), IA_4_P = as.name("IA_4_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      )
   }
-  else if (NoIA == 6) {
-    data %>%
-      mutate(., IA_0_ELogit = log((IA_0_C + Constant) / (SamplesPerBin - IA_0_C + Constant)),
-             IA_1_ELogit = log((IA_1_C + Constant) / (SamplesPerBin - IA_1_C + Constant)),
-             IA_2_ELogit = log((IA_2_C + Constant) / (SamplesPerBin - IA_2_C + Constant)),
-             IA_3_ELogit = log((IA_3_C + Constant) / (SamplesPerBin - IA_3_C + Constant)),
-             IA_4_ELogit = log((IA_4_C + Constant) / (SamplesPerBin - IA_4_C + Constant)),
-             IA_5_ELogit = log((IA_5_C + Constant) / (SamplesPerBin - IA_5_C + Constant)),
-             IA_6_ELogit = log((IA_6_C + Constant) / (SamplesPerBin - IA_6_C + Constant)),
-             IA_0_wts = 1/(IA_0_C + Constant) + 1/(SamplesPerBin - IA_0_C + Constant),
-             IA_1_wts = 1/(IA_1_C + Constant) + 1/(SamplesPerBin - IA_1_C + Constant),
-             IA_2_wts = 1/(IA_2_C + Constant) + 1/(SamplesPerBin - IA_2_C + Constant),
-             IA_3_wts = 1/(IA_3_C + Constant) + 1/(SamplesPerBin - IA_3_C + Constant),
-             IA_4_wts = 1/(IA_4_C + Constant) + 1/(SamplesPerBin - IA_4_C + Constant),
-             IA_5_wts = 1/(IA_5_C + Constant) + 1/(SamplesPerBin - IA_5_C + Constant),
-             IA_6_wts = 1/(IA_6_C + Constant) + 1/(SamplesPerBin - IA_6_C + Constant))
+  if (NoIA >= 5) {
+    data <- data %>%
+      mutate_(IA_5_ELogit = interp(~ elogit(proportion=IA_5_P, observations=Obs, constant=Constant), IA_5_P = as.name("IA_5_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_5_wts = interp(~ weight(proportion=IA_5_P, observations=Obs, constant=Constant), IA_5_P = as.name("IA_5_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      )
   }
-  else if (NoIA == 7) {
-    data %>%
-      mutate(., IA_0_ELogit = log((IA_0_C + Constant) / (SamplesPerBin - IA_0_C + Constant)),
-             IA_1_ELogit = log((IA_1_C + Constant) / (SamplesPerBin - IA_1_C + Constant)),
-             IA_2_ELogit = log((IA_2_C + Constant) / (SamplesPerBin - IA_2_C + Constant)),
-             IA_3_ELogit = log((IA_3_C + Constant) / (SamplesPerBin - IA_3_C + Constant)),
-             IA_4_ELogit = log((IA_4_C + Constant) / (SamplesPerBin - IA_4_C + Constant)),
-             IA_5_ELogit = log((IA_5_C + Constant) / (SamplesPerBin - IA_5_C + Constant)),
-             IA_6_ELogit = log((IA_6_C + Constant) / (SamplesPerBin - IA_6_C + Constant)),
-             IA_7_ELogit = log((IA_7_C + Constant) / (SamplesPerBin - IA_7_C + Constant)),
-             IA_0_wts = 1/(IA_0_C + Constant) + 1/(SamplesPerBin - IA_0_C + Constant),
-             IA_1_wts = 1/(IA_1_C + Constant) + 1/(SamplesPerBin - IA_1_C + Constant),
-             IA_2_wts = 1/(IA_2_C + Constant) + 1/(SamplesPerBin - IA_2_C + Constant),
-             IA_3_wts = 1/(IA_3_C + Constant) + 1/(SamplesPerBin - IA_3_C + Constant),
-             IA_4_wts = 1/(IA_4_C + Constant) + 1/(SamplesPerBin - IA_4_C + Constant),
-             IA_5_wts = 1/(IA_5_C + Constant) + 1/(SamplesPerBin - IA_5_C + Constant),
-             IA_6_wts = 1/(IA_6_C + Constant) + 1/(SamplesPerBin - IA_6_C + Constant),
-             IA_7_wts = 1/(IA_7_C + Constant) + 1/(SamplesPerBin - IA_7_C + Constant))
+  if (NoIA >= 6) {
+    data <- data %>%
+      mutate_(IA_6_ELogit = interp(~ elogit(proportion=IA_6_P, observations=Obs, constant=Constant), IA_6_P = as.name("IA_6_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_6_wts = interp(~ weight(proportion=IA_6_P, observations=Obs, constant=Constant), IA_6_P = as.name("IA_6_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      )
   }
-  else if (NoIA == 8) {
-    data %>%
-      mutate(., IA_0_ELogit = log((IA_0_C + Constant) / (SamplesPerBin - IA_0_C + Constant)),
-             IA_1_ELogit = log((IA_1_C + Constant) / (SamplesPerBin - IA_1_C + Constant)),
-             IA_2_ELogit = log((IA_2_C + Constant) / (SamplesPerBin - IA_2_C + Constant)),
-             IA_3_ELogit = log((IA_3_C + Constant) / (SamplesPerBin - IA_3_C + Constant)),
-             IA_4_ELogit = log((IA_4_C + Constant) / (SamplesPerBin - IA_4_C + Constant)),
-             IA_5_ELogit = log((IA_5_C + Constant) / (SamplesPerBin - IA_5_C + Constant)),
-             IA_6_ELogit = log((IA_6_C + Constant) / (SamplesPerBin - IA_6_C + Constant)),
-             IA_7_ELogit = log((IA_7_C + Constant) / (SamplesPerBin - IA_7_C + Constant)),
-             IA_8_ELogit = log((IA_8_C + Constant) / (SamplesPerBin - IA_8_C + Constant)),
-             IA_0_wts = 1/(IA_0_C + Constant) + 1/(SamplesPerBin - IA_0_C + Constant),
-             IA_1_wts = 1/(IA_1_C + Constant) + 1/(SamplesPerBin - IA_1_C + Constant),
-             IA_2_wts = 1/(IA_2_C + Constant) + 1/(SamplesPerBin - IA_2_C + Constant),
-             IA_3_wts = 1/(IA_3_C + Constant) + 1/(SamplesPerBin - IA_3_C + Constant),
-             IA_4_wts = 1/(IA_4_C + Constant) + 1/(SamplesPerBin - IA_4_C + Constant),
-             IA_5_wts = 1/(IA_5_C + Constant) + 1/(SamplesPerBin - IA_5_C + Constant),
-             IA_6_wts = 1/(IA_6_C + Constant) + 1/(SamplesPerBin - IA_6_C + Constant),
-             IA_7_wts = 1/(IA_7_C + Constant) + 1/(SamplesPerBin - IA_7_C + Constant),
-             IA_8_wts = 1/(IA_8_C + Constant) + 1/(SamplesPerBin - IA_8_C + Constant))
+  if (NoIA >= 7) {
+    data <- data %>%
+      mutate_(IA_7_ELogit = interp(~ elogit(proportion=IA_7_P, observations=Obs, constant=Constant), IA_7_P = as.name("IA_7_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_7_wts = interp(~ weight(proportion=IA_7_P, observations=Obs, constant=Constant), IA_7_P = as.name("IA_7_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      )
   }
+  if (NoIA == 8) {
+    data <- data %>%
+      mutate_(IA_8_ELogit = interp(~ elogit(proportion=IA_8_P, observations=Obs, constant=Constant), IA_8_P = as.name("IA_8_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
+              IA_8_wts = interp(~ weight(proportion=IA_8_P, observations=Obs, constant=Constant), IA_8_P = as.name("IA_8_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      )
+  }
+  return(ungroup(data))
 }
 
 
@@ -350,196 +311,104 @@ transform_to_elogit <- function(data = data, NoIA = NoIA, SamplesPerBin = Sample
 #' \code{\link{transform_to_elogit}}.
 #' @param NoIA A positive integer indicating the number of interest areas defined 
 #' when creating the study. 
+#' @param ObsPerBin A positive integer indicating the number of observations to
+#' use in the calculation. Typically, this will be the number of samples per 
+#' bin, which can be determined with \code{\link{check_samples_per_bin}}.
+#' @param ObsOverride A logical value controlling restrictions on the value
+#' provided to ObsPerBin. Default value is FALSE.
 #' @return A data table with additional columns (the number of which depends on 
 #' the number of interest areas specified) added to \code{data}.
 #' @examples
 #' \dontrun{
 #' library(VWPre)
 #' # Create binomial (success/failure) column...
-#' df <- create_binomial(data = dat, NoIA = 4)
+#' df <- create_binomial(data = dat, NoIA = 4, ObsPerBin = 20)
 #' }
-create_binomial <- function(data = data, NoIA = NoIA) {
+create_binomial <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
+                            ObsOverride = FALSE) {
   
   data <- data %>% ungroup()
   
-  if (NoIA > 8) {
-    stop("You have too many interest areas. You must modify the function.")
-  }
-  else if (NoIA == 1) {
-    tmp <- data %>% 
-      group_by(Event) %>%
-      do(
-        mutate(., IA_0_off = IA_1_C,
-               IA_1_off = IA_0_C)
-      ) 
-    
-    tmp$IA_0_Looks = cbind(tmp$IA_0_C, tmp$IA_0_off)
-    tmp$IA_1_Looks = cbind(tmp$IA_1_C, tmp$IA_1_off)
-    
-    tmp <- select(tmp, -IA_0_off, -IA_1_off)
-    return(tmp)
+  if (NoIA == 0) {
+    stop("You must have at least one interest area!")
+  } else if (NoIA > 8) {
+    stop("You have more than 8 interest areas; you must modify this function.")
+  } 
+  
+  
+  if (ObsPerBin == max(data$NSamples)) {
+    message(
+      "Number of Observations equal to Number of Samples. \n Counts will remain as present in the data."
+    )
+    data$Obs <- data$NSamples
+  } else if (ObsPerBin == (data$Time[2] - data$Time[1])) {
+    if (ObsPerBin %% 2 == 1 | ObsPerBin > max(data$NSamples)) {
+      if (ObsOverride == FALSE) {
+        stop("It is not advisable have an odd Number of Observations (induces artifacts in the scaling); \n nor is it advisable to have a Number of Observations greater than the Number of Samples present in the data. \n This error can be overridden with the parameter ObsOverride, though, do so with caution.")
+      } else {
+        message(
+          "Number of Observations has been user-defined. \n Counts will be scaled to time in milliseconds using the proportion columns."
+        )
+        data$Obs <- ObsPerBin
+      }
+    } else {
+      message(
+        "Number of Observations has been user-defined. \n Counts will be scaled to time in milliseconds using the proportion columns."
+      )
+      data$Obs <- ObsPerBin
+    }
+  } else {
+    if (ObsPerBin %% 2 == 1 | ObsPerBin > max(data$NSamples)) {
+      if (ObsOverride == FALSE) {
+        stop("It is not advisable have an odd Number of Observations (induces artifacts in the scaling); \n nor is it advisable to have a Number of Observations greater than the Number of Samples present in the data. \n This error can be overridden with the parameter ObsOverride, though, do so with caution.")
+      } else {
+        message(
+          "Number of Observations has been user-defined. \n Counts will be scaled to the user-defined value using the proportion columns."
+        )
+        data$Obs <- ObsPerBin
+      }
+    } else {
+      message(
+        "Number of Observations has been user-defined. \n Counts will be scaled to the user-defined value using the proportion columns."
+      )
+      data$Obs <- ObsPerBin
+    }
   }
   
-  else if (NoIA == 2) {
-    tmp <- data %>% 
-      group_by(Event) %>%
-      do(
-        mutate(., IA_0_off = IA_1_C + IA_2_C,
-               IA_1_off = IA_0_C + IA_2_C ,
-               IA_2_off = IA_1_C + IA_0_C)
-      ) 
-    
-    tmp$IA_0_Looks = cbind(tmp$IA_0_C, tmp$IA_0_off)
-    tmp$IA_1_Looks = cbind(tmp$IA_1_C, tmp$IA_1_off)
-    tmp$IA_2_Looks = cbind(tmp$IA_2_C, tmp$IA_2_off)
-    
-    tmp <- select(tmp, -IA_0_off, -IA_1_off, -IA_2_off)
-    return(tmp)
+  
+  if (NoIA >= 1) {
+    tmp <- data  
+    tmp$IA_0_Looks = cbind(as.integer(round(tmp$IA_0_P*tmp$Obs)), as.integer(round((1-tmp$IA_0_P)*tmp$Obs)))
+    tmp$IA_1_Looks = cbind(as.integer(round(tmp$IA_1_P*tmp$Obs)), as.integer(round((1-tmp$IA_1_P)*tmp$Obs)))
   }
   
-  else if (NoIA == 3) {
-    tmp <- data %>% 
-      group_by(Event) %>%
-      do(
-        mutate(., IA_0_off = IA_1_C + IA_2_C + IA_3_C,
-               IA_1_off = IA_0_C + IA_2_C + IA_3_C,
-               IA_2_off = IA_1_C + IA_0_C + IA_3_C,
-               IA_3_off = IA_1_C + IA_2_C + IA_0_C)
-      ) 
-    
-    tmp$IA_0_Looks = cbind(tmp$IA_0_C, tmp$IA_0_off)
-    tmp$IA_1_Looks = cbind(tmp$IA_1_C, tmp$IA_1_off)
-    tmp$IA_2_Looks = cbind(tmp$IA_2_C, tmp$IA_2_off)
-    tmp$IA_3_Looks = cbind(tmp$IA_3_C, tmp$IA_3_off)
-    
-    tmp <- select(tmp, -IA_0_off, -IA_1_off, -IA_2_off, -IA_3_off)
-    return(tmp)
+  if (NoIA >= 2) {
+    tmp$IA_2_Looks = cbind(as.integer(round(tmp$IA_2_P*tmp$Obs)), as.integer(round((1-tmp$IA_2_P)*tmp$Obs)))
   }
   
-  else if (NoIA == 4) {
-    tmp <- data %>% 
-      group_by(Event) %>%
-      do(
-        mutate(., IA_0_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C,
-               IA_1_off = IA_0_C + IA_2_C + IA_3_C + IA_4_C,
-               IA_2_off = IA_1_C + IA_0_C + IA_3_C + IA_4_C,
-               IA_3_off = IA_1_C + IA_2_C + IA_0_C + IA_4_C,
-               IA_4_off = IA_1_C + IA_2_C + IA_3_C + IA_0_C)
-      ) 
-    
-    tmp$IA_0_Looks = cbind(tmp$IA_0_C, tmp$IA_0_off)
-    tmp$IA_1_Looks = cbind(tmp$IA_1_C, tmp$IA_1_off)
-    tmp$IA_2_Looks = cbind(tmp$IA_2_C, tmp$IA_2_off)
-    tmp$IA_3_Looks = cbind(tmp$IA_3_C, tmp$IA_3_off)
-    tmp$IA_4_Looks = cbind(tmp$IA_4_C, tmp$IA_4_off)
-    
-    tmp <- select(tmp, -IA_0_off, -IA_1_off, -IA_2_off, -IA_3_off, -IA_4_off)
-    return(tmp)
+  if (NoIA >= 3) {
+    tmp$IA_3_Looks = cbind(as.integer(round(tmp$IA_3_P*tmp$Obs)), as.integer(round((1-tmp$IA_3_P)*tmp$Obs)))
   }
   
-  else if (NoIA == 5) {
-    tmp <- data %>% 
-      group_by(Event) %>%
-      do(
-        mutate(., IA_0_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C,
-               IA_1_off = IA_0_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C,
-               IA_2_off = IA_1_C + IA_0_C + IA_3_C + IA_4_C + IA_5_C,
-               IA_3_off = IA_1_C + IA_2_C + IA_0_C + IA_4_C + IA_5_C,
-               IA_4_off = IA_1_C + IA_2_C + IA_3_C + IA_0_C + IA_5_C,
-               IA_5_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_0_C)
-      ) 
-    
-    tmp$IA_0_Looks = cbind(tmp$IA_0_C, tmp$IA_0_off)
-    tmp$IA_1_Looks = cbind(tmp$IA_1_C, tmp$IA_1_off)
-    tmp$IA_2_Looks = cbind(tmp$IA_2_C, tmp$IA_2_off)
-    tmp$IA_3_Looks = cbind(tmp$IA_3_C, tmp$IA_3_off)
-    tmp$IA_4_Looks = cbind(tmp$IA_4_C, tmp$IA_4_off)
-    tmp$IA_5_Looks = cbind(tmp$IA_5_C, tmp$IA_5_off)
-    
-    tmp <- select(tmp, -IA_0_off, -IA_1_off, -IA_2_off, -IA_3_off, -IA_4_off, -IA_5_off)
-    return(tmp)
+  if (NoIA >= 4) {
+    tmp$IA_4_Looks = cbind(as.integer(round(tmp$IA_4_P*tmp$Obs)), as.integer(round((1-tmp$IA_4_P)*tmp$Obs)))
   }
   
-  else if (NoIA == 6) {
-    tmp <- data %>% 
-      group_by(Event) %>%
-      do(
-        mutate(., IA_0_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C + IA_6_C,
-               IA_1_off = IA_0_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C + IA_6_C,
-               IA_2_off = IA_1_C + IA_0_C + IA_3_C + IA_4_C + IA_5_C + IA_6_C,
-               IA_3_off = IA_1_C + IA_2_C + IA_0_C + IA_4_C + IA_5_C + IA_6_C,
-               IA_4_off = IA_1_C + IA_2_C + IA_3_C + IA_0_C + IA_5_C + IA_6_C,
-               IA_5_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_0_C + IA_6_C,
-               IA_6_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C + IA_0_C)
-      ) 
-    
-    tmp$IA_0_Looks = cbind(tmp$IA_0_C, tmp$IA_0_off)
-    tmp$IA_1_Looks = cbind(tmp$IA_1_C, tmp$IA_1_off)
-    tmp$IA_2_Looks = cbind(tmp$IA_2_C, tmp$IA_2_off)
-    tmp$IA_3_Looks = cbind(tmp$IA_3_C, tmp$IA_3_off)
-    tmp$IA_4_Looks = cbind(tmp$IA_4_C, tmp$IA_4_off)
-    tmp$IA_5_Looks = cbind(tmp$IA_5_C, tmp$IA_5_off)
-    tmp$IA_6_Looks = cbind(tmp$IA_6_C, tmp$IA_6_off)
-    
-    tmp <- select(tmp, -IA_0_off, -IA_1_off, -IA_2_off, -IA_3_off, -IA_4_off, -IA_5_off, -IA_6_off)
-    return(tmp)
+  if (NoIA >= 5) {
+    tmp$IA_5_Looks = cbind(as.integer(round(tmp$IA_5_P*tmp$Obs)), as.integer(round((1-tmp$IA_5_P)*tmp$Obs)))
   }
   
-  else if (NoIA == 7) {
-    tmp <- data %>% 
-      group_by(Event) %>%
-      do(
-        mutate(., IA_0_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C + IA_6_C + IA_7_C,
-               IA_1_off = IA_0_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C + IA_6_C + IA_7_C,
-               IA_2_off = IA_1_C + IA_0_C + IA_3_C + IA_4_C + IA_5_C + IA_6_C + IA_7_C,
-               IA_3_off = IA_1_C + IA_2_C + IA_0_C + IA_4_C + IA_5_C + IA_6_C + IA_7_C,
-               IA_4_off = IA_1_C + IA_2_C + IA_3_C + IA_0_C + IA_5_C + IA_6_C + IA_7_C,
-               IA_5_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_0_C + IA_6_C + IA_7_C,
-               IA_6_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C + IA_0_C + IA_7_C,
-               IA_7_off = IA_1_C + IA_2_C + IA_3_C + IA_4_C + IA_5_C + IA_6_C + IA_0_C)
-      ) 
-    
-    tmp$IA_0_Looks = cbind(tmp$IA_0_C, tmp$IA_0_off)
-    tmp$IA_1_Looks = cbind(tmp$IA_1_C, tmp$IA_1_off)
-    tmp$IA_2_Looks = cbind(tmp$IA_2_C, tmp$IA_2_off)
-    tmp$IA_3_Looks = cbind(tmp$IA_3_C, tmp$IA_3_off)
-    tmp$IA_4_Looks = cbind(tmp$IA_4_C, tmp$IA_4_off)
-    tmp$IA_5_Looks = cbind(tmp$IA_5_C, tmp$IA_5_off)
-    tmp$IA_6_Looks = cbind(tmp$IA_6_C, tmp$IA_6_off)
-    tmp$IA_7_Looks = cbind(tmp$IA_7_C, tmp$IA_7_off)
-    
-    tmp <- select(tmp, -IA_0_off, -IA_1_off, -IA_2_off, -IA_3_off, -IA_4_off, -IA_5_off, -IA_6_off, -IA_7_off)
-    return(tmp)
+  if (NoIA >= 6) {
+    tmp$IA_6_Looks = cbind(as.integer(round(tmp$IA_6_P*tmp$Obs)), as.integer(round((1-tmp$IA_6_P)*tmp$Obs)))
   }
   
-  else if (NoIA == 8) {
-    tmp <- data %>% 
-      group_by(Event) %>%
-      do(
-        mutate(., IA_0_off = IA_1_C  +  IA_2_C  +  IA_3_C  +  IA_4_C  +  IA_5_C  +  IA_6_C  +  IA_7_C  +  IA_8_C,
-               IA_1_off = IA_0_C  +  IA_2_C  +  IA_3_C  +  IA_4_C  +  IA_5_C  +  IA_6_C  +  IA_7_C  +  IA_8_C,
-               IA_2_off = IA_1_C  +  IA_0_C  +  IA_3_C  +  IA_4_C  +  IA_5_C  +  IA_6_C  +  IA_7_C  +  IA_8_C,
-               IA_3_off = IA_1_C  +  IA_2_C  +  IA_0_C  +  IA_4_C  +  IA_5_C  +  IA_6_C  +  IA_7_C  +  IA_8_C,
-               IA_4_off = IA_1_C  +  IA_2_C  +  IA_3_C  +  IA_0_C  +  IA_5_C  +  IA_6_C  +  IA_7_C  +  IA_8_C,
-               IA_5_off = IA_1_C  +  IA_2_C  +  IA_3_C  +  IA_4_C  +  IA_0_C  +  IA_6_C  +  IA_7_C  +  IA_8_C,
-               IA_6_off = IA_1_C  +  IA_2_C  +  IA_3_C  +  IA_4_C  +  IA_5_C  +  IA_0_C  +  IA_7_C  +  IA_8_C,
-               IA_7_off = IA_1_C  +  IA_2_C  +  IA_3_C  +  IA_4_C  +  IA_5_C  +  IA_6_C  +  IA_0_C  +  IA_8_C,
-               IA_8_off = IA_1_C  +  IA_2_C  +  IA_3_C  +  IA_4_C  +  IA_5_C  +  IA_6_C  +  IA_7_C  +  IA_0_C)
-      ) 
-    
-    tmp$IA_0_Looks = cbind(tmp$IA_0_C, tmp$IA_0_off)
-    tmp$IA_1_Looks = cbind(tmp$IA_1_C, tmp$IA_1_off)
-    tmp$IA_2_Looks = cbind(tmp$IA_2_C, tmp$IA_2_off)
-    tmp$IA_3_Looks = cbind(tmp$IA_3_C, tmp$IA_3_off)
-    tmp$IA_4_Looks = cbind(tmp$IA_4_C, tmp$IA_4_off)
-    tmp$IA_5_Looks = cbind(tmp$IA_5_C, tmp$IA_5_off)
-    tmp$IA_6_Looks = cbind(tmp$IA_6_C, tmp$IA_6_off)
-    tmp$IA_7_Looks = cbind(tmp$IA_7_C, tmp$IA_7_off)
-    tmp$IA_8_Looks = cbind(tmp$IA_8_C, tmp$IA_8_off)
-    
-    tmp <- select(tmp, -IA_0_off, -IA_1_off, -IA_2_off, -IA_3_off, -IA_4_off, -IA_5_off, -IA_6_off, -IA_7_off, -IA_8_off)
-    return(tmp)
+  if (NoIA >= 7) {
+    tmp$IA_7_Looks = cbind(as.integer(round(tmp$IA_7_P*tmp$Obs)), as.integer(round((1-tmp$IA_7_P)*tmp$Obs)))
   }
   
+  if (NoIA == 8) {
+    tmp$IA_8_Looks = cbind(as.integer(round(tmp$IA_8_P*tmp$Obs)), as.integer(round((1-tmp$IA_8_P)*tmp$Obs)))
+  }
+  
+  return(tmp)
 }
-

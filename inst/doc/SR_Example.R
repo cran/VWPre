@@ -31,6 +31,16 @@ dat0 <- prep_data(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "ite
 dat1 <- relabel_na(data = dat0, NoIA = 4)
 
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
+check_ia(data = dat1)
+
+## ---- eval= FALSE, echo=TRUE, results='asis'-----------------------------
+#  dat1a <- recode_ia(data=dat1, IDs=c("0"="0", "11"="1", "234"="2", "345"="3",
+#                                           "456"="4"),
+#                          Labels=c(Outside="Outside", Targ="Target",
+#                                   Comp="Competitor", Dist1="Distractor1",
+#                                   Dist2="Distractor2"))
+
+## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
 dat2 <- create_time_series(data = dat1, Offset = 100)
 
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
@@ -57,17 +67,20 @@ check_samplingrate(dat4)
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
 check_samples_per_bin(dat4)
 
-## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
-dat5 <- transform_to_elogit(dat4, NoIA = 4, SamplesPerBin = 20)
+## ---- eval=FALSE, echo=TRUE, results='asis'------------------------------
+#  plot_transformation_app()
 
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
-dat5a <- create_binomial(data = dat4, NoIA = 4)
+dat5 <- transform_to_elogit(dat4, NoIA = 4, ObsPerBin = 20)
+
+## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
+dat5a <- create_binomial(data = dat4, NoIA = 4, ObsPerBin = 20)
 
 ## ---- eval = TRUE, echo=TRUE, results='asis'-----------------------------
 dat5b <- fasttrack(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
 	EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Offset = 100, Recording = "LandR", 
   WhenLandR = "Right", BinSize = 20, SamplingRate = 1000,
-  SamplesPerBin = 20, Constant = 0.5, Output = "ELogit")
+  ObsPerBin = 20, Constant = 0.5, Output = "ELogit")
 
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
 dat6 <- rename_columns(dat5, Labels = c(IA1="Target", IA2="Rhyme", 

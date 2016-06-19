@@ -1,3 +1,42 @@
+# -----------------------------------------------
+
+# VWPre 0.7.0
+
+## Major changes:
+
+### New functions
+
+* check_ia: Allows users to check the interest area labels and interest area IDs present in the data. (Thanks to Athanassios Protopapas for pointing this out.)
+* recode_ia: Allows users to recode the interest area labels and/or interest area IDs to conform with the scheme necessary for preprocessing.
+* plot_tranformation_app: Shiny app that allows users to visualize the effect of number of observations on the empirical logit transformation.
+
+### Changes to functions
+
+* bin_prop: Internal reorganization/streamlining of code. Now also outputs an additional column for the number of samples in each bin (now utilized by other functions) and prints a summary of bins containing fewer than expected samples (typically the last time bin). 
+* transform_to_elogit: The underlying calculation has been modified to allow greater flexibility. Because the number of observations used in the calculation influences the values produced by the transformation, users can now specify how many observations on which to base the calculation. The function prints notification regarding this. To accommodate this, the parameter SamplesPerBin has been replaced with ObsPerBin (Thanks to Anne Pier Salverda for discussion on this). 
+* create_binomial: Similar to transform_to_elogit, the function now allows users to scale the number of observations in each bin for creating the successes/failures column (e.g., IA_1_Looks). This scaling operates on proportions rather than counts. The function prints notifications regarding this. To accommodate this, the parameter ObsPerBin has been added.  
+
+## Minor changes:
+
+### SR_Example Vignette
+
+* The text of the vignette now indicates that the interest area IDs must be coded with numbers 1-8 (as the preprocessing functions rely on this scheme). The vignette also now includes the new functions (e.g., for recoding interest area IDs, etc). The text also reflects the other changes to the package functions.
+
+### Changes to functions 
+
+* Functions now use message() rather than print() to output information to the user.
+* plot_var_app: Quit button added. 
+* plot_indiv_app: Quit button added. Window layout adjusted.
+* check_samples_per_bin: Internal reorganization/streamlining of code. Returns same information.
+
+## Bug fixes:
+
+* fasttrack: Corrected NoIA parameter input to transform_to_elogit and create_binomial.  Has been updated to reflect changes in the component functions.
+
+
+
+# -----------------------------------------------
+
 # VWPre 0.5.0
 
 ## Major changes:

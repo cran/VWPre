@@ -13,6 +13,9 @@ rename_columns(data = data, Labels = Labels)
 \item{Labels}{A named character vector specifying the interest areas and the
 desired names to be inserted in place of the numerical labelling.}
 }
+\value{
+A data table object with renamed columns.
+}
 \description{
 \code{rename_columns} will replace the default numerical coding of the 
 interest area columns with more meaningful user-specified names. For example,

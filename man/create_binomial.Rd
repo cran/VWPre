@@ -4,7 +4,8 @@
 \alias{create_binomial}
 \title{Creates a success/failure column for each IA based on counts.}
 \usage{
-create_binomial(data = data, NoIA = NoIA)
+create_binomial(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
+  ObsOverride = FALSE)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}} or
@@ -12,6 +13,13 @@ create_binomial(data = data, NoIA = NoIA)
 
 \item{NoIA}{A positive integer indicating the number of interest areas defined 
 when creating the study.}
+
+\item{ObsPerBin}{A positive integer indicating the number of observations to
+use in the calculation. Typically, this will be the number of samples per 
+bin, which can be determined with \code{\link{check_samples_per_bin}}.}
+
+\item{ObsOverride}{A logical value controlling restrictions on the value
+provided to ObsPerBin. Default value is FALSE.}
 }
 \value{
 A data table with additional columns (the number of which depends on 
@@ -26,7 +34,7 @@ N.B.: This function will work for data with a maximum of 8 interest areas.
 \dontrun{
 library(VWPre)
 # Create binomial (success/failure) column...
-df <- create_binomial(data = dat, NoIA = 4)
+df <- create_binomial(data = dat, NoIA = 4, ObsPerBin = 20)
 }
 }
 

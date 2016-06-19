@@ -105,6 +105,27 @@ The number of interest areas you defined in your experiment should be supplied t
 dat1 <- relabel_na(data = dat0, NoIA = 4)
 ```
 
+Notice that the output informs us that the number of levels `LEFT_INTEREST_AREA_LABEL` does not match the number of interest areas listed in `NoIA`.
+This is because we only have data from the right eye (hence, all samples in `LEFT_INTEREST_AREA_LABEL` are listed as "Outside").
+
+### Check interest area coding
+
+Because the subsequent preprocessing assumes that the interest area IDs are coded between 0 and 8, it's important to check that the IDs present in the data set, conform to this. The `check_ia` functions does just this and indicates how those IDs are mapped to the interest area labels.
+
+```{r, eval= TRUE, echo=TRUE, results='asis'}
+check_ia(data = dat1)
+```
+
+If the IDs do not conform, or if you'd like to change the labels, you can recode these using the `recode_ia` function. New IDs and/or labels can be specified using a named character vector.  If using the sample data set included in this package, it is not necessary to do this step, as the IDs and labels are already in the appropriate format. The following code serves as an example. Note that if your interest area labels contain spaces you must also put the old names in quotes.
+
+```{r, eval= FALSE, echo=TRUE, results='asis'}
+dat1a <- recode_ia(data=dat1, IDs=c("0"="0", "11"="1", "234"="2", "345"="3",
+                                         "456"="4"), 
+                        Labels=c(Outside="Outside", Targ="Target", 
+                                 Comp="Competitor", Dist1="Distractor1",
+                                 Dist2="Distractor2"))
+```
+
 ## Creating a meaningful time series
 
 The function `create_time_series` creates a meaningful time series which can be used for visualizing and modeling the data.
@@ -139,13 +160,14 @@ It takes one of four possible strings: "LandR", "LorR", "L", or "R".
 
 If in doubt, use the function `check_eye_recording` which will do a quick check to see if `LEFT_INTEREST_AREA_ID` and `RIGHT_INTEREST_AREA_ID` contain data. It will then suggest the appropriate Recording parameter setting.
 When in complete doubt, use "LandR".
-The "LandR" setting requires an additional parameter (`WhenLandR`) to be specified. This instructs the function to select either the right eye or the left eye when there data exist for both.
+The "LandR" setting requires an additional parameter (`WhenLandR`) to be specified. 
+This instructs the function to select either the right eye or the left eye when data exist for both.
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
 check_eye_recording(data = dat2)
 ```
 
-After operating, the function prints a summary of the output.
+After executing, the function prints a summary of the output.
 While the function `check_eye_recording` indicated that the parameter `Recording` should be set to "R", the example below sets the parameter to "LandR", which can act as a "catch-all". 
 Consequently, in the summary, it can be seen that there were only recordings in the right eye.
 
@@ -184,7 +206,7 @@ ds_options(SamplingRate = 1000)
 ```
 
 The `SamplingRate` parameter in `bin_prop` should be specified in Hertz (see `check_samplingrate`), representing the original sampling rate of the data and the `BinSize` should be specified in milliseconds (see `ds_options`), representing the span of time over which to calculate the proportion.
-The `bin_prop`function returns new columns corresponding to each interest area ID (e.g., `IA_1_C`, `IA_1_P`). 
+The `bin_prop` function returns new columns corresponding to each interest area ID (e.g., `IA_1_C`, `IA_1_P`). 
 The extension '\_C' indicates the count of samples in the bin and the extension '\_P' indicates the proportion. 
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
@@ -201,38 +223,64 @@ check_samplingrate(dat4)
 ## Empirical logits
 
 Proportions are inherently bound between 0 and 1 and are therefore not suitable for many types of analysis. 
-Logits provide a transformation resulting in an unbounded measure. 
-However, because logits range from negative infinity to infinity, the empirical logit transformation adds a constant thus avoiding +/- infinity.  
+Logits provide a transformation resulting in an unbounded measure (as well as weights which estimate the variance). 
+The calculations contained in this package are based on: Barr, D. J., (2008) Analyzing 'visual world' eyetracking data using multilevel logistic regression, *Journal of Memory and Language*, *59*(4), 457--474. 
+However, they have been modified to allow greater flexibility.
 
-In order to calculate empirical logits, it is necessary to know the number of samples in each bin.
-This will vary depending on your original sampling rate and bin size. 
-To determine this, use the function `check_samples_per_bin`.
+When using an empirical logit transformation it is important to keep two things in mind. 
+The first is the number of observations (or samples) on which to base the calculation. 
+Typically, this is the number of samples per bin, which varies depending on your original sampling rate and bin size. 
+
+To determine the number of samples per bin present in the data, use the function `check_samples_per_bin`.
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
 check_samples_per_bin(dat4)
 ```
 
-The function `transform_to_elogit` transforms the proportions to empirical logits and also calculates a weight for each value.
-The weight estimate the variance in each bin (because the variance of the logit depends on the mean). 
-This is particularly important for regression analyses and should be specified in the model call (e.g., weight = 1 / `IA_1_wts`).
+However, a user may choose to define a different number of observations (because the number of samples is inherently linked to the sampling rate). 
+Though, it is important to note that changing this value can drastically impact the results of the transformation and weight calculations. 
+Some safeguards are in place in the transformation function to prevent users from choosing inadvisable values (though these safeguards can be overridden with the parameter `ObsOverride`).
+So, if in doubt, it is safest to use the number of samples present in your data (as indicated by `check_samples_per_bin`).
+The second things to keep in mind is the constant to be added in the transformation. 
+Note that by default the calculation uses a constant of 0.5; however, the user can specify a different value to be used.
 
-These calculations are taken from: Barr, D. J., (2008) Analyzing 'visual world' eyetracking data using multilevel logistic regression, *Journal of Memory and Language*, *59*(4), 457--474. 
-Note that by default the calculation uses a constant of 0.5 (as indicated by Barr); however, a different value can be used by specifying it in the parameter `Constant`.
+<style>
+im {
+width: 100%;
+text-align: center;
+}
+</style>
 
-```{r, eval= TRUE, echo=TRUE, results='asis'}
-dat5 <- transform_to_elogit(dat4, NoIA = 4, SamplesPerBin = 20)
+The function `plot_transformation_app` allows the user to visualize the effect of both number of observations and constant on the result of the empirical logit transformation and weight calculations. These values are plotted against proportions (0 to 1). 
+
+```{r, eval=FALSE, echo=TRUE, results='asis'}
+plot_transformation_app()
 ```
 
+<div id='im'>
+ <img src="plottransformationapp.PNG" alt="VWP" height="350" width="650"> 
+</div>
+
+The function `transform_to_elogit` transforms the proportions to empirical logits and also calculates a weight for each value.
+The weight estimates the variance in each bin (because the variance of the logit depends on the mean). 
+This is particularly important for regression analyses and should be specified in the model call (e.g., weight = 1 / `IA_1_wts`).
+As mentioned above, the function takes the number of observations in the parameter `ObsPerBin`. Here we use the number of samples per bin present in the data.
+
+```{r, eval= TRUE, echo=TRUE, results='asis'}
+dat5 <- transform_to_elogit(dat4, NoIA = 4, ObsPerBin = 20)
+```
 
 
 ## Binomial data
 
 Some researchers may prefer to perform a binomial analysis. 
-Therefore the function `create_binomial` uses (previously calculated) sample counts to create a success/failure column for each IA.
-This column is then suitable as a response variable in logistic regression. 
+Therefore the function `create_binomial` uses (previously calculated) proportions and number of observations to create a success/failure column for each IA.
+This column is then a suitable response variable for logistic regression of the time series. 
+As with the empirical logit transformation, a user may choose to define a number of observations that is different from the number of samples per bin. 
+Because this can create artifacts in the scaling or more samples than are present in the data, safeguards are in place to prevent users from choosing inadvisable values (though these safeguards can be overridden with the parameter `ObsOverride`).
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
-dat5a <- create_binomial(data = dat4, NoIA = 4)
+dat5a <- create_binomial(data = dat4, NoIA = 4, ObsPerBin = 20)
 ```
 
 
@@ -248,7 +296,7 @@ Again, this is only recommended for users who have previously worked with visual
 dat5b <- fasttrack(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
 	EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Offset = 100, Recording = "LandR", 
   WhenLandR = "Right", BinSize = 20, SamplingRate = 1000,
-  SamplesPerBin = 20, Constant = 0.5, Output = "ELogit")
+  ObsPerBin = 20, Constant = 0.5, Output = "ELogit")
 ```
 
 
@@ -400,7 +448,7 @@ Color = c("red", "green")) + ggtitle("Looks to target")
 
 There are two functions which provide diagnostic Shiny apps for inspecting the data: `plot_var_app` and `plot_indiv_app`.
 These are interactive and allow the user to inspect variability among subjects and items as well as individual averages compared to the grand average. 
-In this way, the user can determine if there are particular subjects or items that might need to be removed from the dataset.
+In this way, the user can determine if there are particular subjects or items that differ substantially from the average.
 
 <style>
 im {

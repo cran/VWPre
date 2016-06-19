@@ -36,84 +36,84 @@ prep_data <- function(data = data, Subject = Subject, Item = NA,
   
   data <- tbl_df(data)
   
-  print("Step 1 of 9...")
+  message("Step 1 of 9...")
   data <- rename_(data, Subject = interp(~subject, subject = as.name(subject)))
-  print(paste(subject, "renamed to Subject."))
+  message(paste(subject, "renamed to Subject."))
   
   if (is.factor(data$Subject) == F){
     data$Subject <- as.factor(as.character(data$Subject))
-    print("Subject converted to factor.")
+    message("Subject converted to factor.")
   } else {
-    print("Subject already factor.")
+    message("Subject already factor.")
   }
   
-  print("Step 2 of 9...")
+  message("Step 2 of 9...")
   if (!is.na(item)) {
     data <- rename_(data, Item = interp(~item, item = as.name(item)))
-    print(paste(item, "renamed to Item."))
+    message(paste(item, "renamed to Item."))
     if (is.factor(data$Item) == F){
       data$Item <- as.factor(as.character(data$Item))
-      print("Item converted to factor")
+      message("Item converted to factor")
     } else {
-      print("Item already factor")
+      message("Item already factor")
     } 
   } else {
-    print("No Item column specified.")
+    message("No Item column specified.")
   }
   
-  print("Step 3 of 9...")
+  message("Step 3 of 9...")
   if (is.numeric(data$LEFT_INTEREST_AREA_ID) == F){
     data$LEFT_INTEREST_AREA_ID <- as.numeric(as.character(data$LEFT_INTEREST_AREA_ID))
-    print("LEFT_INTEREST_AREA_ID converted to numeric.")
+    message("LEFT_INTEREST_AREA_ID converted to numeric.")
   } else {
-    print("LEFT_INTEREST_AREA_ID already numeric.")
+    message("LEFT_INTEREST_AREA_ID already numeric.")
   }
   
-  print("Step 4 of 9...")
+  message("Step 4 of 9...")
   if (is.numeric(data$RIGHT_INTEREST_AREA_ID) == F){
     data$RIGHT_INTEREST_AREA_ID <- as.numeric(as.character(data$RIGHT_INTEREST_AREA_ID))
-    print("RIGHT_INTEREST_AREA_ID converted to numeric.")
+    message("RIGHT_INTEREST_AREA_ID converted to numeric.")
   } else {
-    print("RIGHT_INTEREST_AREA_ID already numeric.")
+    message("RIGHT_INTEREST_AREA_ID already numeric.")
   }
   
-  print("Step 5 of 9...")
+  message("Step 5 of 9...")
   if (is.factor(data$LEFT_INTEREST_AREA_LABEL) == F){
     data$LEFT_INTEREST_AREA_LABEL <- as.factor(as.character(data$LEFT_INTEREST_AREA_LABEL))
-    print("LEFT_INTEREST_AREA_LABEL converted to factor.")
+    message("LEFT_INTEREST_AREA_LABEL converted to factor.")
   } else {
-    print("LEFT_INTEREST_AREA_LABEL already factor.")
+    message("LEFT_INTEREST_AREA_LABEL already factor.")
   }
   
-  print("Step 6 of 9...")
+  message("Step 6 of 9...")
   if (is.factor(data$RIGHT_INTEREST_AREA_LABEL) == F){
     data$RIGHT_INTEREST_AREA_LABEL <- as.factor(as.character(data$RIGHT_INTEREST_AREA_LABEL))
-    print("RIGHT_INTEREST_AREA_LABEL converted to factor.")
+    message("RIGHT_INTEREST_AREA_LABEL converted to factor.")
   } else {
-    print("RIGHT_INTEREST_AREA_LABEL already factor.")
+    message("RIGHT_INTEREST_AREA_LABEL already factor.")
   }
   
-  print("Step 7 of 9...")
+  message("Step 7 of 9...")
   if (is.numeric(data$TIMESTAMP) == F){
     data$TIMESTAMP <- as.numeric(as.character(data$TIMESTAMP))
-    print("TIMESTAMP converted to numeric.")
+    message("TIMESTAMP converted to numeric.")
   } else {
-    print("TIMESTAMP already numeric.")
+    message("TIMESTAMP already numeric.")
   }
   
-  print("Step 8 of 9...")
+  message("Step 8 of 9...")
   if (is.numeric(data$TRIAL_INDEX) == F){
     data$TRIAL_INDEX <- as.numeric(as.character(data$TRIAL_INDEX))
-    print("TRIAL_INDEX converted to numeric.")
+    message("TRIAL_INDEX converted to numeric.")
   } else {
-    print("TRIAL_INDEX already numeric.")
+    message("TRIAL_INDEX already numeric.")
   }
   
-  print("Step 9 of 9...")
+  message("Step 9 of 9...")
   data$Event <- interaction(data[,EventColumns], drop=TRUE)
-  print(paste("Event variable created from", EventColumns[1], "and", EventColumns[2]))
+  message(paste("Event variable created from", EventColumns[1], "and", EventColumns[2]))
   
-  return(data)
+  return(ungroup(data))
 }
 
 
@@ -146,15 +146,15 @@ relabel_na <- function(data = data, NoIA = NoIA){
   NoIA <- NoIA
   
   if (length(levels(data$LEFT_INTEREST_AREA_LABEL)) == NoIA) {
-  print("LEFT_INTEREST_AREA_LABEL: Number of levels match NoIA.")
+  message("LEFT_INTEREST_AREA_LABEL: Number of levels match NoIA.")
   } else {
-  print("LEFT_INTEREST_AREA_LABEL: Number of levels DO NOT match NoIA.")
+  message("LEFT_INTEREST_AREA_LABEL: Number of levels DO NOT match NoIA.")
   }
   
   if (length(levels(data$RIGHT_INTEREST_AREA_LABEL)) == NoIA) {
-  print("RIGHT_INTEREST_AREA_LABEL: Number of levels match NoIA.")
+  message("RIGHT_INTEREST_AREA_LABEL: Number of levels match NoIA.")
   } else {
-  print("RIGHT_INTEREST_AREA_LABEL: Number of levels DO NOT match NoIA.")
+  message("RIGHT_INTEREST_AREA_LABEL: Number of levels DO NOT match NoIA.")
   } 
   
   data$RIGHT_INTEREST_AREA_ID[is.na(data$RIGHT_INTEREST_AREA_ID)] = 0
@@ -165,10 +165,82 @@ relabel_na <- function(data = data, NoIA = NoIA){
   levels(data$LEFT_INTEREST_AREA_LABEL)[NoIA+1] <- "Outside"
   data$LEFT_INTEREST_AREA_LABEL[is.na(data$LEFT_INTEREST_AREA_LABEL)] = "Outside"
   
-  return(data)
+  return(ungroup(data))
   
 }
 
+
+#' Recode interest area IDs and/or interest area labels
+#' 
+#' \code{recode_ia} replaces existing interest area IDs and/or labels for both 
+#' eyes. For subsequent data processing, it is important that the ID values range 
+#' between 0 and 8 (with 0 representing Outside all predefined interest areas).
+#' LEFT_INTEREST_AREA_ID, 
+#' RIGHT_INTEREST_AREA_ID, LEFT_INTEREST_AREA_LABEL, and RIGHT_INTEREST_AREA_LABEL)
+#' for cells containing NAs. If NA, the missing values in the ID columns are 
+#' relabeled as 0 and missing values in the LABEL columns are relabeled as 'Outside'.
+#' 
+#' @export
+#' @import dplyr
+#' @import tidyr
+#' @import lazyeval
+#' 
+#' @param data A data table object output by \code{\link{relabel_na}}.
+#' @param IDs A named character vector specifying the desired interest area 
+#' IDs and the corresponding existing IDs where the first element is the old
+#' value and the second element is the new value.
+#' @param Labels A named character vector specifying the desired interest area 
+#' labels and the corresponding existing labels where the first element is the 
+#' old value and the second element is the new value.
+#' @return A data table with the same dimensions as \code{data}.
+#' @examples
+#' \dontrun{
+#' library(VWPre)
+#' # To recode both IDs and Labels...
+#' df <- recode_ia(data=dat, IDs=c("234"="2", "0"="0", "35"="3", "11"="1", "
+#' 4"="6666"), Labels=c(Outside="Dumb", Target="Targ", Dist2="Stupid", 
+#' Comp="Comp", Dist1="Distractor1"))
+#' }
+recode_ia <- function(data = data, IDs = NULL, Labels = NULL) {
+  
+  data <- data
+  IDs <- IDs
+  x <- setNames(names(IDs), IDs)
+  IDs <- as.list(x)
+  Labels <- Labels
+  y <- setNames(names(Labels), Labels)
+  Labels <- as.list(y)
+  
+  if(!(is.null(IDs))) {
+    
+    data$RIGHT_INTEREST_AREA_ID <- as.factor(as.character(data$RIGHT_INTEREST_AREA_ID))
+    levels(data$RIGHT_INTEREST_AREA_ID) <- IDs
+    data$RIGHT_INTEREST_AREA_ID <- as.integer(as.character(data$RIGHT_INTEREST_AREA_ID))
+    message("Right interest area IDs recoded.")
+    
+    data$LEFT_INTEREST_AREA_ID <- as.factor(as.character(data$LEFT_INTEREST_AREA_ID))
+    levels(data$LEFT_INTEREST_AREA_ID) <- IDs
+    data$LEFT_INTEREST_AREA_ID <- as.integer(as.character(data$LEFT_INTEREST_AREA_ID))
+    message("Left interest area IDs recoded.")
+    
+  }
+  
+  if(!(is.null(Labels))) {
+    
+    data$RIGHT_INTEREST_AREA_LABEL <- as.factor(as.character(data$RIGHT_INTEREST_AREA_LABEL))
+    levels(data$RIGHT_INTEREST_AREA_LABEL) <- Labels
+    message("Right interest area labels recoded.")
+    
+    data$LEFT_INTEREST_AREA_LABEL <- as.factor(as.character(data$LEFT_INTEREST_AREA_LABEL))
+    levels(data$LEFT_INTEREST_AREA_LABEL) <- Labels
+    message("Left interest area labels recoded.")
+    
+  }
+  
+  data <- droplevels(data)
+  return(ungroup(data))
+  
+}
 
 #' Select the eye used during recording
 #' 
@@ -287,23 +359,23 @@ select_recorded_eye <- function(data = data, Recording = Recording, WhenLandR = 
   tmp$IA_ID <- as.numeric(as.character(tmp$IA_ID))
   tmp$IA_LABEL <- as.factor(as.character(tmp$IA_LABEL))
   
-  print(paste("Gaze data summary for", length(unique(levels(tmp$Event))), "events:"))
+  message(paste("Gaze data summary for", length(unique(levels(tmp$Event))), "events:"))
   
   if (Recording == "LandR") {
-    print(paste(nrow(filter(tmp, Time==first(Time) & EyeRecorded=="Both")), "event(s) contained gaze data for both eyes, for which the", WhenLandR, "eye has been selected." ))
+    message(paste(nrow(filter(tmp, Time==first(Time) & EyeRecorded=="Both")), "event(s) contained gaze data for both eyes, for which the", WhenLandR, "eye has been selected." ))
   }
   
   if (Recording == "LandR" | Recording == "LorR" | Recording == "R" ) {
-    print(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Right")), "event(s) using gaze data from the right eye."))
+    message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Right")), "event(s) using gaze data from the right eye."))
   }
   
   if (Recording == "LandR" | Recording == "LorR" | Recording == "L" ) {
-    print(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Left")), "event(s) using gaze data from the left eye."))
+    message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Left")), "event(s) using gaze data from the left eye."))
   }
   
-  print(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Neither")), "event(s) with no samples falling within any interest area during the given time series."))
+  message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Neither")), "event(s) with no samples falling within any interest area during the given time series."))
   
-  return(tmp)
+  return(ungroup(tmp))
 }
 
 
@@ -335,7 +407,8 @@ create_time_series = function(data = data, Offset = Offset){
     arrange(., Event, TIMESTAMP) %>%
     group_by(Event) %>%
     # apply the offset to the data to create a proper time series
-    mutate_(Time = interp(~TIMESTAMP - first(TIMESTAMP) - offset))
+    mutate_(Time = interp(~TIMESTAMP - first(TIMESTAMP) - offset)) %>%
+    ungroup()
 }
 
 

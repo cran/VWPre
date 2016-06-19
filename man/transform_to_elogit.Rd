@@ -4,8 +4,8 @@
 \alias{transform_to_elogit}
 \title{Transforms proportion looks to empirical logits.}
 \usage{
-transform_to_elogit(data = data, NoIA = NoIA,
-  SamplesPerBin = SamplesPerBin, Constant = 0.5)
+transform_to_elogit(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
+  Constant = 0.5, ObsOverride = FALSE)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{select_recorded_eye}}.}
@@ -13,11 +13,15 @@ transform_to_elogit(data = data, NoIA = NoIA,
 \item{NoIA}{A positive integer indicating the number of interest areas defined 
 when creating the study.}
 
-\item{SamplesPerBin}{A positive integer indicating the number of samples in
-each bin, which can be determines with \code{\link{check_samples_per_bin}}.}
+\item{ObsPerBin}{A positive integer indicating the number of observations to
+use in the calculation. Typically, this will be the number of samples per 
+bin, which can be determined with \code{\link{check_samples_per_bin}}.}
 
 \item{Constant}{A positive number used for the empirical logit and weights
 calculation; by default, 0.5 as in Barr (2008).}
+
+\item{ObsOverride}{A logical value controlling restrictions on the value
+provided to ObsPerBin. Default value is FALSE.}
 }
 \value{
 A data table with additional columns (the number of which depends on 
@@ -35,7 +39,7 @@ mean). This is important for regression analyses. N.B.: This function will
 work for data with a maximum of 8 interest areas.
 }
 \details{
-These calculations are taken from:
+These calculations were adapted from:
 Barr, D. J., (2008) Analyzing 'visual world' eyetracking data using 
 multilevel logistic regression, \emph{Journal of Memory and Language}, 
 \emph{59}(4), 457--474.
@@ -44,7 +48,7 @@ multilevel logistic regression, \emph{Journal of Memory and Language},
 \dontrun{
 library(VWPre)
 # Convert proportions to empirical logits and calculate weights...
-df <- transform_to_elogit(dat, NoIA = 4, SamplesPerBin = 20, Constant = 0.5)
+df <- transform_to_elogit(dat, NoIA = 4, ObsPerBin = 20, Constant = 0.5)
 }
 }
 

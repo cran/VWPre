@@ -11,6 +11,8 @@
 #'   correctly assigned classes for important columns.
 #'   \item The function \code{\link{relabel_na}} returns a data table with
 #'   samples containing 'NA' relabeled as outside any interest area.
+#'   \item The function \code{\link{recode_ia}} returns a data table containing
+#'   recoded/remapped interest area IDs and/or interest area labels.
 #'   \item The function \code{\link{select_recorded_eye}} returns a data table 
 #'   with data from the the recorded eye in new columns (IA_ID and IA_LABEL).
 #' }
@@ -47,6 +49,8 @@
 #'   corresponding to the sampling rate in the data. 
 #'   \item The function \code{\link{ds_options}} returns the binning 
 #'   (downsampling) options possible for the given sampling rate.
+#'   \item The function \code{\link{check_ia}} returns a summary of the 
+#'   interest area IDs and Labels present in the data.
 #' }
 #' 
 #' @section Plotting functions:
@@ -60,7 +64,10 @@
 #' }
 #' 
 #' @section Diagnostic functions:
-#' \itemize{
+#' \itemize{ 
+#'   \item The function \code{\link{plot_transformation_app}} opens a Shiny app 
+#'   for visualizing the effect of both number of observations and constant on 
+#'   the results of the empirical logit transformation and weight calculations.
 #'   \item The function \code{\link{plot_indiv_app}} opens a Shiny app for
 #'   inspecting by-subject or by-item averages for all interest areas, alongside
 #'   the grand average (for proportion or empirical logit looks) within a 
@@ -78,7 +85,7 @@
 #' }
 #'
 #' @author
-#' Vincent Porretta, Jacolien van Rij, Aki-Juhani Kyröläinen, Juhani Järvikivi
+#' Vincent Porretta, Aki-Juhani Kyröläinen, Jacolien van Rij, Juhani Järvikivi
 #'
 #' Maintainer: Vincent Porretta (\email{vincentporretta@@gmail.com})
 #'
