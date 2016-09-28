@@ -10,7 +10,10 @@ if(getRversion() >= "2.15.1")
   "Zscore", "StDev", "EyeSelected", "EyeRecorded", "LEFT_INTEREST_AREA_LABEL", 
   "LEFT_INTEREST_AREA_ID", "RIGHT_INTEREST_AREA_LABEL", 
   "RIGHT_INTEREST_AREA_ID", "Variable", "binomial", "coef", "plogis",
-  "predict", "sd", "setNames", "capture.output"), add = FALSE)
+  "predict", "sd", "setNames", "capture.output",
+  "Align", "HitIDL", "HitIDR", "HitLabelL", "HitLabelR", "LEFT_GAZE_X",
+  "LEFT_GAZE_Y", "Present", "RIGHT_GAZE_X", "RIGHT_GAZE_Y", 
+  "SAMPLE_MESSAGE"), add = FALSE)
 }
 
 .onAttach <- function(...) { 

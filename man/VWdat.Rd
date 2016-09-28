@@ -3,9 +3,9 @@
 \docType{data}
 \name{VWdat}
 \alias{VWdat}
-\title{This is a sample dataset included in the package}
+\title{This is a sample eye-tracking dataset included in the package}
 \description{
-This is a sample dataset included in the package
+This is a sample eye-tracking dataset included in the package
 }
 \author{
 Vincent Porretta

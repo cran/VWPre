@@ -42,7 +42,7 @@ custom theme could be added).}
 \code{plot_avg} calculates the grand or conditional averages of 
 looks to each interest area along with standard error. It then plots the results.
 N.B.: This function will work for data with a maximum of 8 interest areas
-and two conditions.
+and 2 conditions.
 }
 \examples{
 \dontrun{

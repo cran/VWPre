@@ -2,29 +2,39 @@
 % Please edit documentation in R/formatting.R
 \name{create_time_series}
 \alias{create_time_series}
-\title{Create a meaningful time series column}
+\title{Create a time series column}
 \usage{
-create_time_series(data = data, Offset = Offset)
+create_time_series(data = data, Adj = Adj)
 }
 \arguments{
-\item{data}{A data table object output by \code{\link{relabel_na}}.}
+\item{data}{A data table object output by \code{\link{relabel_na}} or 
+\code{\link{align_msg}}.}
 
-\item{Offset}{A positive integer indicating amount of time in milliseconds.}
+\item{Adj}{Optionally an integer value or a text string. If an integer 
+(positive or negative), this will indicate an amount of time in 
+milliseconds. Positive values get added to the time points; negative 
+get subtracted. If a text string, this will be the name of a column in 
+the data set which contains values indicating when the critical stimulus
+was presented relative to the zero point.}
 }
 \value{
 A data table object.
 }
 \description{
-\code{create_time_series} aligns the starting point for each 
+\code{create_time_series} standardizes the starting point for each 
 event, creates a time series for each event including the offset for the 
-amount of time prior to the onset auditory stimulus. The time series
+amount of time prior to (or after) the zero point. The time series
 is indicated in a new column called Time.
 }
 \examples{
 \dontrun{
 library(VWPre)
 # To create the Time column...
-df <- create_time_series(data = dat, Offset = 100)
+df <- create_time_series(data = dat, Adj = "SoundOnsetColumn")
+# or
+df <- create_time_series(data = dat, Adj = -100)
+# or
+df <- create_time_series(data = dat, Adj = 100)
 }
 }
 

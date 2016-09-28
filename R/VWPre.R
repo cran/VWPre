@@ -5,16 +5,20 @@
 #' 
 #' @section Formatting functions:
 #' \itemize{
-#'   \item The function \code{\link{create_time_series}} returns a meaningful
-#'   time columns in milliseconds.
+#'   \item The function \code{\link{create_time_series}} returns a time columns 
+#'   in milliseconds.
 #'   \item The function \code{\link{prep_data}} returns a data table with 
 #'   correctly assigned classes for important columns.
 #'   \item The function \code{\link{relabel_na}} returns a data table with
 #'   samples containing 'NA' relabeled as outside any interest area.
 #'   \item The function \code{\link{recode_ia}} returns a data table containing
-#'   recoded/remapped interest area IDs and/or interest area labels.
+#'   recoded interest area IDs and/or interest area labels.
 #'   \item The function \code{\link{select_recorded_eye}} returns a data table 
 #'   with data from the the recorded eye in new columns (IA_ID and IA_LABEL).
+#'   \item The function \code{\link{custom_ia}} returns a data table 
+#'   with gaze data remapped to new interest areas.
+#'   \item The function \code{\link{align_msg}} returns a data table 
+#'   with newly aligned sample data in a new column (Align).
 #' }
 #' 
 #' @section Calculation functions:
@@ -33,7 +37,8 @@
 #' \itemize{
 #'   \item The function \code{\link{fasttrack}} a meta-function that returns a 
 #'   data table of processed data containing the result of the series of 
-#'   necessary subroutines. This is intended for experienced users.
+#'   necessary subroutines. This is intended for experienced users doing basic
+#'   preprocessing.
 #' }
 #' 
 #' @section Utility functions:
@@ -51,6 +56,8 @@
 #'   (downsampling) options possible for the given sampling rate.
 #'   \item The function \code{\link{check_ia}} returns a summary of the 
 #'   interest area IDs and Labels present in the data.
+#'   \item The function \code{\link{check_msg_time}} returns a summary of the 
+#'   the time value at a given sample message for each recording event.
 #' }
 #' 
 #' @section Plotting functions:

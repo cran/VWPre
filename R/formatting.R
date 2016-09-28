@@ -1,14 +1,14 @@
 #' Check the classes of specific columns and re-assigns as necessary.
 #' 
 #' \code{prep_data} converts the data frame to a data table and examines the 
-#' class of the following columns: Subject, Item, LEFT_INTEREST_AREA_ID, 
+#' required columns (RECORDING_SESSION_LABEL, LEFT_INTEREST_AREA_ID, 
 #' RIGHT_INTEREST_AREA_ID, LEFT_INTEREST_AREA_LABEL, RIGHT_INTEREST_AREA_LABEL, 
-#' TIMESTAMP, and TRIAL_INDEX. If they were not encoded with the correct 
-#' class upon importing the data, the function will reassign the class and print 
-#' a summary of the reassignments. Additionally, the data table output by 
-#' the function contains a new column called Event which indexes each unique 
+#' TIMESTAMP, and TRIAL_INDEX) and optional columns (SAMPLE_MESSAGE, LEFT_GAZE_X,
+#' LEFT_GAZE_Y, RIGHT_GAZE_X, and RIGHT_GAZE_Y). It renames the subject and item 
+#' columns, ensures required/optional columns are of the approriate data class, 
+#' and creates a new column called Event which indexes each unique 
 #' series of samples corresponding to the combination of Subject and 
-#' TRIRAL_Index, necessary for performing subsequent operations.
+#' TRIAL_INDEX (can be changed), necessary for performing subsequent operations.
 #' 
 #' @export
 #' @import dplyr
@@ -27,220 +27,234 @@
 #' # corresponding to the subject.
 #' # To prepare the data...
 #' library(VWPre)
-#' df <- prep_data(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemID")
+#' df <- prep_data(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "ItemCol")
 #' }
 prep_data <- function(data = data, Subject = Subject, Item = NA,
                       EventColumns=c("Subject","TRIAL_INDEX")){
   subject <- Subject
   item <- Item
+  reqcols <- data.frame(Column=c("RECORDING_SESSION_LABEL", 
+                                 "LEFT_INTEREST_AREA_ID","LEFT_INTEREST_AREA_LABEL", 
+                                 "RIGHT_INTEREST_AREA_ID","RIGHT_INTEREST_AREA_LABEL", 
+                                 "TIMESTAMP","TRIAL_INDEX"), Present=NA)
+  optcols <- data.frame(Column=c("SAMPLE_MESSAGE", "LEFT_GAZE_X", "LEFT_GAZE_Y", 
+                                 "RIGHT_GAZE_X", "RIGHT_GAZE_Y"), Present=NA)
   
   data <- tbl_df(data)
   
-  message("Step 1 of 9...")
+  message("Checking required columns...")
+  
+  for (x in 1:nrow(reqcols)) {
+    if (!(reqcols[x,1] %in% names(data))) {
+      reqcols[x,2] <- 0
+    }
+    else {
+      reqcols[x,2] <- 1
+    }
+  }
+  
+  missingcols <- filter(reqcols, Present==0)
+  
+  if (nrow(missingcols) > 0) {
+    stop(paste("\n The following column is required to process the data: ", unique(as.factor(missingcols$Column))))
+  } else {
+    message("    All required columns are present in the data.")
+  }
+  
+  
+  message("Checking optional columns...")
+  
+  for (x in 1:nrow(optcols)) {
+    if (!(optcols[x,1] %in% names(data))) {
+      optcols[x,2] <- 0
+    }
+    else {
+      optcols[x,2] <- 1
+    }
+  }
+  
+  missingoptcols <- filter(optcols, Present==0)
+  
+  if (nrow(missingoptcols) > 0) {
+    message(paste("    The following optional is not present in the data: ", unique(as.factor(missingoptcols$Column)), "\n"))
+  } else {
+    message("    All optional columns are present in the data.")
+  }
+  
+  
+  message("Working on required columns...")
+  
   data <- rename_(data, Subject = interp(~subject, subject = as.name(subject)))
-  message(paste(subject, "renamed to Subject."))
+  message(paste("   ", subject, "renamed to Subject. "))
   
   if (is.factor(data$Subject) == F){
     data$Subject <- as.factor(as.character(data$Subject))
-    message("Subject converted to factor.")
+    message("    Subject converted to factor.")
   } else {
-    message("Subject already factor.")
+    message("    Subject already factor.")
   }
   
-  message("Step 2 of 9...")
   if (!is.na(item)) {
+    
+    if (!(item %in% names(data))) {
+      stop(paste(item, "is not a column name in the data."))
+    }
+    
     data <- rename_(data, Item = interp(~item, item = as.name(item)))
-    message(paste(item, "renamed to Item."))
+    message(paste("   ", item, "renamed to Item."))
     if (is.factor(data$Item) == F){
       data$Item <- as.factor(as.character(data$Item))
-      message("Item converted to factor")
+      message("    Item converted to factor.")
     } else {
-      message("Item already factor")
+      message("    Item already factor.")
     } 
   } else {
-    message("No Item column specified.")
+    message("    No Item column specified.")
   }
   
-  message("Step 3 of 9...")
   if (is.numeric(data$LEFT_INTEREST_AREA_ID) == F){
     data$LEFT_INTEREST_AREA_ID <- as.numeric(as.character(data$LEFT_INTEREST_AREA_ID))
-    message("LEFT_INTEREST_AREA_ID converted to numeric.")
+    message("    LEFT_INTEREST_AREA_ID converted to numeric.")
   } else {
-    message("LEFT_INTEREST_AREA_ID already numeric.")
+    message("    LEFT_INTEREST_AREA_ID already numeric.")
   }
   
-  message("Step 4 of 9...")
   if (is.numeric(data$RIGHT_INTEREST_AREA_ID) == F){
     data$RIGHT_INTEREST_AREA_ID <- as.numeric(as.character(data$RIGHT_INTEREST_AREA_ID))
-    message("RIGHT_INTEREST_AREA_ID converted to numeric.")
+    message("    RIGHT_INTEREST_AREA_ID converted to numeric.")
   } else {
-    message("RIGHT_INTEREST_AREA_ID already numeric.")
+    message("    RIGHT_INTEREST_AREA_ID already numeric.")
   }
   
-  message("Step 5 of 9...")
   if (is.factor(data$LEFT_INTEREST_AREA_LABEL) == F){
     data$LEFT_INTEREST_AREA_LABEL <- as.factor(as.character(data$LEFT_INTEREST_AREA_LABEL))
-    message("LEFT_INTEREST_AREA_LABEL converted to factor.")
+    message("    LEFT_INTEREST_AREA_LABEL converted to factor.")
   } else {
-    message("LEFT_INTEREST_AREA_LABEL already factor.")
+    message("    LEFT_INTEREST_AREA_LABEL already factor.")
   }
   
-  message("Step 6 of 9...")
   if (is.factor(data$RIGHT_INTEREST_AREA_LABEL) == F){
     data$RIGHT_INTEREST_AREA_LABEL <- as.factor(as.character(data$RIGHT_INTEREST_AREA_LABEL))
-    message("RIGHT_INTEREST_AREA_LABEL converted to factor.")
+    message("    RIGHT_INTEREST_AREA_LABEL converted to factor.")
   } else {
-    message("RIGHT_INTEREST_AREA_LABEL already factor.")
+    message("    RIGHT_INTEREST_AREA_LABEL already factor.")
   }
   
-  message("Step 7 of 9...")
   if (is.numeric(data$TIMESTAMP) == F){
     data$TIMESTAMP <- as.numeric(as.character(data$TIMESTAMP))
-    message("TIMESTAMP converted to numeric.")
+    message("    TIMESTAMP converted to numeric.")
   } else {
-    message("TIMESTAMP already numeric.")
+    message("    TIMESTAMP already numeric.")
   }
   
-  message("Step 8 of 9...")
   if (is.numeric(data$TRIAL_INDEX) == F){
     data$TRIAL_INDEX <- as.numeric(as.character(data$TRIAL_INDEX))
-    message("TRIAL_INDEX converted to numeric.")
+    message("    TRIAL_INDEX converted to numeric.")
   } else {
-    message("TRIAL_INDEX already numeric.")
+    message("    TRIAL_INDEX already numeric.")
   }
   
-  message("Step 9 of 9...")
+  if (!(EventColumns[1] %in% names(data))) {
+    stop(paste(EventColumns[1], "is not a column name in the data."))
+  }
+  if (!(EventColumns[2] %in% names(data))) {
+    stop(paste(EventColumns[2], "is not a column name in the data."))
+  }
+  
   data$Event <- interaction(data[,EventColumns], drop=TRUE)
-  message(paste("Event variable created from", EventColumns[1], "and", EventColumns[2]))
+  message(paste("    Event variable created from", EventColumns[1], "and", EventColumns[2]), "")
   
-  return(ungroup(data))
-}
-
-
-
-
-
-#' Relabel samples containing 'NA' as outside any interest area
-#' 
-#' \code{relabel_na} examines interest area columns (LEFT_INTEREST_AREA_ID, 
-#' RIGHT_INTEREST_AREA_ID, LEFT_INTEREST_AREA_LABEL, and RIGHT_INTEREST_AREA_LABEL)
-#' for cells containing NAs. If NA, the missing values in the ID columns are 
-#' relabeled as 0 and missing values in the LABEL columns are relabeled as 'Outside'.
-#' 
-#' @export
-#' @import dplyr
-#' @import tidyr
-#' @import lazyeval
-#' 
-#' @param data A data table object output by \code{\link{prep_data}}.
-#' @param NoIA A positive integer indicating the number of interest areas defined 
-#' when creating the study.
-#' @return A data table with the same dimensions as \code{data}.
-#' @examples
-#' \dontrun{
-#' library(VWPre)
-#' # To relabel the NAs...
-#' df <- relabel_na(data = dat, NoIA = 4)
-#' }
-relabel_na <- function(data = data, NoIA = NoIA){
-  NoIA <- NoIA
   
-  if (length(levels(data$LEFT_INTEREST_AREA_LABEL)) == NoIA) {
-  message("LEFT_INTEREST_AREA_LABEL: Number of levels match NoIA.")
-  } else {
-  message("LEFT_INTEREST_AREA_LABEL: Number of levels DO NOT match NoIA.")
-  }
+  message("Working on optional columns...")
   
-  if (length(levels(data$RIGHT_INTEREST_AREA_LABEL)) == NoIA) {
-  message("RIGHT_INTEREST_AREA_LABEL: Number of levels match NoIA.")
-  } else {
-  message("RIGHT_INTEREST_AREA_LABEL: Number of levels DO NOT match NoIA.")
+  if (nrow(missingoptcols) == 5) {
+    message("    No optional columns present in the data.")
   } 
   
-  data$RIGHT_INTEREST_AREA_ID[is.na(data$RIGHT_INTEREST_AREA_ID)] = 0
-  levels(data$RIGHT_INTEREST_AREA_LABEL)[NoIA+1] <- "Outside"
-  data$RIGHT_INTEREST_AREA_LABEL[is.na(data$RIGHT_INTEREST_AREA_LABEL)] = "Outside"
+  if ("SAMPLE_MESSAGE" %in% names(data)) {
+    if (is.factor(data$SAMPLE_MESSAGE) == F){
+      data$SAMPLE_MESSAGE <- as.factor(as.character(data$SAMPLE_MESSAGE))
+      message("    Optional column SAMPLE_MESSAGE converted to factor.")
+    } else {
+      message("    Optional column SAMPLE_MESSAGE already factor.")
+    }
+  }
   
-  data$LEFT_INTEREST_AREA_ID[is.na(data$LEFT_INTEREST_AREA_ID)] = 0
-  levels(data$LEFT_INTEREST_AREA_LABEL)[NoIA+1] <- "Outside"
-  data$LEFT_INTEREST_AREA_LABEL[is.na(data$LEFT_INTEREST_AREA_LABEL)] = "Outside"
+  if ("LEFT_GAZE_X" %in% names(data)) {
+    if (is.numeric(data$LEFT_GAZE_X) == F){
+      data$LEFT_GAZE_X <- as.numeric(as.character(data$LEFT_GAZE_X))
+      message("    Optional column LEFT_GAZE_X converted to numeric.")
+    } else {
+      message("    Optional column LEFT_GAZE_X already numeric.")
+    }
+  }
+  
+  if ("LEFT_GAZE_Y" %in% names(data)) {
+    if (is.numeric(data$LEFT_GAZE_Y) == F){
+      data$LEFT_GAZE_Y <- as.numeric(as.character(data$LEFT_GAZE_Y))
+      message("    Optional column LEFT_GAZE_Y converted to numeric.")
+    } else {
+      message("    Optional column LEFT_GAZE_Y already numeric.")
+    }
+  }
+  
+  if ("RIGHT_GAZE_X" %in% names(data)) {
+    if (is.numeric(data$RIGHT_GAZE_X) == F){
+      data$RIGHT_GAZE_X <- as.numeric(as.character(data$RIGHT_GAZE_X))
+      message("    Optional column RIGHT_GAZE_X converted to numeric.")
+    } else {
+      message("    Optional column RIGHT_GAZE_X already numeric.")
+    }
+  }
+  
+  if ("RIGHT_GAZE_Y" %in% names(data)) {
+    if (is.numeric(data$RIGHT_GAZE_Y) == F){
+      data$RIGHT_GAZE_Y <- as.numeric(as.character(data$RIGHT_GAZE_Y))
+      message("    Optional column RIGHT_GAZE_Y converted to numeric.")
+    } else {
+      message("    Optional column RIGHT_GAZE_Y already numeric.")
+    }
+  }
   
   return(ungroup(data))
-  
 }
 
 
-#' Recode interest area IDs and/or interest area labels
+
+
+#' Aligns samples to a specific message.
 #' 
-#' \code{recode_ia} replaces existing interest area IDs and/or labels for both 
-#' eyes. For subsequent data processing, it is important that the ID values range 
-#' between 0 and 8 (with 0 representing Outside all predefined interest areas).
-#' LEFT_INTEREST_AREA_ID, 
-#' RIGHT_INTEREST_AREA_ID, LEFT_INTEREST_AREA_LABEL, and RIGHT_INTEREST_AREA_LABEL)
-#' for cells containing NAs. If NA, the missing values in the ID columns are 
-#' relabeled as 0 and missing values in the LABEL columns are relabeled as 'Outside'.
+#' \code{align_msg} examines the data from each recording event and locates the
+#' first instance of the specified message in the column SAMPLE_MESSAGE.
+#' The function creates a new column containing the aligned series which can be 
+#' utilized by subsequent functions for checking and creating the time series
+#' column.
 #' 
 #' @export
 #' @import dplyr
-#' @import tidyr
 #' @import lazyeval
 #' 
-#' @param data A data table object output by \code{\link{relabel_na}}.
-#' @param IDs A named character vector specifying the desired interest area 
-#' IDs and the corresponding existing IDs where the first element is the old
-#' value and the second element is the new value.
-#' @param Labels A named character vector specifying the desired interest area 
-#' labels and the corresponding existing labels where the first element is the 
-#' old value and the second element is the new value.
-#' @return A data table with the same dimensions as \code{data}.
+#' @param data A data table object output from \code{prep_data}.
+#' @param Msg An obligatory string containing the exact message to be found in 
+#' the column SAMPLE_MESSAGE.
+#' @return A data table object.
 #' @examples
 #' \dontrun{
+#' # To align the samples to a specifc message...
 #' library(VWPre)
-#' # To recode both IDs and Labels...
-#' df <- recode_ia(data=dat, IDs=c("234"="2", "0"="0", "35"="3", "11"="1", "
-#' 4"="6666"), Labels=c(Outside="Dumb", Target="Targ", Dist2="Stupid", 
-#' Comp="Comp", Dist1="Distractor1"))
+#' df <- align_msg(data = dat, Msg = "ExperimentDisplay")
 #' }
-recode_ia <- function(data = data, IDs = NULL, Labels = NULL) {
-  
-  data <- data
-  IDs <- IDs
-  x <- setNames(names(IDs), IDs)
-  IDs <- as.list(x)
-  Labels <- Labels
-  y <- setNames(names(Labels), Labels)
-  Labels <- as.list(y)
-  
-  if(!(is.null(IDs))) {
-    
-    data$RIGHT_INTEREST_AREA_ID <- as.factor(as.character(data$RIGHT_INTEREST_AREA_ID))
-    levels(data$RIGHT_INTEREST_AREA_ID) <- IDs
-    data$RIGHT_INTEREST_AREA_ID <- as.integer(as.character(data$RIGHT_INTEREST_AREA_ID))
-    message("Right interest area IDs recoded.")
-    
-    data$LEFT_INTEREST_AREA_ID <- as.factor(as.character(data$LEFT_INTEREST_AREA_ID))
-    levels(data$LEFT_INTEREST_AREA_ID) <- IDs
-    data$LEFT_INTEREST_AREA_ID <- as.integer(as.character(data$LEFT_INTEREST_AREA_ID))
-    message("Left interest area IDs recoded.")
-    
-  }
-  
-  if(!(is.null(Labels))) {
-    
-    data$RIGHT_INTEREST_AREA_LABEL <- as.factor(as.character(data$RIGHT_INTEREST_AREA_LABEL))
-    levels(data$RIGHT_INTEREST_AREA_LABEL) <- Labels
-    message("Right interest area labels recoded.")
-    
-    data$LEFT_INTEREST_AREA_LABEL <- as.factor(as.character(data$LEFT_INTEREST_AREA_LABEL))
-    levels(data$LEFT_INTEREST_AREA_LABEL) <- Labels
-    message("Left interest area labels recoded.")
-    
-  }
-  
-  data <- droplevels(data)
-  return(ungroup(data))
-  
+align_msg <- function(data = data, Msg = Msg) {
+  msg <- Msg
+  tmp1 <- data %>% group_by(Event) %>% 
+    mutate_(Align = interp(~ifelse(SAMPLE_MESSAGE==msg, TIMESTAMP, NA), msg=as.name("msg"))) %>%
+    filter(!is.na(Align)) %>% select(Event, Align) %>% filter(Align==min(Align))
+  tmp2 <- inner_join(data, tmp1, by="Event") %>% mutate(Align = TIMESTAMP - Align)
+  return(ungroup(tmp2))
 }
+
+
+
 
 #' Select the eye used during recording
 #' 
@@ -248,7 +262,7 @@ recode_ia <- function(data = data, IDs = NULL, Labels = NULL) {
 #' interest area information, based on the \code{Recording} parameter (which 
 #' can be determined using \code{\link{check_eye_recording}}). 
 #' This function then selects the data from the recorded eye and copies it
-#' new columns (IA_ID and IA_LABEL). The function prints a summary of output.  
+#' new columns (IA_ID and IA_LABEL). The function prints a summary of the output.  
 #' 
 #' @export
 #' @import dplyr
@@ -381,34 +395,53 @@ select_recorded_eye <- function(data = data, Recording = Recording, WhenLandR = 
 
 
 
-#' Create a meaningful time series column
+#' Create a time series column
 #' 
-#' \code{create_time_series} aligns the starting point for each 
+#' \code{create_time_series} standardizes the starting point for each 
 #' event, creates a time series for each event including the offset for the 
-#' amount of time prior to the onset auditory stimulus. The time series
+#' amount of time prior to (or after) the zero point. The time series
 #' is indicated in a new column called Time.
 #' 
 #' @export
 #' @import dplyr
 #' @import lazyeval
 #' 
-#' @param data A data table object output by \code{\link{relabel_na}}.
-#' @param Offset A positive integer indicating amount of time in milliseconds.
+#' @param data A data table object output by \code{\link{relabel_na}} or 
+#' \code{\link{align_msg}}.
+#' @param Adj Optionally an integer value or a text string. If an integer 
+#' (positive or negative), this will indicate an amount of time in 
+#' milliseconds. Positive values get added to the time points; negative 
+#' get subtracted. If a text string, this will be the name of a column in 
+#' the data set which contains values indicating when the critical stimulus
+#' was presented relative to the zero point.
 #' @return A data table object.
 #' @examples
 #' \dontrun{
 #' library(VWPre)
 #' # To create the Time column...
-#' df <- create_time_series(data = dat, Offset = 100)
+#' df <- create_time_series(data = dat, Adj = "SoundOnsetColumn")
+#' # or
+#' df <- create_time_series(data = dat, Adj = -100)
+#' # or
+#' df <- create_time_series(data = dat, Adj = 100)
 #' }
-create_time_series = function(data = data, Offset = Offset){
-  offset <- Offset
-  data %>%
-    arrange(., Event, TIMESTAMP) %>%
-    group_by(Event) %>%
-    # apply the offset to the data to create a proper time series
-    mutate_(Time = interp(~TIMESTAMP - first(TIMESTAMP) - offset)) %>%
-    ungroup()
+create_time_series <- function (data = data, Adj = Adj) 
+{
+  adj <- Adj
+  if (is.numeric(adj)==T && !("Align" %in% colnames(data))) {
+    data %>% arrange(., Event, TIMESTAMP) %>% group_by(Event) %>% 
+      mutate_(Time = interp(~TIMESTAMP - first(TIMESTAMP) + adj)) %>% ungroup()
+  } 
+  else if (is.numeric(adj)==T && "Align" %in% colnames(data)) {
+    data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
+      mutate_(Time = interp(~Align + adj)) %>% ungroup()
+  } 
+  else if (is.character(adj)==T) {
+    data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
+      mutate_(Time = interp(~Align + adj, adj=as.name(adj))) %>% ungroup()
+  }
 }
+
+
 
 

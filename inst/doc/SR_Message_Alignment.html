@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Vincent Porretta" />
+
+<meta name="date" content="2016-09-27" />
+
+<title>Aligning Sample Data to a Specific Sample Message in SR Eyelink Data</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Aligning Sample Data to a Specific Sample Message in SR Eyelink Data</h1>
+<h4 class="author"><em>Vincent Porretta</em></h4>
+<h4 class="date"><em>2016-09-27</em></h4>
+
+
+
+<p>Sometimes, depending on the design of the experiment, you may decide not to define an interest period in Data Viewer prior to exporting the data. If this is the case, there are some functions in VWPre which can help to align the data to your critical stimulus. Specifically, these functions search for a specific Eyelink message which was read out during the recording sequence. They will align the samples to this message, and, if necessary, also apply a variable adjustment forward or backward in time. This depends on whether the message signals the onset of the stimulus itself, or rather, serves as a reference point for the onset of the stimulus.</p>
+<div id="before-aligning" class="section level2">
+<h2>Before aligning</h2>
+<p>In order to perform the alignment, you must first load your sample report and complete the first two preprocessing steps using the functions <code>prep_data</code> and <code>relabel_na</code> provided in this package. These step will ensure that an Event column (unique index of each recording sequence - typically the combination of Subject and Trial) is created. A description of these can be found in the <code>Basic Preprocessing</code> vignette.</p>
+</div>
+<div id="aligning-to-a-specific-message" class="section level2">
+<h2>Aligning to a specific message</h2>
+<p>Using the function <code>check_msg_time</code> you can see that the TIMESTAMP values associated with the message are not the same for each event. This indicates that alignment is required.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
+<pre><code>## # A tibble: 320 × 3
+##       Event SAMPLE_MESSAGE TIMESTAMP
+##      &lt;fctr&gt;         &lt;fctr&gt;     &lt;dbl&gt;
+## 1   14001.1     VowelOnset   1047469
+## 2   14001.2     VowelOnset   1054718
+## 3   14001.3     VowelOnset   1062679
+## 4   14001.4     VowelOnset   1069987
+## 5   14001.5     VowelOnset   1077113
+## 6   14001.6     VowelOnset   1084338
+## 7   14001.7     VowelOnset   1091555
+## 8   14001.8     VowelOnset   1099738
+## 9   14001.9     VowelOnset   1107363
+## 10 14001.10     VowelOnset   1114682
+## # ... with 310 more rows</code></pre>
+<p>The function <code>align_msg</code> is used to perform the alignment. To do this you must specify the message text as a string to the parameter <code>Msg</code>. The function finds the instance of the message for each event and sets that sample as the zero point. Consequently, this creates a new column called <code>Align</code>, which represents the time sequence relative to the message.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aligned1 &lt;-<span class="st"> </span><span class="kw">align_msg</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
+<p>If we check the message time again, we now see that the message occurs at time 0 in the <code>Align</code> column.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
+<pre><code>## # A tibble: 320 × 3
+##       Event SAMPLE_MESSAGE Align
+##      &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
+## 1   14001.1     VowelOnset     0
+## 2   14001.2     VowelOnset     0
+## 3   14001.3     VowelOnset     0
+## 4   14001.4     VowelOnset     0
+## 5   14001.5     VowelOnset     0
+## 6   14001.6     VowelOnset     0
+## 7   14001.7     VowelOnset     0
+## 8   14001.8     VowelOnset     0
+## 9   14001.9     VowelOnset     0
+## 10 14001.10     VowelOnset     0
+## # ... with 310 more rows</code></pre>
+<p>To fully examine all events, you can include the parameter <code>ReturnData=TRUE</code> and assign the output to an object in your environment.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">MSGTime &lt;-<span class="st"> </span><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>, <span class="dt">ReturnData =</span> <span class="ot">TRUE</span>)</code></pre></div>
+</div>
+<div id="creating-the-time-series-column" class="section level2">
+<h2>Creating the Time series column</h2>
+<p>Once you have aligned the time sequence relative to the message, you need to create the <code>Time</code> column using the function <code>create_time_series</code>. This function returns the time series column called <code>Time</code> which is required for subsequent processing, plotting, and modeling of the data. In the example here, our message relates specifically to the time at which the vowel in the word was played (because we programmed Experiment Builder to output a message for that). So, we do not need to specify an adjustment to the time series. If, however, your critical stimulus did not occur exactly at the message, but rather, before or after, an offset (i.e., positive or negative value in milliseconds) can be applied to the time series, to shift the zero point. This is done by specifying the the <code>Adj</code> parameter. If, on the other hand, this adjustment differed trial by trial, you can input a column name (present in your dataset) in <code>Adj</code>, which will apply offsets specific to each recording event.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aligned2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> aligned1, <span class="dt">Adj =</span> <span class="dv">0</span>)</code></pre></div>
+<p>The function <code>check_time_series</code> can be used to verify that the time series was created. The function outputs a list of the unique start values present in the data. In this example, we do not expect all events to start with the same Time value, given that we performed our own alignment without a relative interest period defined in Data Viewer. As with <code>check_msg_time</code>, the list of Events and Start Times can be returned as a data frame using the parameter <code>ReturnData</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_time_series</span>(<span class="dt">data =</span> aligned2)</code></pre></div>
+<pre><code>##   [1] -165 -280 -198 -176 -110 -384 -182 -163 -293 -445 -207 -362 -213 -157
+##  [15] -249 -191 -204 -175 -184 -155 -185 -214 -248 -190 -164 -409 -174 -241
+##  [29] -215 -361 -177 -242 -367 -197 -179 -178 -258 -289 -202 -257 -244 -111
+##  [43] -108 -136 -250 -104 -484 -188 -116 -227 -195 -338 -181 -413 -117 -115
+##  [57] -255 -318 -328 -263 -264 -118 -485 -412 -426 -172 -106 -114 -170 -211
+##  [71] -319 -154 -171 -180 -296 -107 -402 -109 -408 -431 -254 -271 -432 -203
+##  [85] -270 -317 -259 -267 -612 -135 -298 -368 -134 -158 -253 -152 -323 -260
+##  [99] -139 -105 -235 -160 -210 -611 -268 -321 -315 -113 -112 -218 -446 -206
+## [113] -322 -159 -219 -256 -243 -279 -217 -354 -272 -234 -146 -327 -187 -232
+## [127] -330 -220 -245 -290 -142 -141 -189 -121 -122 -156</code></pre>
+<p>Perhaps more meaningfully, we can check the message time again. We can see that our message is still the zero point in the Time series column.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned2, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
+<pre><code>## # A tibble: 320 × 3
+##      Event SAMPLE_MESSAGE  Time
+##     &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
+## 1  14001.1     VowelOnset     0
+## 2  14002.1     VowelOnset     0
+## 3  14003.1     VowelOnset     0
+## 4  14004.1     VowelOnset     0
+## 5  14005.1     VowelOnset     0
+## 6  14006.1     VowelOnset     0
+## 7  14008.1     VowelOnset     0
+## 8  14010.1     VowelOnset     0
+## 9  14001.2     VowelOnset     0
+## 10 14002.2     VowelOnset     0
+## # ... with 310 more rows</code></pre>
+</div>
+<div id="proceed-with-preprocessing" class="section level2">
+<h2>Proceed with preprocessing</h2>
+<p>At this point it is possible to proceed with preprocessing as usual. For details, please refer to the <code>Basic Preprocessing</code> vignette and continue by selecting a recording eye before binning the data.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

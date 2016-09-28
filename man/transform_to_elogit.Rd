@@ -8,7 +8,7 @@ transform_to_elogit(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
   Constant = 0.5, ObsOverride = FALSE)
 }
 \arguments{
-\item{data}{A data table object output by \code{\link{select_recorded_eye}}.}
+\item{data}{A data table object output by \code{\link{bin_prop}}.}
 
 \item{NoIA}{A positive integer indicating the number of interest areas defined 
 when creating the study.}

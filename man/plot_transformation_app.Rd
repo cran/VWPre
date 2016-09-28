@@ -8,7 +8,8 @@ plot_transformation_app()
 }
 \description{
 \code{plot_transformation_app} plots the empirical logit values for a 
-given number of observations and constant against proportions.
+given number of observations and constant against proportions, in order
+to examine the effect of these variables on the resulting transformation.
 }
 \examples{
 \dontrun{

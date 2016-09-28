@@ -22,14 +22,14 @@ An object of type data table as described in \link[dplyr]{tbl_df}.
 }
 \description{
 \code{prep_data} converts the data frame to a data table and examines the 
-class of the following columns: Subject, Item, LEFT_INTEREST_AREA_ID, 
+required columns (RECORDING_SESSION_LABEL, LEFT_INTEREST_AREA_ID, 
 RIGHT_INTEREST_AREA_ID, LEFT_INTEREST_AREA_LABEL, RIGHT_INTEREST_AREA_LABEL, 
-TIMESTAMP, and TRIAL_INDEX. If they were not encoded with the correct 
-class upon importing the data, the function will reassign the class and print 
-a summary of the reassignments. Additionally, the data table output by 
-the function contains a new column called Event which indexes each unique 
+TIMESTAMP, and TRIAL_INDEX) and optional columns (SAMPLE_MESSAGE, LEFT_GAZE_X,
+LEFT_GAZE_Y, RIGHT_GAZE_X, and RIGHT_GAZE_Y). It renames the subject and item 
+columns, ensures required/optional columns are of the approriate data class, 
+and creates a new column called Event which indexes each unique 
 series of samples corresponding to the combination of Subject and 
-TRIRAL_Index, necessary for performing subsequent operations.
+TRIAL_INDEX (can be changed), necessary for performing subsequent operations.
 }
 \examples{
 \dontrun{
@@ -37,7 +37,7 @@ TRIRAL_Index, necessary for performing subsequent operations.
 # corresponding to the subject.
 # To prepare the data...
 library(VWPre)
-df <- prep_data(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemID")
+df <- prep_data(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "ItemCol")
 }
 }
 

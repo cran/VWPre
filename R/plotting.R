@@ -14,7 +14,7 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #' \code{plot_avg} calculates the grand or conditional averages of 
 #' looks to each interest area along with standard error. It then plots the results.
 #' N.B.: This function will work for data with a maximum of 8 interest areas
-#' and two conditions.
+#' and 2 conditions.
 #' 
 #' @export
 #' @import dplyr
@@ -328,9 +328,10 @@ plot_avg <- function(data = data, type = NA, xlim = NA, IAColumns = IAColumns,
 
 #' Plots average contour surface of looks to a given interest area.
 #' 
-#' \code{plot_avg_contour} calculates the conditional average of empirical logit 
-#' looks to a given interest area by Time and a specified continuous variable. 
-#' It then applies a 3D smooth (derived using \code{\link[mgcv]{gam}}) over 
+#' \code{plot_avg_contour} calculates the conditional average of proportions or 
+#' empirical logit looks to a given interest area by Time and a specified 
+#' continuous variable. It then applies a 3D smooth 
+#' (derived using \code{\link[mgcv]{gam}}) over 
 #' the surface and plots the results as a contour plot. 
 #' 
 #' @export

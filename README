@@ -18,8 +18,7 @@ install.packages("VWPre")
 ### Usage
 
 Example usage of specific functions contained in the package can be found in the vignettes. 
-There is one vignette currently available which walks users through the steps needed to preprocess and visualize data from an SR Research (Eyelink) sample report. 
-More vignettes will be included as functionality for other eye-tracking systems is added.
+These documents are organized thematically and walk users through the steps needed to preprocess and visualize data from an SR Research (Eyelink) sample report.
 You can view the available vignettes as follows:
 browseVignettes("VWPre")
 

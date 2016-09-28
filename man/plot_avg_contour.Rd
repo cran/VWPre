@@ -29,9 +29,10 @@ function, or ggplot2's base theme (which any other custom theme could be added).
 \item{Colors}{A vector of two strings specifying the colrs of the contour shading - The default values represent grayscale.}
 }
 \description{
-\code{plot_avg_contour} calculates the conditional average of empirical logit 
-looks to a given interest area by Time and a specified continuous variable. 
-It then applies a 3D smooth (derived using \code{\link[mgcv]{gam}}) over 
+\code{plot_avg_contour} calculates the conditional average of proportions or 
+empirical logit looks to a given interest area by Time and a specified 
+continuous variable. It then applies a 3D smooth 
+(derived using \code{\link[mgcv]{gam}}) over 
 the surface and plots the results as a contour plot.
 }
 \examples{

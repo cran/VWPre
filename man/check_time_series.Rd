@@ -4,10 +4,13 @@
 \alias{check_time_series}
 \title{Check the new time series}
 \usage{
-check_time_series(data = data)
+check_time_series(data = data, ReturnData = F)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{create_time_series}}.}
+
+\item{ReturnData}{A logical indicating whether to return a data table 
+containing Start Time information for each event.}
 }
 \value{
 The value(s) of Time (in milliseconds) at which events begin relative 
@@ -16,13 +19,15 @@ to the onset of the auditory stimulus.
 \description{
 \code{check_time_series} examines the first value in the Time column
 for each event. If they are equal, it will return a single value.  The returned
-value should be equal to 0 minus the offset.
+value(s) will vary depending on the interest period (if defined), message 
+alignment (if completed), and the Adjustment parameter (`Adj`) supplied to 
+\code{\link{create_time_series}}.
 }
 \examples{
 \dontrun{
 library(VWPre)
 # Check the starting Time column...
-check_time_series(dat)
+check_time_series(data = dat)
 }
 }
 

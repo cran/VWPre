@@ -73,7 +73,9 @@ check_ia <- function(data = data) {
 #' 
 #' \code{check_time_series} examines the first value in the Time column
 #' for each event. If they are equal, it will return a single value.  The returned
-#' value should be equal to 0 minus the offset.
+#' value(s) will vary depending on the interest period (if defined), message 
+#' alignment (if completed), and the Adjustment parameter (`Adj`) supplied to 
+#' \code{\link{create_time_series}}.
 #' 
 #' @export
 #' @import dplyr
@@ -81,22 +83,65 @@ check_ia <- function(data = data) {
 #' @import lazyeval
 #' 
 #' @param data A data table object output by \code{\link{create_time_series}}.
+#' @param ReturnData A logical indicating whether to return a data table 
+#' containing Start Time information for each event.
 #' @return The value(s) of Time (in milliseconds) at which events begin relative 
 #' to the onset of the auditory stimulus.
 #' @examples
 #' \dontrun{
 #' library(VWPre)
 #' # Check the starting Time column...
-#' check_time_series(dat)
+#' check_time_series(data = dat)
 #' }
-check_time_series = function(data = data) {
-  event_start_table = data %>% group_by(Event) %>%
-    summarise(ftime = min(Time))
-  message(paste(capture.output(cat(unique(event_start_table$ftime)))), collapse = "\n")
+check_time_series <- function(data = data, ReturnData = F) {
+  event_start_table = data %>% group_by(Event) %>% summarise(Start_Time = min(Time))
+  message(paste(capture.output(unique(event_start_table$Start_Time)), collapse = "\n"))
+  if(ReturnData==T) {
+    return(ungroup(event_start_table))
+  }
 }
 
 
-
+#' Check the time value(s) at a specific message
+#' 
+#' \code{check_msg_time} examines the time point of a specific Sample Message
+#' for each event. Depending on the format of the data, it will use one of three
+#' columns: TIMESTAMP, Align, or Time. 
+#' 
+#' @export
+#' @import dplyr
+#' @import tidyr
+#' @import lazyeval
+#' 
+#' @param data A data table object output by \code{\link{relabel_na}},
+#' \code{\link{align_msg}}, or \code{\link{create_time_series}}.
+#' @param Msg A character string containing the exact message to be found in 
+#' the column SAMPLE_MESSAGE.
+#' @param ReturnData A logical indicating whether to return a data table 
+#' containing Message Time information for each event.
+#' @return The value(s) of Time (in milliseconds) at which the Sample Message
+#' is found.
+#' @examples
+#' \dontrun{
+#' library(VWPre)
+#' # Check the Sample Message time...
+#' check_msg_time(data = dat)
+#' }
+check_msg_time <- function(data = data, Msg = Msg, ReturnData = F) {
+  if(!("Time" %in% colnames(data)) && !("Align" %in% colnames(data))) {
+    tmp <- data %>% filter(SAMPLE_MESSAGE==Msg) %>% select(Event, SAMPLE_MESSAGE, TIMESTAMP)
+    message(paste(capture.output(print(tmp)), collapse = "\n"))
+  } else if (!("Time" %in% colnames(data)) && ("Align" %in% colnames(data))) {
+    tmp <- data %>% filter(SAMPLE_MESSAGE==Msg) %>% select(Event, SAMPLE_MESSAGE, Align)
+    message(paste(capture.output(print(tmp)), collapse = "\n"))
+  } else if ("Time" %in% colnames(data)) {
+    tmp <- data %>% filter(SAMPLE_MESSAGE==Msg) %>% select(Event, SAMPLE_MESSAGE, Time)
+    message(paste(capture.output(print(tmp)), collapse = "\n"))
+  }
+  if(ReturnData==T) {
+    return(tmp)
+  }
+}
 
 
 #' Check the number of samples in each bin
@@ -270,13 +315,13 @@ rename_columns <- function(data = data, Labels = Labels) {
   
   Labels <- Labels
   tmp <- data
-
+  
   if (length(names(Labels))>8) {
     stop("You have more than 8 interest areas.")
   } else {
     message(paste("Renaming", length(names(Labels)), "interest areas.", sep = " "))
   }
-    
+  
   Labels <- c("0" = "outside", Labels)
   
   NoIA <- length(names(Labels))
@@ -287,7 +332,18 @@ rename_columns <- function(data = data, Labels = Labels) {
     tmp<-setNames(tmp, gsub(names(Labels)[x],Labels[[x]],names(tmp)))
   }
   
-  return(tmp)
+  custcol <- data.frame(C1 = grep("[_0-9]+[_V_]+[0-9_]", names(tmp), value = T),
+                        C2 = rep(NA, length(grep("[_0-9]+[_V_]+[0-9_]", names(tmp), value = T))))
+  
+  if (nrow(custcol) > 0) {
+    for (y in 1:nrow(custcol)) {
+      for (z in 1:length(Labels)) {
+        custcol[y,2]<-gsub(paste(z-1), Labels[[z]], custcol[y,1])
+        tmp<-setNames(tmp, gsub(custcol[y,1], custcol[y,2], names(tmp)))
+      }
+    }
+  }
+  
+  return(ungroup(tmp))
   
 }
-

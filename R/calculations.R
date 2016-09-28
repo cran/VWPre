@@ -180,7 +180,7 @@ bin_prop <- function(data = data, NoIA = NoIA, BinSize = BinSize, SamplingRate =
 #' @import dplyr
 #' @import lazyeval
 #' 
-#' @param data A data table object output by \code{\link{select_recorded_eye}}.
+#' @param data A data table object output by \code{\link{bin_prop}}.
 #' @param NoIA A positive integer indicating the number of interest areas defined 
 #' when creating the study. 
 #' @param ObsPerBin A positive integer indicating the number of observations to
@@ -316,6 +316,8 @@ transform_to_elogit <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
 #' bin, which can be determined with \code{\link{check_samples_per_bin}}.
 #' @param ObsOverride A logical value controlling restrictions on the value
 #' provided to ObsPerBin. Default value is FALSE.
+#' @param CustomBinom An optional parameter specifying a vector containing two 
+#' integers corresponding to the interest area IDs to be combined.
 #' @return A data table with additional columns (the number of which depends on 
 #' the number of interest areas specified) added to \code{data}.
 #' @examples
@@ -325,7 +327,7 @@ transform_to_elogit <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
 #' df <- create_binomial(data = dat, NoIA = 4, ObsPerBin = 20)
 #' }
 create_binomial <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
-                            ObsOverride = FALSE) {
+                            ObsOverride = FALSE, CustomBinom = NULL) {
   
   data <- data %>% ungroup()
   
@@ -409,6 +411,16 @@ create_binomial <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
   if (NoIA == 8) {
     tmp$IA_8_Looks = cbind(as.integer(round(tmp$IA_8_P*tmp$Obs)), as.integer(round((1-tmp$IA_8_P)*tmp$Obs)))
   }
+  
+  
+  if (!(is.null(CustomBinom))) {
+    bindcol1 <- paste("IA_", CustomBinom[1], "_Looks", sep="")
+    bindcol2 <- paste("IA_", CustomBinom[2], "_Looks", sep="")
+    newcol <- paste("IA_", CustomBinom[1], "_V_", CustomBinom[2], "_Looks", sep="")
+    tmp$Custom <- cbind(tmp[,bindcol1][,1],tmp[,bindcol2][,1])
+    tmp <- rename_(tmp, .dots = setNames("Custom", newcol))
+  }
+  
   
   return(tmp)
 }

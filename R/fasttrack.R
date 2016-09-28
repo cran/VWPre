@@ -1,12 +1,12 @@
-#' Fast-track processing
+#' Fast-track basic preprocessing
 #' 
 #' \code{fasttrack} is a meta-function for advanced users who are 
-#' already familiar with the package functions.
-#' It takes all necessary arguments for the component functions
-#' to produce proportion looks. It also takes an argument specifying 
-#' if empirical logits or binomial data should be output.  The
-#' function returns a dataframe contained the result of the series 
-#' of subroutines.
+#' already familiar with the package functions and do not need to take remedial 
+#' actions such as recoding interest areas, remapping gaze data, or performing
+#' message alignment.It takes all necessary arguments for the component functions
+#' to produce proportion looks and can output either empirical logits or 
+#' binomial data. The function returns a dataframe containing the result of 
+#' the series of subroutines.
 #' 
 #' @export
 #' @import dplyr
@@ -21,7 +21,8 @@
 #' the Event variable; by default, Subject and TRIAL_INDEX.
 #' @param NoIA A positive integer indicating the number of interest areas defined 
 #' when creating the study. 
-#' @param Offset A positive integer indicating amount of time in milliseconds.
+#' @param Adj An integer indicating amount of time in milliseconds by which to 
+#' offset the time series.
 #' @param Recording A string indicating which eyes were used for recording gaze data.
 #' @param WhenLandR A string indicating which eye ("Right" or "Left) to use 
 #' if gaze data is available for both eyes (i.e., Recording = "LandR"). 
@@ -35,6 +36,8 @@
 #' provided to ObsPerBin. Default value is FALSE.
 #' @param Constant A positive number used for the empirical logit and weights
 #' calculation; by default, 0.5 as in Barr (2008).
+#' @param CustomBinom An optional parameter specifying a vector containing two 
+#' integers corresponding to the interest area IDs to be combined.
 #' @param Output An obligatory string containing either "ELogit" or "Binomial".
 #' @return A data table containing formatting and calculations.
 #' @examples
@@ -42,24 +45,24 @@
 #' library(VWPre)
 #' # Perform meta-function on data
 #' df <- fasttrack(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
-#'        EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Offset = 100, 
+#'        EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adj = -100, 
 #'				Recording = "LandR", WhenLandR = "Right", BinSize = 20, 
 #'				SamplingRate = 1000, ObsPerBin = 20, Constant = 0.5, 
 #'				Output = "ELogit")
 #' }
 fasttrack = function(data = data, Subject = Subject, Item = Item, 
                         EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA,
-                        Offset = Offset, Recording = Recording, 
+                        Adj = Adj, Recording = Recording, 
                         WhenLandR = WhenLandR, BinSize = BinSize, SamplingRate = SamplingRate,
                         ObsPerBin = ObsPerBin, ObsOverride = FALSE, 
-						Constant = 0.5, Output = Output) {
+						Constant = 0.5, CustomBinom = NULL, Output = Output) {
   
   dat <- data
   Subject <- Subject
   Item <- Item
   EventColumns <- EventColumns
   NoIA <- NoIA
-  Offset <- Offset
+  Adj <- Adj
   Recording <- Recording
   WhenLandR <- WhenLandR
   BinSize <- BinSize
@@ -67,6 +70,7 @@ fasttrack = function(data = data, Subject = Subject, Item = Item,
   ObsPerBin <- ObsPerBin
   ObsOverride <- ObsOverride
   Constant <- Constant
+  CustomBinom <- CustomBinom
   Output <- Output
   
   message("Preparing data...")
@@ -78,8 +82,8 @@ fasttrack = function(data = data, Subject = Subject, Item = Item,
   
   check_ia(data = dat1)
   
-  message(paste("Creating time series with", Offset, "ms offset...", sep = " "))
-  dat2 <- create_time_series(data = dat1, Offset = Offset)
+  message(paste("Creating time series with", Adj, "ms adjustment...", sep = " "))
+  dat2 <- create_time_series(data = dat1, Adj = Adj)
   rm(dat1)
   
   check_time_series(data = dat2)
@@ -105,7 +109,7 @@ fasttrack = function(data = data, Subject = Subject, Item = Item,
                                 Constant = Constant, ObsOverride = ObsOverride)
   } else if (Output == "Binomial") {
     dat5 <- create_binomial(data = dat4, NoIA = NoIA, ObsPerBin = ObsPerBin,
-                            ObsOverride = ObsOverride)
+                            ObsOverride = ObsOverride, CustomBinom = CustomBinom)
   }
   
   rm(dat4)

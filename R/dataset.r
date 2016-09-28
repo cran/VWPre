@@ -1,4 +1,4 @@
-#' This is a sample dataset included in the package
+#' This is a sample eye-tracking dataset included in the package
 #'
 #' @name VWdat
 #' @docType data

@@ -5,7 +5,7 @@
 \title{Creates a success/failure column for each IA based on counts.}
 \usage{
 create_binomial(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
-  ObsOverride = FALSE)
+  ObsOverride = FALSE, CustomBinom = NULL)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}} or
@@ -20,6 +20,9 @@ bin, which can be determined with \code{\link{check_samples_per_bin}}.}
 
 \item{ObsOverride}{A logical value controlling restrictions on the value
 provided to ObsPerBin. Default value is FALSE.}
+
+\item{CustomBinom}{An optional parameter specifying a vector containing two 
+integers corresponding to the interest area IDs to be combined.}
 }
 \value{
 A data table with additional columns (the number of which depends on 

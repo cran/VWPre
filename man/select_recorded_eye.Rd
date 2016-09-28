@@ -23,7 +23,7 @@ A data table with four additional columns ('EyeRecorded', 'EyeSelected',
 interest area information, based on the \code{Recording} parameter (which 
 can be determined using \code{\link{check_eye_recording}}). 
 This function then selects the data from the recorded eye and copies it
-new columns (IA_ID and IA_LABEL). The function prints a summary of output.
+new columns (IA_ID and IA_LABEL). The function prints a summary of the output.
 }
 \examples{
 \dontrun{

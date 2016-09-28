@@ -1,5 +1,41 @@
 # -----------------------------------------------
 
+# VWPre 0.9.0
+
+## Major changes:
+
+### New functions
+
+* align_msg: Allows users to align the data manually based on a given sample message, rather than using interest periods defined in SR DataViewer.
+* check_msg_time: Allows users to examine the time values for a given sample message. It is also possible to return a data frame containing the time point value at the given message of each recording event. 
+* custom_ia: Allows users to map the eye gaze data to newly defined interest areas via X and Y gaze coordinates. This requires the user to create a bounding box for each interest area per recording event.
+
+### Changes to functions
+
+* check_time_series: Internal changes that allow the function to handle the output from the new alignment function. Also, it is now possible to return a data frame containing the start time of each recording event. 
+* create_time_series: Internal changes that allow the function to use the output of the new alignment function. As part of this, the parameter Offset has been replaced with Adj (Adjustment), which allows the user to apply an offset in either direction using a (positive or negative) constant as well as to specify a column in the data set that contains values to be applied as the offset. 
+* create_binomial: Internal changes which now allow the user to create custom binomial columns (e.g., looks to IA1 vs. looks to IA4). If this is desired, it can be specified in the parameter CustomBinom.
+
+### Vignettes
+
+* Vignettes have been updated and are now organized thematically as to be more digestible: 1) Basic preprocessing; 2) Plotting; 3) Message alignment; and 4) Interest Areas.
+
+## Minor changes:
+
+### Changes to functions 
+
+* prep_data: Internal changes that now check required/optional columns needed called within package functions.
+* rename_columns: Internal changes that allow the function to handle the custom binomial columns available in create_binomial.
+* fasttrack: Changes reflect changes to the component functions.
+
+## Bug fixes:
+
+* None.
+
+
+
+# -----------------------------------------------
+
 # VWPre 0.7.0
 
 ## Major changes:

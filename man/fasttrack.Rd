@@ -2,13 +2,13 @@
 % Please edit documentation in R/fasttrack.R
 \name{fasttrack}
 \alias{fasttrack}
-\title{Fast-track processing}
+\title{Fast-track basic preprocessing}
 \usage{
 fasttrack(data = data, Subject = Subject, Item = Item,
-  EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA,
-  Offset = Offset, Recording = Recording, WhenLandR = WhenLandR,
-  BinSize = BinSize, SamplingRate = SamplingRate, ObsPerBin = ObsPerBin,
-  ObsOverride = FALSE, Constant = 0.5, Output = Output)
+  EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA, Adj = Adj,
+  Recording = Recording, WhenLandR = WhenLandR, BinSize = BinSize,
+  SamplingRate = SamplingRate, ObsPerBin = ObsPerBin, ObsOverride = FALSE,
+  Constant = 0.5, CustomBinom = NULL, Output = Output)
 }
 \arguments{
 \item{data}{A data frame object created from an Eyelink Sample Report.}
@@ -25,7 +25,8 @@ the Event variable; by default, Subject and TRIAL_INDEX.}
 \item{NoIA}{A positive integer indicating the number of interest areas defined 
 when creating the study.}
 
-\item{Offset}{A positive integer indicating amount of time in milliseconds.}
+\item{Adj}{An integer indicating amount of time in milliseconds by which to 
+offset the time series.}
 
 \item{Recording}{A string indicating which eyes were used for recording gaze data.}
 
@@ -47,6 +48,9 @@ provided to ObsPerBin. Default value is FALSE.}
 \item{Constant}{A positive number used for the empirical logit and weights
 calculation; by default, 0.5 as in Barr (2008).}
 
+\item{CustomBinom}{An optional parameter specifying a vector containing two 
+integers corresponding to the interest area IDs to be combined.}
+
 \item{Output}{An obligatory string containing either "ELogit" or "Binomial".}
 }
 \value{
@@ -54,19 +58,19 @@ A data table containing formatting and calculations.
 }
 \description{
 \code{fasttrack} is a meta-function for advanced users who are 
-already familiar with the package functions.
-It takes all necessary arguments for the component functions
-to produce proportion looks. It also takes an argument specifying 
-if empirical logits or binomial data should be output.  The
-function returns a dataframe contained the result of the series 
-of subroutines.
+already familiar with the package functions and do not need to take remedial 
+actions such as recoding interest areas, remapping gaze data, or performing
+message alignment.It takes all necessary arguments for the component functions
+to produce proportion looks and can output either empirical logits or 
+binomial data. The function returns a dataframe containing the result of 
+the series of subroutines.
 }
 \examples{
 \dontrun{
 library(VWPre)
 # Perform meta-function on data
 df <- fasttrack(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
-       EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Offset = 100, 
+       EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adj = -100, 
 			Recording = "LandR", WhenLandR = "Right", BinSize = 20, 
 			SamplingRate = 1000, ObsPerBin = 20, Constant = 0.5, 
 			Output = "ELogit")
