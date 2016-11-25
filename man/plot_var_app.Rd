@@ -4,7 +4,7 @@
 \alias{plot_var_app}
 \title{Plots diagnostic plots of subject/item variance.}
 \usage{
-plot_var_app(data = data)
+plot_var_app(data)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 

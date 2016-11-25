@@ -4,11 +4,11 @@
 \alias{fasttrack}
 \title{Fast-track basic preprocessing}
 \usage{
-fasttrack(data = data, Subject = Subject, Item = Item,
-  EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA, Adj = Adj,
-  Recording = Recording, WhenLandR = WhenLandR, BinSize = BinSize,
-  SamplingRate = SamplingRate, ObsPerBin = ObsPerBin, ObsOverride = FALSE,
-  Constant = 0.5, CustomBinom = NULL, Output = Output)
+fasttrack(data = data, Subject = NULL, Item = NA,
+  EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA, Adjust = 0,
+  Recording = NULL, WhenLandR = NA, BinSize = NULL, SamplingRate = NULL,
+  ObsPerBin = NULL, ObsOverride = FALSE, Constant = 0.5,
+  CustomBinom = NULL, Output = NULL)
 }
 \arguments{
 \item{data}{A data frame object created from an Eyelink Sample Report.}
@@ -25,7 +25,7 @@ the Event variable; by default, Subject and TRIAL_INDEX.}
 \item{NoIA}{A positive integer indicating the number of interest areas defined 
 when creating the study.}
 
-\item{Adj}{An integer indicating amount of time in milliseconds by which to 
+\item{Adjust}{An integer indicating amount of time in milliseconds by which to 
 offset the time series.}
 
 \item{Recording}{A string indicating which eyes were used for recording gaze data.}
@@ -70,7 +70,7 @@ the series of subroutines.
 library(VWPre)
 # Perform meta-function on data
 df <- fasttrack(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
-       EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adj = -100, 
+       EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adjust = 100, 
 			Recording = "LandR", WhenLandR = "Right", BinSize = 20, 
 			SamplingRate = 1000, ObsPerBin = 20, Constant = 0.5, 
 			Output = "ELogit")

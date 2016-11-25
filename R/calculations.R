@@ -30,18 +30,25 @@
 #' # Bin samples and calculation proportions...
 #' df <- bin_prop(dat, NoIA = 4, BinSize = 20, SamplingRate = 1000)
 #' }
-bin_prop <- function(data = data, NoIA = NoIA, BinSize = BinSize, SamplingRate = SamplingRate) {
+bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
   
-  NoIA = NoIA
-  samplerate <-  data$Time[2] - data$Time[1]
-  BinSize = BinSize
-  SamplesPerBin <- (SamplingRate / 1000) * BinSize
-  
-    if (NoIA == 0) {
+  if(is.null(NoIA)){
+    stop("Please supply the number of interest areas!")
+  } else if (NoIA == 0) {
     stop("You must have at least one interest area!")
   } else if (NoIA > 8) {
     stop("You have more than 8 interest areas; you must modify this function.")
   } 
+  
+  if(is.null(BinSize)){
+    stop("Please supply the bin size!")
+  } 
+  if(is.null(SamplingRate)){
+    stop("Please supply the sampling rate!")
+  } 
+
+  SamplesPerBin <- (SamplingRate / 1000) * BinSize
+  samplerate <-  data$Time[2] - data$Time[1]
   
   if (BinSize %% samplerate != 0) {
     stop("Sample frequency of data is not a multiple of the target frequency.")
@@ -151,7 +158,6 @@ bin_prop <- function(data = data, NoIA = NoIA, BinSize = BinSize, SamplingRate =
   message(paste("These occur at time bin(s):", capture.output(cat(unique(tmp$Time))), collapse = "\n"))
   message("Subsequent Empirical Logit calculations may be influenced by the number of samples (depending on the number of observations requested).")
   
-  
   return(ungroup(data))
 }
 
@@ -198,17 +204,19 @@ bin_prop <- function(data = data, NoIA = NoIA, BinSize = BinSize, SamplingRate =
 #' # Convert proportions to empirical logits and calculate weights...
 #' df <- transform_to_elogit(dat, NoIA = 4, ObsPerBin = 20, Constant = 0.5)
 #' }
-transform_to_elogit <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
+transform_to_elogit <- function(data, NoIA = NULL, ObsPerBin = NULL,
                                 Constant = 0.5, ObsOverride = FALSE) {
-  NoIA = NoIA
-  ObsPerBin = ObsPerBin
-  Constant = Constant
-  ObsOverride = ObsOverride
-  
-  if (NoIA == 0) {
+
+  if(is.null(NoIA)){
+    stop("Please supply the number of interest areas!")
+  } else if (NoIA == 0) {
     stop("You must have at least one interest area!")
   } else if (NoIA > 8) {
     stop("You have more than 8 interest areas; you must modify this function.")
+  }
+  
+  if(is.null(ObsPerBin)){
+    stop("Please supply the number of observations per bin!")
   } 
   
   if (ObsPerBin == max(data$NSamples)) {
@@ -326,17 +334,22 @@ transform_to_elogit <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
 #' # Create binomial (success/failure) column...
 #' df <- create_binomial(data = dat, NoIA = 4, ObsPerBin = 20)
 #' }
-create_binomial <- function(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
+create_binomial <- function(data, NoIA = NULL, ObsPerBin = NULL,
                             ObsOverride = FALSE, CustomBinom = NULL) {
   
   data <- data %>% ungroup()
   
-  if (NoIA == 0) {
+  if(is.null(NoIA)){
+    stop("Please supply the number of interest areas!")
+  } else if (NoIA == 0) {
     stop("You must have at least one interest area!")
   } else if (NoIA > 8) {
     stop("You have more than 8 interest areas; you must modify this function.")
-  } 
+  }
   
+  if(is.null(ObsPerBin)){
+    stop("Please supply the number of observations per bin!")
+  } 
   
   if (ObsPerBin == max(data$NSamples)) {
     message(

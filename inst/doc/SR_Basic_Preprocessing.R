@@ -33,10 +33,13 @@ dat1 <- relabel_na(data = dat0, NoIA = 4)
 check_ia(data = dat1)
 
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
-dat2 <- create_time_series(data = dat1, Adj = -100)
+dat2 <- create_time_series(data = dat1, Adjust = 100)
 
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
 check_time_series(data = dat2)
+
+## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
+check_msg_time(data = dat2, Msg = "TargetOnset")
 
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
 check_eye_recording(data = dat2)
@@ -67,7 +70,7 @@ dat5a <- create_binomial(data = dat4, NoIA = 4, ObsPerBin = 20)
 
 ## ---- eval = TRUE, echo=TRUE, results='asis'-----------------------------
 dat5b <- fasttrack(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
-	EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adj = -100, Recording = "LandR", 
+	EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adjust = 100, Recording = "LandR", 
   WhenLandR = "Right", BinSize = 20, SamplingRate = 1000,
   ObsPerBin = 20, Constant = 0.5, Output = "ELogit")
 

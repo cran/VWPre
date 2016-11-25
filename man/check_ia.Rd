@@ -4,7 +4,7 @@
 \alias{check_ia}
 \title{Check the interest area IDs and labels}
 \usage{
-check_ia(data = data)
+check_ia(data)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{relabel_na}}.}

@@ -4,7 +4,7 @@
 \alias{check_samplingrate}
 \title{Determine the sampling rate present in the data}
 \usage{
-check_samplingrate(data = data, ReturnData = FALSE)
+check_samplingrate(data, ReturnData = FALSE)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{select_recorded_eye}}.}

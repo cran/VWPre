@@ -4,7 +4,7 @@
 \alias{custom_ia}
 \title{Map gaze data to newly defined interest areas}
 \usage{
-custom_ia(data = data, iaLookup = iaLookup)
+custom_ia(data, iaLookup = NULL)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{prep_data}}.}

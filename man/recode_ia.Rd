@@ -4,7 +4,7 @@
 \alias{recode_ia}
 \title{Recode interest area IDs and/or interest area labels}
 \usage{
-recode_ia(data = data, IDs = NULL, Labels = NULL)
+recode_ia(data, IDs = NULL, Labels = NULL)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{relabel_na}}.}

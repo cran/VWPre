@@ -4,7 +4,8 @@ theme_mybw <- function(base_size = 12, base_family = ""){
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank(),
           panel.grid.major.y = element_blank(),
-          panel.grid.minor.y = element_blank()
+          panel.grid.minor.y = element_blank(),
+          plot.title = element_text(hjust = 0.5, vjust = 1)
     )
 }
 
@@ -80,17 +81,19 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #'    EN3 = "English 1"), Cond2Labels = c(High = "H Exp", Low = "L Exp"),
 #'    ErrorBar = TRUE, VWPreTheme = TRUE)
 #' }
-plot_avg <- function(data = data, type = NA, xlim = NA, IAColumns = IAColumns, 
+plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL, 
                      Condition1 = NA, Condition2 = NA, Cond1Labels = NA, 
                      Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE) {
   
-  NoIA <- length(names(IAColumns))
-  IAColumns <- IAColumns
-  Condition1 <- Condition1
-  Condition2 <- Condition2
-  Cond1Labels <- Cond1Labels
-  Cond2Labels <- Cond2Labels
-  ErrorBar <- ErrorBar
+  if(is.null(type)){
+    stop("Please supply the plot type!")
+  }
+  if(is.null(IAColumns)){
+    stop("Please supply the interest area columns to be plotted!")
+  } else {
+    NoIA <- length(names(IAColumns))
+  }
+
   Theme <- VWPreTheme
   
   if (is.na(xlim)[1]) {
@@ -349,7 +352,7 @@ plot_avg <- function(data = data, type = NA, xlim = NA, IAColumns = IAColumns,
 #' @param Var A string containing the column name corresponding to the continuous
 #' variable.
 #' @param VarLabel A string specifying the axis label to use for \code{Var}.
-#' @param Theme A logical indicating whether the theme included with the 
+#' @param VWPreTheme A logical indicating whether the theme included with the 
 #' function, or ggplot2's base theme (which any other custom theme could be added).
 #' @param Colors A vector of two strings specifying the colrs of the contour shading - The default values represent grayscale.
 #' @examples
@@ -358,18 +361,36 @@ plot_avg <- function(data = data, type = NA, xlim = NA, IAColumns = IAColumns,
 #' # For plotting a conditional contour surface...
 #' plot_avg_contour(data = dat, IA = "IA_1_ELogit", type = "elogit", 
 #'                Var = "Rating", VarLabel = "Accent Rating", xlim = c(0,1000), 
-#'                Theme = FALSE, Color = c("red", "white"))
+#'                VWPreTheme = FALSE, Colors = c("red", "white"))
 #' }
-plot_avg_contour <- function(data = data, IA = "IA_1_P", type = NA, Var = Var, 
-                             VarLabel = VarLabel, xlim=NA, Theme=TRUE, 
+plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL, 
+                             VarLabel = NULL, xlim=NA, VWPreTheme=TRUE, 
                              Colors=c("gray20", "gray90")) {
-  data <- data
-  IA <- IA
-  Var <- Var
+
+  if(is.null(IA)){
+    stop("Please supply the interest area to be plotted!")
+  }
+  if(is.null(type)){
+    stop("Please supply the plot type!")
+  }
+  if(is.null(Var)){
+    stop("Please supply the variable column name to be used in the contour plot!")
+  } 
+  
+  if(is.numeric(eval(parse(text=paste0("data$", Var)))) | is.integer(eval(parse(text=paste0("data$", Var))))){
+  } else {
+	stop("The contour plot variable must be of class 'numeric' or class 'integer'!")
+  }
+  
   zlim <- c(-4,4)
   sel_names <- c("Time", IA, Var)
   Colors <- Colors
+  Theme <- VWPreTheme
   
+  if(is.null(VarLabel)) {
+    VarLabel <- Var
+  }
+
   if (is.na(xlim)[1]) {
     xlim <- c(range(data$Time)[1], range(data$Time)[2])
   } else {
@@ -440,18 +461,18 @@ plot_avg_contour <- function(data = data, IA = "IA_1_P", type = NA, Var = Var,
       geom_tile(aes(fill = mean)) +
       stat_contour() +
       geom_contour(color = "white") + 
-      scale_fill_gradient(limit=c(zlim[1], zlim[2]), low = Colors[1], high = Colors[2]) + 
+      scale_fill_gradient(name = "Mean", limit=c(zlim[1], zlim[2]), low = Colors[1], high = Colors[2]) + 
       scale_x_continuous(expand=c(0,0)) +
       scale_y_continuous(expand=c(0,0)) +
       ylab(VarLabel) +
-      theme_bw()
+      theme_mybw()
   } else {
     ggplot(predsmooth) + 
       aes(x = Time, y = Variable, z = mean, fill = mean) + 
       geom_tile(aes(fill = mean)) +
       stat_contour() +
       geom_contour(color = "white") + 
-      scale_fill_gradient(limit=c(zlim[1], zlim[2]), low = Colors[1], high = Colors[2]) + 
+      scale_fill_gradient(name = "Mean", limit=c(zlim[1], zlim[2]), low = Colors[1], high = Colors[2]) + 
       scale_x_continuous(expand=c(0,0)) +
       scale_y_continuous(expand=c(0,0)) +
       ylab(VarLabel) 
@@ -512,21 +533,21 @@ plot_avg_contour <- function(data = data, IA = "IA_1_P", type = NA, Var = Var,
 #'            Cond2Labels = c(High = "H Exp", Low = "L Exp"), ErrorBar = TRUE, 
 #'            VWPreTheme = TRUE)
 #' }
-plot_avg_diff <- function(data = data, DiffCols = DiffCols, xlim = NA,
+plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA,
                           Condition1 = NA, Condition2 = NA, Cond1Labels = NA, 
                           Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE) {
   dat <- data
   
-  DiffCols <- DiffCols
+  if(is.null(DiffCols)){
+    stop("Please supply the columns for the difference!")
+  } else {
   DiffCol1 <- names(DiffCols)[1]
   DiffCol2 <- names(DiffCols)[2]
+  }
+  
   ylim <- c(0,0)
   dat <- dat %>% mutate_(., Diff = interp(~DiffCol1 - DiffCol2, DiffCol1 = as.name(DiffCol1), DiffCol2 = as.name(DiffCol2)))
-  Condition1 <- Condition1
-  Condition2 <- Condition2
-  Cond1Labels <- Cond1Labels
-  Cond2Labels <- Cond2Labels
-  ErrorBar <- ErrorBar
+
   Theme <- VWPreTheme
   sel_names <- c("Time", "Diff")
   

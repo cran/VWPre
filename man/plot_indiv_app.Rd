@@ -4,7 +4,7 @@
 \alias{plot_indiv_app}
 \title{Plots diagnostic average plots of subjects/items.}
 \usage{
-plot_indiv_app(data = data)
+plot_indiv_app(data)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 

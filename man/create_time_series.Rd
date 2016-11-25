@@ -4,18 +4,23 @@
 \alias{create_time_series}
 \title{Create a time series column}
 \usage{
-create_time_series(data = data, Adj = Adj)
+create_time_series(data, Adjust = 0, Adj = NULL, Offset = NULL)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{relabel_na}} or 
 \code{\link{align_msg}}.}
 
-\item{Adj}{Optionally an integer value or a text string. If an integer 
+\item{Adjust}{Optionally an integer value or a text string. If an integer 
 (positive or negative), this will indicate an amount of time in 
-milliseconds. Positive values get added to the time points; negative 
-get subtracted. If a text string, this will be the name of a column in 
+milliseconds. The value is subtracted from the time points: positive values
+shift the zero forward; negative values shift the zero backward.
+If a text string, this will be the name of a column in 
 the data set which contains values indicating when the critical stimulus
 was presented relative to the zero point.}
+
+\item{Adj}{DEPRECATED SINCE VERSION 0.9.5 - TO BE REMOVED.}
+
+\item{Offset}{DEPRECATED SINCE VERSION 0.9.0 - TO BE REMOVED.}
 }
 \value{
 A data table object.
@@ -30,11 +35,11 @@ is indicated in a new column called Time.
 \dontrun{
 library(VWPre)
 # To create the Time column...
-df <- create_time_series(data = dat, Adj = "SoundOnsetColumn")
+df <- create_time_series(data = dat, Adjust = "SoundOnsetColumn")
+# or  
+df <- create_time_series(data = dat, Adjust = -100)
 # or
-df <- create_time_series(data = dat, Adj = -100)
-# or
-df <- create_time_series(data = dat, Adj = 100)
+df <- create_time_series(data = dat, Adjust = 100)
 }
 }
 

@@ -4,9 +4,9 @@
 \alias{plot_avg_diff}
 \title{Plots average difference between looks to interest areas.}
 \usage{
-plot_avg_diff(data = data, DiffCols = DiffCols, xlim = NA,
-  Condition1 = NA, Condition2 = NA, Cond1Labels = NA, Cond2Labels = NA,
-  ErrorBar = TRUE, VWPreTheme = TRUE)
+plot_avg_diff(data, DiffCols = NULL, xlim = NA, Condition1 = NA,
+  Condition2 = NA, Cond1Labels = NA, Cond2Labels = NA, ErrorBar = TRUE,
+  VWPreTheme = TRUE)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 

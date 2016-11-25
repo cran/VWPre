@@ -75,12 +75,29 @@ Once you have aligned the time sequence relative to the message, you need to cre
 This function returns the time series column called `Time` which is required for subsequent processing, plotting, and modeling of the data.
 In the example here, our message relates specifically to the time at which the vowel in the word was played (because we programmed Experiment Builder to output a message for that).
 So, we do not need to specify an adjustment to the time series.
-If, however, your critical stimulus did not occur exactly at the message, but rather, before or after, an offset (i.e., positive or negative value in milliseconds) can be applied to the time series, to shift the zero point.
-This is done by specifying the the `Adj` parameter. 
-If, on the other hand, this adjustment differed trial by trial, you can input a column name (present in your dataset) in `Adj`, which will apply offsets specific to each recording event. 
+If, however, your critical stimulus did not occur exactly at the message, but rather, before or after, an adjustment (i.e., negative or positive value in milliseconds) can be applied to the time series, to shift the zero point.
+This is done by specifying the `Adjust` parameter. 
+If, on the other hand, this adjustment differed trial by trial, you can input a column name (present in your dataset) in `Adjust`, which will apply the recording event specific adjustment. 
+
+A positive value (3 in the example below) provided to `Adjust` shifts the zero point to *after* the reference point (i.e., Message), effectively moving the zero point forward along the number line and causing the reference point to have a negative time value.
+
+|  | Smp1 | Smp2 | Smp3 | Smp4 | Smp5 | Smp6 | Smp7 | Smp8 | Smp9 | Smp10 | Smp11 |
+|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|
+| Before | -4 | -3 | -2 | -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 
+|  |  |  |  |  | Old 0 |  |  | New 0 |  |  |  |
+| After | -7 | -6 | -5 | -4 | -3 | -2 | -1 | 0 | 1 | 2 | 3 |
+
+A negative value (-3 in the example below) provided to `Adjust` shifts the zero point to *before* the reference point (i.e., Message), effectively moving the zero point backward along the number line and causing the reference point to have a postive time value.
+
+|  | Smp1 | Smp2 | Smp3 | Smp4 | Smp5 | Smp6 | Smp7 | Smp8 | Smp9 | Smp10 | Smp11 |
+|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|
+| Before | -4 | -3 | -2 | -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 
+|  |  | New 0 |  |  | Old 0 |  |  |  |  |  |  |
+| After | -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
-aligned2 <- create_time_series(data = aligned1, Adj = 0)
+aligned2 <- create_time_series(data = aligned1, Adjust = 0)
 ```
 
 The function `check_time_series` can be used to verify that the time series was created.

@@ -4,7 +4,7 @@
 \alias{check_time_series}
 \title{Check the new time series}
 \usage{
-check_time_series(data = data, ReturnData = F)
+check_time_series(data, ReturnData = FALSE)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{create_time_series}}.}

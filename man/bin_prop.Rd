@@ -4,8 +4,7 @@
 \alias{bin_prop}
 \title{Bins the sample data and calculates proportion looks by interest area}
 \usage{
-bin_prop(data = data, NoIA = NoIA, BinSize = BinSize,
-  SamplingRate = SamplingRate)
+bin_prop(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{select_recorded_eye}}

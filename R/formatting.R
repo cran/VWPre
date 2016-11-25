@@ -29,10 +29,9 @@
 #' library(VWPre)
 #' df <- prep_data(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "ItemCol")
 #' }
-prep_data <- function(data = data, Subject = Subject, Item = NA,
+prep_data <- function(data, Subject = NULL, Item = NA,
                       EventColumns=c("Subject","TRIAL_INDEX")){
-  subject <- Subject
-  item <- Item
+
   reqcols <- data.frame(Column=c("RECORDING_SESSION_LABEL", 
                                  "LEFT_INTEREST_AREA_ID","LEFT_INTEREST_AREA_LABEL", 
                                  "RIGHT_INTEREST_AREA_ID","RIGHT_INTEREST_AREA_LABEL", 
@@ -84,6 +83,12 @@ prep_data <- function(data = data, Subject = Subject, Item = NA,
   
   message("Working on required columns...")
   
+  if(is.null(Subject)){
+    stop("Please supply the name of the subject column!")
+  } else {
+    subject <- Subject
+  }
+  
   data <- rename_(data, Subject = interp(~subject, subject = as.name(subject)))
   message(paste("   ", subject, "renamed to Subject. "))
   
@@ -93,6 +98,8 @@ prep_data <- function(data = data, Subject = Subject, Item = NA,
   } else {
     message("    Subject already factor.")
   }
+
+  item <- Item
   
   if (!is.na(item)) {
     
@@ -244,12 +251,19 @@ prep_data <- function(data = data, Subject = Subject, Item = NA,
 #' library(VWPre)
 #' df <- align_msg(data = dat, Msg = "ExperimentDisplay")
 #' }
-align_msg <- function(data = data, Msg = Msg) {
+align_msg <- function(data, Msg = NULL) {
+  
+  if(is.null(Msg)){
+    stop("Please supply the message text!")
+  } else {
   msg <- Msg
+  }
+  
   tmp1 <- data %>% group_by(Event) %>% 
     mutate_(Align = interp(~ifelse(SAMPLE_MESSAGE==msg, TIMESTAMP, NA), msg=as.name("msg"))) %>%
     filter(!is.na(Align)) %>% select(Event, Align) %>% filter(Align==min(Align))
   tmp2 <- inner_join(data, tmp1, by="Event") %>% mutate(Align = TIMESTAMP - Align)
+  
   return(ungroup(tmp2))
 }
 
@@ -280,11 +294,17 @@ align_msg <- function(data = data, Msg = Msg) {
 #' # Create a unified columns for the gaze data...
 #' df <- select_recorded_eye(data = dat, Recording = "LandR", WhenLandR = "Right")
 #' }
-select_recorded_eye <- function(data = data, Recording = Recording, WhenLandR = NA) {
-  Recording = Recording
-  WhenLandR = WhenLandR
+select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
+
+  if(is.null(Recording)){
+    stop("Please supply the recording eye(s)!")
+  }
   
   if (Recording == "LandR") {
+    
+    if(is.na(WhenLandR)){
+      stop("Please specify which eye to use when Recording is set to 'LandR'!")
+    }
     
     tmp <- data %>%
       group_by(Event) %>%
@@ -408,40 +428,58 @@ select_recorded_eye <- function(data = data, Recording = Recording, WhenLandR = 
 #' 
 #' @param data A data table object output by \code{\link{relabel_na}} or 
 #' \code{\link{align_msg}}.
-#' @param Adj Optionally an integer value or a text string. If an integer 
+#' @param Adjust Optionally an integer value or a text string. If an integer 
 #' (positive or negative), this will indicate an amount of time in 
-#' milliseconds. Positive values get added to the time points; negative 
-#' get subtracted. If a text string, this will be the name of a column in 
+#' milliseconds. The value is subtracted from the time points: positive values
+#' shift the zero forward; negative values shift the zero backward.
+#' If a text string, this will be the name of a column in 
 #' the data set which contains values indicating when the critical stimulus
-#' was presented relative to the zero point.
+#' was presented relative to the zero point. 
+#' @param Adj DEPRECATED SINCE VERSION 0.9.5 - TO BE REMOVED.
+#' @param Offset DEPRECATED SINCE VERSION 0.9.0 - TO BE REMOVED.
 #' @return A data table object.
 #' @examples
 #' \dontrun{
 #' library(VWPre)
 #' # To create the Time column...
-#' df <- create_time_series(data = dat, Adj = "SoundOnsetColumn")
+#' df <- create_time_series(data = dat, Adjust = "SoundOnsetColumn")
+#' # or  
+#' df <- create_time_series(data = dat, Adjust = -100)
 #' # or
-#' df <- create_time_series(data = dat, Adj = -100)
-#' # or
-#' df <- create_time_series(data = dat, Adj = 100)
+#' df <- create_time_series(data = dat, Adjust = 100)
 #' }
-create_time_series <- function (data = data, Adj = Adj) 
+create_time_series <- function (data, Adjust = 0, Adj = NULL, Offset = NULL) 
 {
-  adj <- Adj
-  if (is.numeric(adj)==T && !("Align" %in% colnames(data))) {
+  
+    if ("Adj" %in% names(match.call())) {
+    stop("'Adj' is deprecated; please use 'Adjust' instead. Please refer to the vignettes for explanation of usage.")
+    } else if ("Offset" %in% names(match.call())) {
+      stop("'Offset' is deprecated; please use 'Adjust' instead. Please refer to the vignettes for explanation of usage.")
+    }
+
+  adjust <- Adjust
+  if (is.numeric(adjust)==T && !("Align" %in% colnames(data))) {
+    if (adjust==0) {
+      message("No adjustment applied.")
+    } else {
+    message(paste(adjust, "ms adjustment applied."))
+    }
     data %>% arrange(., Event, TIMESTAMP) %>% group_by(Event) %>% 
-      mutate_(Time = interp(~TIMESTAMP - first(TIMESTAMP) + adj)) %>% ungroup()
+      mutate_(Time = interp(~TIMESTAMP - first(TIMESTAMP) - adjust)) %>% ungroup()
   } 
-  else if (is.numeric(adj)==T && "Align" %in% colnames(data)) {
+  else if (is.numeric(adjust)==T && "Align" %in% colnames(data)) {
+    if (adjust==0) {
+      message("No adjustment applied.")
+    } else {
+      message(paste(adjust, "ms adjustment applied."))
+    }
     data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
-      mutate_(Time = interp(~Align + adj)) %>% ungroup()
+      mutate_(Time = interp(~Align - adjust)) %>% ungroup()
   } 
-  else if (is.character(adj)==T) {
+  else if (is.character(adjust)==T) {
+    message(paste("Adjustment applied using values contained in", adjust))
     data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
-      mutate_(Time = interp(~Align + adj, adj=as.name(adj))) %>% ungroup()
+      mutate_(Time = interp(~Align - adjust, adjust=as.name(adjust))) %>% ungroup()
   }
 }
-
-
-
 

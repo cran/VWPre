@@ -4,7 +4,7 @@
 \alias{ds_options}
 \title{Determine downsampling options based on current sampling rate}
 \usage{
-ds_options(SamplingRate = SamplingRate)
+ds_options(SamplingRate)
 }
 \arguments{
 \item{SamplingRate}{A positive integer indicating the sampling rate (in Hertz) 

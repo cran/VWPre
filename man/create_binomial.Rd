@@ -4,8 +4,8 @@
 \alias{create_binomial}
 \title{Creates a success/failure column for each IA based on counts.}
 \usage{
-create_binomial(data = data, NoIA = NoIA, ObsPerBin = ObsPerBin,
-  ObsOverride = FALSE, CustomBinom = NULL)
+create_binomial(data, NoIA = NULL, ObsPerBin = NULL, ObsOverride = FALSE,
+  CustomBinom = NULL)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}} or

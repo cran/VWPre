@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2016-09-27" />
+<meta name="date" content="2016-11-25" />
 
 <title>Aligning Sample Data to a Specific Sample Message in SR Eyelink Data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Aligning Sample Data to a Specific Sample Message in SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2016-09-27</em></h4>
+<h4 class="date"><em>2016-11-25</em></h4>
 
 
 
@@ -120,8 +120,135 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="creating-the-time-series-column" class="section level2">
 <h2>Creating the Time series column</h2>
-<p>Once you have aligned the time sequence relative to the message, you need to create the <code>Time</code> column using the function <code>create_time_series</code>. This function returns the time series column called <code>Time</code> which is required for subsequent processing, plotting, and modeling of the data. In the example here, our message relates specifically to the time at which the vowel in the word was played (because we programmed Experiment Builder to output a message for that). So, we do not need to specify an adjustment to the time series. If, however, your critical stimulus did not occur exactly at the message, but rather, before or after, an offset (i.e., positive or negative value in milliseconds) can be applied to the time series, to shift the zero point. This is done by specifying the the <code>Adj</code> parameter. If, on the other hand, this adjustment differed trial by trial, you can input a column name (present in your dataset) in <code>Adj</code>, which will apply offsets specific to each recording event.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aligned2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> aligned1, <span class="dt">Adj =</span> <span class="dv">0</span>)</code></pre></div>
+<p>Once you have aligned the time sequence relative to the message, you need to create the <code>Time</code> column using the function <code>create_time_series</code>. This function returns the time series column called <code>Time</code> which is required for subsequent processing, plotting, and modeling of the data. In the example here, our message relates specifically to the time at which the vowel in the word was played (because we programmed Experiment Builder to output a message for that). So, we do not need to specify an adjustment to the time series. If, however, your critical stimulus did not occur exactly at the message, but rather, before or after, an adjustment (i.e., negative or positive value in milliseconds) can be applied to the time series, to shift the zero point. This is done by specifying the <code>Adjust</code> parameter. If, on the other hand, this adjustment differed trial by trial, you can input a column name (present in your dataset) in <code>Adjust</code>, which will apply the recording event specific adjustment.</p>
+<p>A positive value (3 in the example below) provided to <code>Adjust</code> shifts the zero point to <em>after</em> the reference point (i.e., Message), effectively moving the zero point forward along the number line and causing the reference point to have a negative time value.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center"></th>
+<th align="center">Smp1</th>
+<th align="center">Smp2</th>
+<th align="center">Smp3</th>
+<th align="center">Smp4</th>
+<th align="center">Smp5</th>
+<th align="center">Smp6</th>
+<th align="center">Smp7</th>
+<th align="center">Smp8</th>
+<th align="center">Smp9</th>
+<th align="center">Smp10</th>
+<th align="center">Smp11</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Before</td>
+<td align="center">-4</td>
+<td align="center">-3</td>
+<td align="center">-2</td>
+<td align="center">-1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">5</td>
+<td align="center">6</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">Old 0</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">New 0</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">After</td>
+<td align="center">-7</td>
+<td align="center">-6</td>
+<td align="center">-5</td>
+<td align="center">-4</td>
+<td align="center">-3</td>
+<td align="center">-2</td>
+<td align="center">-1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">3</td>
+</tr>
+</tbody>
+</table>
+<p>A negative value (-3 in the example below) provided to <code>Adjust</code> shifts the zero point to <em>before</em> the reference point (i.e., Message), effectively moving the zero point backward along the number line and causing the reference point to have a postive time value.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center"></th>
+<th align="center">Smp1</th>
+<th align="center">Smp2</th>
+<th align="center">Smp3</th>
+<th align="center">Smp4</th>
+<th align="center">Smp5</th>
+<th align="center">Smp6</th>
+<th align="center">Smp7</th>
+<th align="center">Smp8</th>
+<th align="center">Smp9</th>
+<th align="center">Smp10</th>
+<th align="center">Smp11</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Before</td>
+<td align="center">-4</td>
+<td align="center">-3</td>
+<td align="center">-2</td>
+<td align="center">-1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">5</td>
+<td align="center">6</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">New 0</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">Old 0</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">After</td>
+<td align="center">-1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">5</td>
+<td align="center">6</td>
+<td align="center">7</td>
+<td align="center">8</td>
+<td align="center">9</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aligned2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> aligned1, <span class="dt">Adjust =</span> <span class="dv">0</span>)</code></pre></div>
+<pre><code>## No adjustment applied.</code></pre>
 <p>The function <code>check_time_series</code> can be used to verify that the time series was created. The function outputs a list of the unique start values present in the data. In this example, we do not expect all events to start with the same Time value, given that we performed our own alignment without a relative interest period defined in Data Viewer. As with <code>check_msg_time</code>, the list of Events and Start Times can be returned as a data frame using the parameter <code>ReturnData</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_time_series</span>(<span class="dt">data =</span> aligned2)</code></pre></div>
 <pre><code>##   [1] -165 -280 -198 -176 -110 -384 -182 -163 -293 -445 -207 -362 -213 -157

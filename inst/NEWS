@@ -1,5 +1,37 @@
 # -----------------------------------------------
 
+# VWPre 0.9.5
+
+## Major changes:
+
+### New functions
+
+* None.
+
+### Changes to functions
+
+* create_time_series: Internal operation of this function has changed; specifically, the application of the adjustment has been reinstated as a subtraction (addition was introduced in Version 0.9.0 when by-trial offset values were allowed via the parameter 'Adj'). As this underlying change significantly impacts the output, the parameter 'Adj' (from Version 0.9.0) has been replaced with 'Adjust' to ensure that old code will not inadvertently produce unexpected results (Thanks to John Matthews for helping to point this out). Please consult the vignettes for discussion of the operation of this function.
+* plot_avg_contour: The parameter 'Theme' has been changed to 'VWPreTheme' to conform with the parameter in other plotting functions
+
+### Vignettes
+
+* The text of the vignettes has been updated to reflect changes made to the functions.  
+
+## Minor changes:
+
+### Changes to functions 
+
+* The default values of required parameters have been standardized for all functions. Additionally, now if a required parameter is missing, the function will stop and throw an error. Previously some default values were not functional if the required parameter was not specified (as pointed out by Athanassios Protopapas).
+* The custom plotting theme included in the package (VWPreTheme) has been updated internally to reflect changes in the most recent version of ggplot2.
+
+## Bug fixes:
+
+* None.
+
+
+
+# -----------------------------------------------
+
 # VWPre 0.9.0
 
 ## Major changes:

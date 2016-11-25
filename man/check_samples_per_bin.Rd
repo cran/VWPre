@@ -4,7 +4,7 @@
 \alias{check_samples_per_bin}
 \title{Check the number of samples in each bin}
 \usage{
-check_samples_per_bin(data = data)
+check_samples_per_bin(data)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{bin_prop}}.}

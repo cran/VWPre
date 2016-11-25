@@ -4,7 +4,7 @@
 \alias{align_msg}
 \title{Aligns samples to a specific message.}
 \usage{
-align_msg(data = data, Msg = Msg)
+align_msg(data, Msg = NULL)
 }
 \arguments{
 \item{data}{A data table object output from \code{prep_data}.}

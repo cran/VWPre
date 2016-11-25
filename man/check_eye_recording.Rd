@@ -4,7 +4,7 @@
 \alias{check_eye_recording}
 \title{Check which eyes were recorded during the experiment}
 \usage{
-check_eye_recording(data = data)
+check_eye_recording(data)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{create_time_series}}.}

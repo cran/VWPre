@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2016-09-27" />
+<meta name="date" content="2016-11-25" />
 
 <title>Basic VWP Preprocessing for SR Eyelink Data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Basic VWP Preprocessing for SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2016-09-27</em></h4>
+<h4 class="date"><em>2016-11-25</em></h4>
 
 
 
@@ -161,12 +161,29 @@ VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 </div>
 <div id="creating-the-time-series-column" class="section level2">
 <h2>Creating the Time series column</h2>
-<p>The function <code>create_time_series</code> creates a time series (a new column called <code>Time</code>) which is required for subsequent processing, plotting, and modeling of the data. It is common to export a period of time prior to the onset of the stimulus as a baseline. In this case, an offset (equal to the duration of the baseline period) must be applied to the time series, specified in the <code>Adj</code> parameter. In the example below, the data were exported with a 100ms pre-stimulus interval.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> dat1, <span class="dt">Adj =</span> -<span class="dv">100</span>)</code></pre></div>
-<p>Note that if you have used the <code>align_msg</code> function (illustrated in the <code>SR_Align_Message</code> vignette), you may need to specify a column name in <code>Adj</code>. That column can be used to apply offsets specific to each recording event. Consult the vignette for further details.</p>
-<p>The function <code>check_time_series</code> can be used to verify the time series. It outputs the unique start times present in the data. These will be the same standardized time point relative to the stimulus if you have exported your data from Data Viewer with pre-defined interest period relative to a message. By specifying the parameter <code>ReturnData = T</code>, the function can return a summary data frame that can be used to inspect the start time of each event.</p>
+<p>The function <code>create_time_series</code> creates a time series (a new column called <code>Time</code>) which is required for subsequent processing, plotting, and modeling of the data. It is common to export a period of time prior to the onset of the stimulus as a baseline. In this case, an adjustment (equal to the duration of the baseline period) must be applied to the time series, specified in the <code>Adjust</code> parameter. In effect, the adjustment simply subtracts the given value to each time point. So, a positive value will shift the zero point forward (making the initial zero a negative time value), while a negative value will shift the zero point backward (making the initial zero a positive time value). An example illustrating this can be found in the vignette <code>SR_Message_Alignment</code>. In the example below, the data were exported with a 100ms pre-stimulus interval.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> dat1, <span class="dt">Adjust =</span> <span class="dv">100</span>)</code></pre></div>
+<pre><code>## 100 ms adjustment applied.</code></pre>
+<p>Note that if you have used the <code>align_msg</code> function (illustrated in the <code>SR_Align_Message</code> vignette), you may need to specify a column name in <code>Adjust</code>. That column can be used to apply the recording event specific adjustment to each . Consult that vignette for further details.</p>
+<p>The function <code>check_time_series</code> can be used to verify the time series. It outputs the unique start times present in the data. These will be the same standardized time point relative to the stimulus if you have exported your data from Data Viewer with pre-defined interest period relative to a message. By specifying the parameter <code>ReturnData = T</code>, the function can return a summary data frame that can be used to inspect the start time of each event. As you can see below, by providing <code>Adjust</code> with a postive value, we have effectively shifted the zero point forward along the number line, causing the first sample to have a negative time value.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_time_series</span>(<span class="dt">data =</span> dat2)</code></pre></div>
 <pre><code>## [1] -100</code></pre>
+<p>Another way to check that your time series has been created correctly is to use the <code>check_msg_time</code> function. By providing the appropriate message text, we can see that the onset of our target now occurs at Time = 0. As with <code>check_time_series</code>, the parameter <code>ReturnData = T</code> will return a summary data frame that can be used to inspect the message time of each event.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> dat2, <span class="dt">Msg =</span> <span class="st">&quot;TargetOnset&quot;</span>)</code></pre></div>
+<pre><code>## # A tibble: 320 × 3
+##      Event SAMPLE_MESSAGE  Time
+##     &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
+## 1  14001.1    TargetOnset     0
+## 2  14002.1    TargetOnset     0
+## 3  14003.1    TargetOnset     0
+## 4  14004.1    TargetOnset     0
+## 5  14005.1    TargetOnset     0
+## 6  14006.1    TargetOnset     0
+## 7  14008.1    TargetOnset     0
+## 8  14010.1    TargetOnset     0
+## 9  14001.2    TargetOnset     0
+## 10 14002.2    TargetOnset     0
+## # ... with 310 more rows</code></pre>
 </div>
 <div id="selecting-which-eye-to-use" class="section level2">
 <h2>Selecting which eye to use</h2>
@@ -248,7 +265,7 @@ text-align: center;
 <h2>Fastrack function</h2>
 <p>For advanced users who have worked with the package functions before and who are familiar with the required steps and output, there is a meta-function, called <code>fasttrack</code>, which runs through the previous functions and outputs a dataframe with either empirical logits or binomial data. Note that using this function will still require the user to manually remove unneeded columns (see above). This meta-function takes as parameters all the required arguments to the component functions. Also, this function assumes that dynamic interest areas were used and do not need to be relabelled/reassigned. It also assumes an interest period was defined in Data Viewer relative to the critical stimulus, thus not requiring separate message alignment. Again, this is only recommended for users who have previously worked with visual world data, the functions contained in this package, and are confident that their data meet the requirements/assumptions of the <code>fasttrack</code> function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat5b &lt;-<span class="st"> </span><span class="kw">fasttrack</span>(<span class="dt">data =</span> VWdat, <span class="dt">Subject =</span> <span class="st">&quot;RECORDING_SESSION_LABEL&quot;</span>, <span class="dt">Item =</span> <span class="st">&quot;itemid&quot;</span>, 
-    <span class="dt">EventColumns =</span> <span class="kw">c</span>(<span class="st">&quot;Subject&quot;</span>, <span class="st">&quot;TRIAL_INDEX&quot;</span>), <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">Adj =</span> -<span class="dv">100</span>, <span class="dt">Recording =</span> <span class="st">&quot;LandR&quot;</span>, 
+    <span class="dt">EventColumns =</span> <span class="kw">c</span>(<span class="st">&quot;Subject&quot;</span>, <span class="st">&quot;TRIAL_INDEX&quot;</span>), <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">Adjust =</span> <span class="dv">100</span>, <span class="dt">Recording =</span> <span class="st">&quot;LandR&quot;</span>, 
   <span class="dt">WhenLandR =</span> <span class="st">&quot;Right&quot;</span>, <span class="dt">BinSize =</span> <span class="dv">20</span>, <span class="dt">SamplingRate =</span> <span class="dv">1000</span>,
   <span class="dt">ObsPerBin =</span> <span class="dv">20</span>, <span class="dt">Constant =</span> <span class="fl">0.5</span>, <span class="dt">Output =</span> <span class="st">&quot;ELogit&quot;</span>)</code></pre></div>
 <pre><code>## Preparing data...</code></pre>
@@ -287,7 +304,8 @@ text-align: center;
 <pre><code>## Interest Area IDs for the left eye are coded appropriately.</code></pre>
 <pre><code>##   ID   Label
 ## 1  0 Outside</code></pre>
-<pre><code>## Creating time series with -100 ms adjustment...</code></pre>
+<pre><code>## Creating time series with 100 ms adjustment...</code></pre>
+<pre><code>## 100 ms adjustment applied.</code></pre>
 <pre><code>## [1] -100</code></pre>
 <pre><code>## The dataset contains recordings for ONLY the right eye. 
 ##  Set the Recording parameter in select_recorded_eye() to 'R'.</code></pre>

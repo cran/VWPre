@@ -4,7 +4,7 @@
 \alias{rename_columns}
 \title{Rename default column names for interest areas.}
 \usage{
-rename_columns(data = data, Labels = Labels)
+rename_columns(data, Labels = NULL)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 

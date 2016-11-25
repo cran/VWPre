@@ -21,7 +21,7 @@
 #' the Event variable; by default, Subject and TRIAL_INDEX.
 #' @param NoIA A positive integer indicating the number of interest areas defined 
 #' when creating the study. 
-#' @param Adj An integer indicating amount of time in milliseconds by which to 
+#' @param Adjust An integer indicating amount of time in milliseconds by which to 
 #' offset the time series.
 #' @param Recording A string indicating which eyes were used for recording gaze data.
 #' @param WhenLandR A string indicating which eye ("Right" or "Left) to use 
@@ -45,24 +45,24 @@
 #' library(VWPre)
 #' # Perform meta-function on data
 #' df <- fasttrack(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
-#'        EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adj = -100, 
+#'        EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adjust = 100, 
 #'				Recording = "LandR", WhenLandR = "Right", BinSize = 20, 
 #'				SamplingRate = 1000, ObsPerBin = 20, Constant = 0.5, 
 #'				Output = "ELogit")
 #' }
-fasttrack = function(data = data, Subject = Subject, Item = Item, 
+fasttrack = function(data = data, Subject = NULL, Item = NA, 
                         EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA,
-                        Adj = Adj, Recording = Recording, 
-                        WhenLandR = WhenLandR, BinSize = BinSize, SamplingRate = SamplingRate,
-                        ObsPerBin = ObsPerBin, ObsOverride = FALSE, 
-						Constant = 0.5, CustomBinom = NULL, Output = Output) {
+                        Adjust = 0, Recording = NULL, 
+                        WhenLandR = NA, BinSize = NULL, SamplingRate = NULL,
+                        ObsPerBin = NULL, ObsOverride = FALSE, 
+						Constant = 0.5, CustomBinom = NULL, Output = NULL) {
   
   dat <- data
   Subject <- Subject
   Item <- Item
   EventColumns <- EventColumns
   NoIA <- NoIA
-  Adj <- Adj
+  Adjust <- Adjust
   Recording <- Recording
   WhenLandR <- WhenLandR
   BinSize <- BinSize
@@ -82,8 +82,8 @@ fasttrack = function(data = data, Subject = Subject, Item = Item,
   
   check_ia(data = dat1)
   
-  message(paste("Creating time series with", Adj, "ms adjustment...", sep = " "))
-  dat2 <- create_time_series(data = dat1, Adj = Adj)
+  message(paste("Creating time series with", Adjust, "ms adjustment...", sep = " "))
+  dat2 <- create_time_series(data = dat1, Adjust = Adjust)
   rm(dat1)
   
   check_time_series(data = dat2)
@@ -104,7 +104,9 @@ fasttrack = function(data = data, Subject = Subject, Item = Item,
   check_samples_per_bin(dat4)
   
   message(paste("Preparing", Output, "output...", sep = " "))
-  if (Output == "ELogit") {
+  if(is.null(Output)) {
+	stop("Please specify the desired output type!")
+  } else if (Output == "ELogit") {
     dat5 <- transform_to_elogit(dat4, NoIA = NoIA, ObsPerBin = ObsPerBin, 
                                 Constant = Constant, ObsOverride = ObsOverride)
   } else if (Output == "Binomial") {

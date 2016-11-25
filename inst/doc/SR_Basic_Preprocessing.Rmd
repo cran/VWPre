@@ -128,26 +128,38 @@ That vignette illustrates how to relabel existing interest area codings (as well
 ## Creating the Time series column
 
 The function `create_time_series` creates a time series (a new column called `Time`) which is required for subsequent processing, plotting, and modeling of the data.
-It is common to export a period of time prior to the onset of the stimulus as a baseline. In this case, an offset (equal to the duration of the baseline period) must be applied to the time series, specified in the `Adj` parameter. 
+It is common to export a period of time prior to the onset of the stimulus as a baseline. In this case, an adjustment (equal to the duration of the baseline period) must be applied to the time series, specified in the `Adjust` parameter. 
+In effect, the adjustment simply subtracts the given value to each time point.
+So, a positive value will shift the zero point forward (making the initial zero a negative time value), while a negative value will shift the zero point backward (making the initial zero a positive time value). 
+An example illustrating this can be found in the vignette `SR_Message_Alignment`.
 In the example below, the data were exported with a 100ms pre-stimulus interval.
 
+
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
-dat2 <- create_time_series(data = dat1, Adj = -100)
+dat2 <- create_time_series(data = dat1, Adjust = 100)
 ```
 
-Note that if you have used the `align_msg` function (illustrated in the `SR_Align_Message` vignette), you may need to specify a column name in `Adj`. 
-That column can be used to apply offsets specific to each recording event. 
-Consult the vignette for further details.
+Note that if you have used the `align_msg` function (illustrated in the `SR_Align_Message` vignette), you may need to specify a column name in `Adjust`. 
+That column can be used to apply the recording event specific adjustment to each . 
+Consult that vignette for further details.
 
 The function `check_time_series` can be used to verify the time series.
 It outputs the unique start times present in the data.
 These will be the same standardized time point relative to the stimulus if you have exported your data from Data Viewer with pre-defined interest period relative to a message.
 By specifying the parameter `ReturnData = T`, the function can return a summary data frame that can be used to inspect the start time of each event.
+As you can see below, by providing `Adjust` with a postive value, we have effectively shifted the zero point forward along the number line, causing the first sample to have a negative time value. 
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
 check_time_series(data = dat2)
 ```
 
+Another way to check that your time series has been created correctly is to use the `check_msg_time` function. 
+By providing the appropriate message text, we can see that the onset of our target now occurs at Time = 0.
+As with `check_time_series`, the parameter `ReturnData = T` will return a summary data frame that can be used to inspect the message time of each event.
+
+```{r, eval= TRUE, echo=TRUE, results='asis'}
+check_msg_time(data = dat2, Msg = "TargetOnset")
+```
 
 ## Selecting which eye to use
 
@@ -297,7 +309,7 @@ Again, this is only recommended for users who have previously worked with visual
 
 ```{r, eval = TRUE, echo=TRUE, results='asis'}
 dat5b <- fasttrack(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
-	EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adj = -100, Recording = "LandR", 
+	EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adjust = 100, Recording = "LandR", 
   WhenLandR = "Right", BinSize = 20, SamplingRate = 1000,
   ObsPerBin = 20, Constant = 0.5, Output = "ELogit")
 ```

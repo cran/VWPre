@@ -4,7 +4,7 @@
 \alias{select_recorded_eye}
 \title{Select the eye used during recording}
 \usage{
-select_recorded_eye(data = data, Recording = Recording, WhenLandR = NA)
+select_recorded_eye(data, Recording = NULL, WhenLandR = NA)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{create_time_series}}.}

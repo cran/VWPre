@@ -77,7 +77,8 @@ plot_transformation_app <- function ()
             panel.grid.major.x = element_blank(),
             panel.grid.minor.x = element_blank(),
             panel.grid.major.y = element_blank(),
-            panel.grid.minor.y = element_blank()
+            panel.grid.minor.y = element_blank(),
+            plot.title = element_text(hjust = 0.5, vjust = 1)
           ) +
           ggtitle("Transformation")
         }
@@ -95,7 +96,8 @@ plot_transformation_app <- function ()
             panel.grid.major.x = element_blank(),
             panel.grid.minor.x = element_blank(),
             panel.grid.major.y = element_blank(),
-            panel.grid.minor.y = element_blank()
+            panel.grid.minor.y = element_blank(),
+            plot.title = element_text(hjust = 0.5, vjust = 1)
           ) + 
           ggtitle("Variance Estimation")
         }
@@ -137,7 +139,7 @@ plot_transformation_app <- function ()
 #' # For plotting the grand average with the included theme
 #' plot_var_app(data = dat) 
 #' }
-plot_var_app <- function (data = data)
+plot_var_app <- function (data)
 {
   dat <- data
   shiny::shinyApp(
@@ -285,7 +287,7 @@ plot_var_app <- function (data = data)
 #' # For plotting the grand average with the included theme
 #' plot_indiv_app(data = dat)
 #' } 
-plot_indiv_app <- function (data = data)
+plot_indiv_app <- function (data)
 {
   shiny::shinyApp(
     ui = shiny::fluidPage(

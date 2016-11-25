@@ -5,7 +5,7 @@ knitr::opts_chunk$set(fig.width=6, fig.height=4, warning=FALSE)
 library(VWPre)
 data(VWdat)
 dat <- fasttrack(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid", 
-	EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adj = -100, Recording = "LandR", 
+	EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = 4, Adjust = 100, Recording = "LandR", 
   WhenLandR = "Right", BinSize = 20, SamplingRate = 1000,
   ObsPerBin = 20, Constant = 0.5, Output = "ELogit")
 
@@ -70,16 +70,19 @@ plot_avg_diff(data = dat, xlim = c(0, 1000), DiffCols = c(IA_1_P = "Target", IA_
 
 ## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE---------
 plot_avg_contour(data = dat, IA = "IA_1_P", type = "proportion", Var = "Rating", 
-VarLabel = "Accent Rating", xlim = c(0,1000), Theme = FALSE, 
-Color = c("gray20", "gray90"))
+VarLabel = "Accent Rating", xlim = c(0,1000), VWPreTheme = TRUE, 
+Colors = c("gray20", "gray90"))
 
 ## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE---------
 plot_avg_contour(data = dat, IA = "IA_1_P", type = "proportion", Var = "Rating", 
-VarLabel = "Accent Rating", xlim = c(0,1000), Theme = FALSE, 
-Color = c("red", "green")) + ggtitle("Looks to target")
+VarLabel = "Accent Rating", xlim = c(0,1000), VWPreTheme = TRUE, 
+Colors = c("red", "green")) + ggtitle("Looks to target")
 
 ## ---- eval=FALSE, echo=TRUE, results='asis'------------------------------
 #  plot_transformation_app()
+
+## ------------------------------------------------------------------------
+
 
 ## ---- eval=FALSE, echo=TRUE, results='asis'------------------------------
 #  plot_var_app(dat)

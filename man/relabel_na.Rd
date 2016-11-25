@@ -4,7 +4,7 @@
 \alias{relabel_na}
 \title{Relabel samples containing 'NA' as outside any interest area}
 \usage{
-relabel_na(data = data, NoIA = NoIA)
+relabel_na(data, NoIA = NULL)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{prep_data}}.}

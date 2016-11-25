@@ -4,7 +4,7 @@
 \alias{check_msg_time}
 \title{Check the time value(s) at a specific message}
 \usage{
-check_msg_time(data = data, Msg = Msg, ReturnData = F)
+check_msg_time(data, Msg = NULL, ReturnData = FALSE)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{relabel_na}},

@@ -19,7 +19,7 @@ if(getRversion() >= "2.15.1")
 .onAttach <- function(...) { 
     name <- utils::packageDescription("VWPre", fields = c("Package", "Version"))[[1]]
 	version <- utils::packageDescription("VWPre", fields = c("Package", "Version"))[[2]]
-    hello <- paste("This is ", name, " version ",version,". \nFor an overview of the package, type 'help(package=\"VWPre\")'.",sep="")
+    hello <- paste("This is ", name, " version ",version,". \nFor an overview of the package, type 'help(package=\"VWPre\")'.", "\nIMPORTANT CHANGES - See NEWS.",sep="")
     packageStartupMessage(hello)
 }
 

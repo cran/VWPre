@@ -17,9 +17,7 @@
 #' # Check the interest area information...
 #' check_ia(dat)
 #' }
-check_ia <- function(data = data) {
-  
-  data <- data
+check_ia <- function(data) {
   
   Rias <-
     data.frame(
@@ -93,7 +91,7 @@ check_ia <- function(data = data) {
 #' # Check the starting Time column...
 #' check_time_series(data = dat)
 #' }
-check_time_series <- function(data = data, ReturnData = F) {
+check_time_series <- function(data, ReturnData = FALSE) {
   event_start_table = data %>% group_by(Event) %>% summarise(Start_Time = min(Time))
   message(paste(capture.output(unique(event_start_table$Start_Time)), collapse = "\n"))
   if(ReturnData==T) {
@@ -127,7 +125,12 @@ check_time_series <- function(data = data, ReturnData = F) {
 #' # Check the Sample Message time...
 #' check_msg_time(data = dat)
 #' }
-check_msg_time <- function(data = data, Msg = Msg, ReturnData = F) {
+check_msg_time <- function(data, Msg = NULL, ReturnData = FALSE) {
+  
+  if(is.null(Msg)){
+    stop("Please supply the message text!")
+  }
+  
   if(!("Time" %in% colnames(data)) && !("Align" %in% colnames(data))) {
     tmp <- data %>% filter(SAMPLE_MESSAGE==Msg) %>% select(Event, SAMPLE_MESSAGE, TIMESTAMP)
     message(paste(capture.output(print(tmp)), collapse = "\n"))
@@ -138,6 +141,7 @@ check_msg_time <- function(data = data, Msg = Msg, ReturnData = F) {
     tmp <- data %>% filter(SAMPLE_MESSAGE==Msg) %>% select(Event, SAMPLE_MESSAGE, Time)
     message(paste(capture.output(print(tmp)), collapse = "\n"))
   }
+  
   if(ReturnData==T) {
     return(tmp)
   }
@@ -164,7 +168,7 @@ check_msg_time <- function(data = data, Msg = Msg, ReturnData = F) {
 #' # Determine the number of samples per bin...
 #' check_samples_per_bin(dat)
 #' }
-check_samples_per_bin <- function (data = data) {
+check_samples_per_bin <- function (data) {
   samples <- max(data$NSamples)
   rate <- abs(data$Time[2] - data$Time[1])
   message(paste("There are", samples, "samples per bin."))
@@ -197,7 +201,7 @@ check_samples_per_bin <- function (data = data) {
 #' # Determine the sampling rate...
 #' check_samplingrate(dat)
 #' }
-check_samplingrate <- function(data = data, ReturnData = FALSE) {
+check_samplingrate <- function(data, ReturnData = FALSE) {
   ReturnData <- ReturnData
   
   tmp <- data %>%
@@ -238,8 +242,7 @@ check_samplingrate <- function(data = data, ReturnData = FALSE) {
 #' # Determine downsampling options...
 #' ds_options(SamplingRate = 1000)
 #' }
-ds_options <- function(SamplingRate=SamplingRate) {
-  SamplingRate = SamplingRate
+ds_options <- function(SamplingRate) {
   for (x in 1:100) {
   if (x %% (1000/SamplingRate) == 0) {
     if ((1000/x) %% 1 == 0) {
@@ -272,7 +275,7 @@ ds_options <- function(SamplingRate=SamplingRate) {
 #' # Create a unified columns for the gaze data...
 #' check_eye_recording(dat)
 #' }
-check_eye_recording <- function(data = data) {
+check_eye_recording <- function(data) {
   
   if (sum(data$LEFT_INTEREST_AREA_ID) > 0 & sum(data$RIGHT_INTEREST_AREA_ID) > 0) {
     message("The dataset contains recordings for both eyes. \n If any participants had both eyes tracked, set the Recording parameter in select_recorded_eye() to 'LandR'. \n If participants had either the left OR the right eye tracked, set the Recording parameter in select_recorded_eye() to 'LorR'.")
@@ -311,10 +314,13 @@ check_eye_recording <- function(data = data) {
 #' dat2 <- rename_columns(dat, Labels = c(IA1="Target", IA2="Rhyme", 
 #'                            IA3="OnsetComp", IA4="Distractor")) 
 #' }
-rename_columns <- function(data = data, Labels = Labels) {
+rename_columns <- function(data, Labels = NULL) {
   
-  Labels <- Labels
   tmp <- data
+  
+  if(is.null(Labels)){
+    stop("Please supply the interest area names!")
+  }
   
   if (length(names(Labels))>8) {
     stop("You have more than 8 interest areas.")

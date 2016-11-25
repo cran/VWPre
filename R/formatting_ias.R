@@ -20,8 +20,11 @@
 #' # To relabel the NAs...
 #' df <- relabel_na(data = dat, NoIA = 4)
 #' }
-relabel_na <- function(data = data, NoIA = NoIA){
-  NoIA <- NoIA
+relabel_na <- function(data, NoIA = NULL){
+  
+  if(is.null(NoIA)){
+    stop("Please supply the number of interest areas!")
+  }
   
   if (length(levels(data$LEFT_INTEREST_AREA_LABEL)) == NoIA) {
   message("LEFT_INTEREST_AREA_LABEL: Number of levels match NoIA.")
@@ -75,7 +78,7 @@ relabel_na <- function(data = data, NoIA = NoIA){
 #' "4"="6666"), Labels=c(Outside="Outside", Target="NewTargName", 
 #' Dist2="NewDist2Name", Comp="NewCompName", Dist1="NewDist1Name"))
 #' }
-recode_ia <- function(data = data, IDs = NULL, Labels = NULL) {
+recode_ia <- function(data, IDs = NULL, Labels = NULL) {
   
   data <- data
   IDs <- IDs
@@ -139,7 +142,7 @@ recode_ia <- function(data = data, IDs = NULL, Labels = NULL) {
 #' # Map gaze data to newly defined interest areas...
 #' df <- custom_ia(data = dat, iaLookup = LookUpDF)
 #' }
-custom_ia <- function(data=data, iaLookup=iaLookup) {
+custom_ia <- function(data, iaLookup=NULL) {
   
   boxhit <- function(Xpos = Xpos, Ypos = Ypos, lookup = lookup, event = event) {
     lookuptmp <- filter(lookup, Event==event)
@@ -166,8 +169,12 @@ custom_ia <- function(data=data, iaLookup=iaLookup) {
     return(as.integer(Code))
   }
   
-  data <- data
+  if(is.null(iaLookup)){
+  stop("Please supply the interest area lookup dataframe!")  
+  } else {
   iaLookup <- iaLookup
+  }
+  
   IAinfo <- data.frame(unique(iaLookup[, c("IA_LABEL", "IA_ID")]))
   
   hitdat <- data %>% group_by(Event) %>% rowwise() %>%

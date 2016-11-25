@@ -4,8 +4,8 @@
 \alias{plot_avg_contour}
 \title{Plots average contour surface of looks to a given interest area.}
 \usage{
-plot_avg_contour(data = data, IA = "IA_1_P", type = NA, Var = Var,
-  VarLabel = VarLabel, xlim = NA, Theme = TRUE, Colors = c("gray20",
+plot_avg_contour(data, IA = NULL, type = NULL, Var = NULL,
+  VarLabel = NULL, xlim = NA, VWPreTheme = TRUE, Colors = c("gray20",
   "gray90"))
 }
 \arguments{
@@ -23,7 +23,7 @@ variable.}
 
 \item{xlim}{A vector of two integers specifying the limits of the x-axis.}
 
-\item{Theme}{A logical indicating whether the theme included with the 
+\item{VWPreTheme}{A logical indicating whether the theme included with the 
 function, or ggplot2's base theme (which any other custom theme could be added).}
 
 \item{Colors}{A vector of two strings specifying the colrs of the contour shading - The default values represent grayscale.}
@@ -41,7 +41,7 @@ library(VWPre)
 # For plotting a conditional contour surface...
 plot_avg_contour(data = dat, IA = "IA_1_ELogit", type = "elogit", 
                Var = "Rating", VarLabel = "Accent Rating", xlim = c(0,1000), 
-               Theme = FALSE, Color = c("red", "white"))
+               VWPreTheme = FALSE, Colors = c("red", "white"))
 }
 }
 

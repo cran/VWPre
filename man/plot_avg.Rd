@@ -4,7 +4,7 @@
 \alias{plot_avg}
 \title{Plots average looks to interest areas.}
 \usage{
-plot_avg(data = data, type = NA, xlim = NA, IAColumns = IAColumns,
+plot_avg(data, type = NULL, xlim = NA, IAColumns = NULL,
   Condition1 = NA, Condition2 = NA, Cond1Labels = NA, Cond2Labels = NA,
   ErrorBar = TRUE, VWPreTheme = TRUE)
 }
