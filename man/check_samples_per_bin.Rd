@@ -25,4 +25,3 @@ library(VWPre)
 check_samples_per_bin(dat)
 }
 }
-

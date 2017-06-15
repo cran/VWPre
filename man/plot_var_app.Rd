@@ -22,4 +22,3 @@ library(VWPre)
 plot_var_app(data = dat) 
 }
 }
-

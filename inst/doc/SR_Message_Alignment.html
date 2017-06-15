@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2016-11-25" />
+<meta name="date" content="2017-06-14" />
 
 <title>Aligning Sample Data to a Specific Sample Message in SR Eyelink Data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Aligning Sample Data to a Specific Sample Message in SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2016-11-25</em></h4>
+<h4 class="date"><em>2017-06-14</em></h4>
 
 
 
@@ -83,36 +83,36 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>Aligning to a specific message</h2>
 <p>Using the function <code>check_msg_time</code> you can see that the TIMESTAMP values associated with the message are not the same for each event. This indicates that alignment is required.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
-<pre><code>## # A tibble: 320 × 3
+<pre><code>## # A tibble: 320 x 3
 ##       Event SAMPLE_MESSAGE TIMESTAMP
 ##      &lt;fctr&gt;         &lt;fctr&gt;     &lt;dbl&gt;
-## 1   14001.1     VowelOnset   1047469
-## 2   14001.2     VowelOnset   1054718
-## 3   14001.3     VowelOnset   1062679
-## 4   14001.4     VowelOnset   1069987
-## 5   14001.5     VowelOnset   1077113
-## 6   14001.6     VowelOnset   1084338
-## 7   14001.7     VowelOnset   1091555
-## 8   14001.8     VowelOnset   1099738
-## 9   14001.9     VowelOnset   1107363
+##  1  14001.1     VowelOnset   1047469
+##  2  14001.2     VowelOnset   1054718
+##  3  14001.3     VowelOnset   1062679
+##  4  14001.4     VowelOnset   1069987
+##  5  14001.5     VowelOnset   1077113
+##  6  14001.6     VowelOnset   1084338
+##  7  14001.7     VowelOnset   1091555
+##  8  14001.8     VowelOnset   1099738
+##  9  14001.9     VowelOnset   1107363
 ## 10 14001.10     VowelOnset   1114682
 ## # ... with 310 more rows</code></pre>
 <p>The function <code>align_msg</code> is used to perform the alignment. To do this you must specify the message text as a string to the parameter <code>Msg</code>. The function finds the instance of the message for each event and sets that sample as the zero point. Consequently, this creates a new column called <code>Align</code>, which represents the time sequence relative to the message.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aligned1 &lt;-<span class="st"> </span><span class="kw">align_msg</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
 <p>If we check the message time again, we now see that the message occurs at time 0 in the <code>Align</code> column.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
-<pre><code>## # A tibble: 320 × 3
+<pre><code>## # A tibble: 320 x 3
 ##       Event SAMPLE_MESSAGE Align
 ##      &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
-## 1   14001.1     VowelOnset     0
-## 2   14001.2     VowelOnset     0
-## 3   14001.3     VowelOnset     0
-## 4   14001.4     VowelOnset     0
-## 5   14001.5     VowelOnset     0
-## 6   14001.6     VowelOnset     0
-## 7   14001.7     VowelOnset     0
-## 8   14001.8     VowelOnset     0
-## 9   14001.9     VowelOnset     0
+##  1  14001.1     VowelOnset     0
+##  2  14001.2     VowelOnset     0
+##  3  14001.3     VowelOnset     0
+##  4  14001.4     VowelOnset     0
+##  5  14001.5     VowelOnset     0
+##  6  14001.6     VowelOnset     0
+##  7  14001.7     VowelOnset     0
+##  8  14001.8     VowelOnset     0
+##  9  14001.9     VowelOnset     0
 ## 10 14001.10     VowelOnset     0
 ## # ... with 310 more rows</code></pre>
 <p>To fully examine all events, you can include the parameter <code>ReturnData=TRUE</code> and assign the output to an object in your environment.</p>
@@ -263,18 +263,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## [127] -330 -220 -245 -290 -142 -141 -189 -121 -122 -156</code></pre>
 <p>Perhaps more meaningfully, we can check the message time again. We can see that our message is still the zero point in the Time series column.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned2, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
-<pre><code>## # A tibble: 320 × 3
+<pre><code>## # A tibble: 320 x 3
 ##      Event SAMPLE_MESSAGE  Time
 ##     &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
-## 1  14001.1     VowelOnset     0
-## 2  14002.1     VowelOnset     0
-## 3  14003.1     VowelOnset     0
-## 4  14004.1     VowelOnset     0
-## 5  14005.1     VowelOnset     0
-## 6  14006.1     VowelOnset     0
-## 7  14008.1     VowelOnset     0
-## 8  14010.1     VowelOnset     0
-## 9  14001.2     VowelOnset     0
+##  1 14001.1     VowelOnset     0
+##  2 14002.1     VowelOnset     0
+##  3 14003.1     VowelOnset     0
+##  4 14004.1     VowelOnset     0
+##  5 14005.1     VowelOnset     0
+##  6 14006.1     VowelOnset     0
+##  7 14008.1     VowelOnset     0
+##  8 14010.1     VowelOnset     0
+##  9 14001.2     VowelOnset     0
 ## 10 14002.2     VowelOnset     0
 ## # ... with 310 more rows</code></pre>
 </div>
@@ -290,7 +290,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

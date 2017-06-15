@@ -29,4 +29,3 @@ library(VWPre)
 df <- align_msg(data = dat, Msg = "ExperimentDisplay")
 }
 }
-

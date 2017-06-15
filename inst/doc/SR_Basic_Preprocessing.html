@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2016-11-25" />
+<meta name="date" content="2017-06-14" />
 
 <title>Basic VWP Preprocessing for SR Eyelink Data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Basic VWP Preprocessing for SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2016-11-25</em></h4>
+<h4 class="date"><em>2017-06-14</em></h4>
 
 
 
@@ -124,15 +124,15 @@ VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <div id="remove-unnecessary-columns" class="section level3">
 <h3>Remove unnecessary columns</h3>
 <p>At this point, it is safe to remove the columns which were output by Data Viewer, but that are not needed for preprocessing in using this package. Removing these will reduce the amount of system memory consumed and result in a final dataset that consume less disk space. This is done straightforwardly using <code>dplyr::select</code>, which can also accommodate both column names and regular expressions for matching. If using the sample data set included in this package, it is not necessary to do this step, as these columns have already been removed.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat0 &lt;-<span class="st"> </span><span class="kw">select</span>(dat0, -<span class="kw">starts_with</span>(<span class="st">&quot;AVERAGE&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;DATA_&quot;</span>), 
-               -<span class="kw">starts_with</span>(<span class="st">&quot;HTARGET&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;IP&quot;</span>), 
-               -<span class="kw">starts_with</span>(<span class="st">&quot;LEFT_ACCELLERATION&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;LEFT_IN_&quot;</span>), 
-               -<span class="kw">starts_with</span>(<span class="st">&quot;LEFT_PUPIL&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;LEFT_VELOCITY&quot;</span>), 
-               -<span class="kw">starts_with</span>(<span class="st">&quot;RESOLUTION&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_ACCELLERATION&quot;</span>), 
-               -<span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_IN_&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_PUPIL&quot;</span>), 
-               -<span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_VELOCITY&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_INDEX&quot;</span>),
-               -<span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_BUTTON&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;TARGET_&quot;</span>), 
-               -<span class="kw">starts_with</span>(<span class="st">&quot;TRIAL_START&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;VIDEO&quot;</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat0 &lt;-<span class="st"> </span><span class="kw">select</span>(dat0, <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;AVERAGE&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;DATA_&quot;</span>), 
+               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;HTARGET&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;IP&quot;</span>), 
+               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_ACCELLERATION&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_IN_&quot;</span>), 
+               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_PUPIL&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_VELOCITY&quot;</span>), 
+               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RESOLUTION&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_ACCELLERATION&quot;</span>), 
+               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_IN_&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_PUPIL&quot;</span>), 
+               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_VELOCITY&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_INDEX&quot;</span>),
+               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_BUTTON&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;TARGET_&quot;</span>), 
+               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;TRIAL_START&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;VIDEO&quot;</span>))</code></pre></div>
 </div>
 <div id="relabel-na-samples-as-outside-any-interest-area" class="section level3">
 <h3>Relabel NA samples as outside any interest area</h3>
@@ -170,18 +170,18 @@ VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <pre><code>## [1] -100</code></pre>
 <p>Another way to check that your time series has been created correctly is to use the <code>check_msg_time</code> function. By providing the appropriate message text, we can see that the onset of our target now occurs at Time = 0. As with <code>check_time_series</code>, the parameter <code>ReturnData = T</code> will return a summary data frame that can be used to inspect the message time of each event.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> dat2, <span class="dt">Msg =</span> <span class="st">&quot;TargetOnset&quot;</span>)</code></pre></div>
-<pre><code>## # A tibble: 320 × 3
+<pre><code>## # A tibble: 320 x 3
 ##      Event SAMPLE_MESSAGE  Time
 ##     &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
-## 1  14001.1    TargetOnset     0
-## 2  14002.1    TargetOnset     0
-## 3  14003.1    TargetOnset     0
-## 4  14004.1    TargetOnset     0
-## 5  14005.1    TargetOnset     0
-## 6  14006.1    TargetOnset     0
-## 7  14008.1    TargetOnset     0
-## 8  14010.1    TargetOnset     0
-## 9  14001.2    TargetOnset     0
+##  1 14001.1    TargetOnset     0
+##  2 14002.1    TargetOnset     0
+##  3 14003.1    TargetOnset     0
+##  4 14004.1    TargetOnset     0
+##  5 14005.1    TargetOnset     0
+##  6 14006.1    TargetOnset     0
+##  7 14008.1    TargetOnset     0
+##  8 14010.1    TargetOnset     0
+##  9 14001.2    TargetOnset     0
 ## 10 14002.2    TargetOnset     0
 ## # ... with 310 more rows</code></pre>
 </div>
@@ -373,10 +373,10 @@ text-align: center;
 <div id="subsetting-and-ordering" class="section level3">
 <h3>Subsetting and ordering</h3>
 <p>Before embarking on a statistical analysis, it is probably necessary to take a couple steps, such as paring down the data to only include the columns which will be needed later and ensuring the data are ordered appropriately. This is straightforward using <code>dplyr</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FinalDat &lt;-<span class="st"> </span>dat5 %&gt;%<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FinalDat &lt;-<span class="st"> </span>dat5 <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="co"># Select just the columns you want</span>
 <span class="st">  </span><span class="kw">select</span>(., Subject, Item, Time, <span class="kw">starts_with</span>(<span class="st">&quot;IA&quot;</span>), Event, TRIAL_INDEX, Rating, 
-         InteractChinese, Exp, target, rhymecomp, onsetcomp, distractor) %&gt;%
+         InteractChinese, Exp, target, rhymecomp, onsetcomp, distractor) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="co"># Order the data by Subject, Trial, and Time</span>
 <span class="st">  </span><span class="kw">arrange</span>(., Subject, TRIAL_INDEX, Time)</code></pre></div>
 </div>
@@ -398,7 +398,7 @@ text-align: center;
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

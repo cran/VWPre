@@ -18,4 +18,3 @@ library(VWPre)
 plot_transformation_app() 
 }
 }
-

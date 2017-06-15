@@ -30,4 +30,3 @@ library(VWPre)
 df <- custom_ia(data = dat, iaLookup = LookUpDF)
 }
 }
-

@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2016-11-25" />
+<meta name="date" content="2017-06-14" />
 
 <title>Relabeling Interest Areas or Defining New Post-hoc Interest Areas for SR Eyelink Data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Relabeling Interest Areas or Defining New Post-hoc Interest Areas for SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2016-11-25</em></h4>
+<h4 class="date"><em>2017-06-14</em></h4>
 
 
 
@@ -201,12 +201,12 @@ IAdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 </tbody>
 </table>
 <p>Next, create the Event column. Typically this is done using the Subject Identifier and Trial Index.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">IAdat$Event &lt;-<span class="st"> </span><span class="kw">interaction</span>(IAdat$RECORDING_SESSION_LABEL, IAdat$TRIAL_INDEX, <span class="dt">drop =</span> T)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">IAdat<span class="op">$</span>Event &lt;-<span class="st"> </span><span class="kw">interaction</span>(IAdat<span class="op">$</span>RECORDING_SESSION_LABEL, IAdat<span class="op">$</span>TRIAL_INDEX, <span class="dt">drop =</span> T)</code></pre></div>
 <p>Next you need to create a column which indicates the location of each interest area for a specific trial. If you defined this in your data source and output all columns to the eye-tracking file, these should already be included in your interest area report. In the example below, the columns (NAME_reg) indicate a numeric index (in this case Cartesian quadrants) of where the target and other objects were located per trial. This information must be unified into a single column so that it can be used later to merge in other information.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat1 &lt;-<span class="st"> </span>IAdat %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">ScreenLoc =</span> <span class="kw">ifelse</span>(IA_LABEL==<span class="st">&quot;Target&quot;</span>, target_reg,
-                        <span class="kw">ifelse</span>(IA_LABEL==<span class="st">&quot;RhymeComp&quot;</span>, rhymecomp_reg,
-                               <span class="kw">ifelse</span>(IA_LABEL==<span class="st">&quot;OnsetComp&quot;</span>, onsetcomp_reg,
-                                      <span class="kw">ifelse</span>(IA_LABEL==<span class="st">&quot;Distractor&quot;</span>, distractor_reg, <span class="ot">NA</span>))))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat1 &lt;-<span class="st"> </span>IAdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">ScreenLoc =</span> <span class="kw">ifelse</span>(IA_LABEL<span class="op">==</span><span class="st">&quot;Target&quot;</span>, target_reg,
+                        <span class="kw">ifelse</span>(IA_LABEL<span class="op">==</span><span class="st">&quot;RhymeComp&quot;</span>, rhymecomp_reg,
+                               <span class="kw">ifelse</span>(IA_LABEL<span class="op">==</span><span class="st">&quot;OnsetComp&quot;</span>, onsetcomp_reg,
+                                      <span class="kw">ifelse</span>(IA_LABEL<span class="op">==</span><span class="st">&quot;Distractor&quot;</span>, distractor_reg, <span class="ot">NA</span>))))
                   )</code></pre></div>
 <p>To create the bounding boxes of the region locations, make a dataframe that includes the top, bottom, left, and right pixel boundaries. These will, of course, be dependent on the resolution of the screen used in the experiment.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Loc_Table &lt;-<span class="st"> </span>df1 &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">ScreenLoc =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>), 
@@ -259,14 +259,14 @@ IAdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <p>This table will be merged with the interest area report, matching by ScreenLoc column.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat2 &lt;-<span class="st"> </span><span class="kw">inner_join</span>(dat1, Loc_Table, <span class="dt">by=</span><span class="st">&quot;ScreenLoc&quot;</span>)</code></pre></div>
 <p>The look-up table (as with other functions in VWPre) requires a numeric interest area ID column. This can be created directly from the <code>IA_LABEL</code> column, as follows by corresponding the Labels to the IDs.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat2$IA_ID &lt;-<span class="st"> </span><span class="kw">case_when</span>(
-  dat2$IA_LABEL ==<span class="st"> &quot;Target&quot;</span> ~<span class="st"> </span><span class="dv">1</span>,
-  dat2$IA_LABEL ==<span class="st"> &quot;RhymeComp&quot;</span> ~<span class="st"> </span><span class="dv">2</span>,
-  dat2$IA_LABEL ==<span class="st"> &quot;OnsetComp&quot;</span> ~<span class="st"> </span><span class="dv">3</span>,
-  dat2$IA_LABEL ==<span class="st"> &quot;Distractor&quot;</span> ~<span class="st"> </span><span class="dv">4</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat2<span class="op">$</span>IA_ID &lt;-<span class="st"> </span><span class="kw">case_when</span>(
+  dat2<span class="op">$</span>IA_LABEL <span class="op">==</span><span class="st"> &quot;Target&quot;</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,
+  dat2<span class="op">$</span>IA_LABEL <span class="op">==</span><span class="st"> &quot;RhymeComp&quot;</span> <span class="op">~</span><span class="st"> </span><span class="dv">2</span>,
+  dat2<span class="op">$</span>IA_LABEL <span class="op">==</span><span class="st"> &quot;OnsetComp&quot;</span> <span class="op">~</span><span class="st"> </span><span class="dv">3</span>,
+  dat2<span class="op">$</span>IA_LABEL <span class="op">==</span><span class="st"> &quot;Distractor&quot;</span> <span class="op">~</span><span class="st"> </span><span class="dv">4</span>
 )</code></pre></div>
 <p>Lastly, select only the required columns for the look-up table.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LookUpTable &lt;-<span class="st"> </span>dat2 %&gt;%<span class="st"> </span><span class="kw">select</span>(Event, IA_LABEL, IA_ID, Top, Bottom, Left, Right)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LookUpTable &lt;-<span class="st"> </span>dat2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Event, IA_LABEL, IA_ID, Top, Bottom, Left, Right)</code></pre></div>
 <p>The table should now look similar to the following.</p>
 <table>
 <thead>
@@ -408,7 +408,7 @@ IAdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

@@ -63,4 +63,3 @@ plot_avg_diff(data = dat, xlim = c(0, 1000), DiffCols = c(IA_1_P = "Target", IA_
            VWPreTheme = TRUE)
 }
 }
-

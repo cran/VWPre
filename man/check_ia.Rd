@@ -24,4 +24,3 @@ library(VWPre)
 check_ia(dat)
 }
 }
-

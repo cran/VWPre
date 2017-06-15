@@ -11,4 +11,3 @@ This is a sample eye-tracking dataset included in the package
 Vincent Porretta
 }
 \keyword{data}
-

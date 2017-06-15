@@ -30,4 +30,3 @@ library(VWPre)
 check_time_series(data = dat)
 }
 }
-

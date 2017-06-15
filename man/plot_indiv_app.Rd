@@ -21,4 +21,3 @@ library(VWPre)
 plot_indiv_app(data = dat)
 } 
 }
-

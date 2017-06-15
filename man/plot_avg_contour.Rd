@@ -44,4 +44,3 @@ plot_avg_contour(data = dat, IA = "IA_1_ELogit", type = "elogit",
                VWPreTheme = FALSE, Colors = c("red", "white"))
 }
 }
-

@@ -34,4 +34,3 @@ df <- recode_ia(data=dat, IDs=c("234"="2", "0"="0", "35"="3", "11"="1",
 Dist2="NewDist2Name", Comp="NewCompName", Dist1="NewDist1Name"))
 }
 }
-

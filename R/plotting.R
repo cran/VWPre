@@ -56,7 +56,7 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #' # For plotting conditional averages (one condition) with the included theme.
 #' # This produces plots arranged vertically.
 #' plot_avg(data = dat, type = "elogit", xlim = c(0, 1000), 
-#'    IAColumns = IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
+#'    IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
 #'    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
 #'    Condition1 = "talker", Condition2 = NA, 
 #'    Cond1Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
@@ -65,7 +65,7 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #' # For plotting conditional averages (one condition) with the included theme.
 #' # This produces plots arranged horizontally
 #' plot_avg(data = dat, type = "elogit", xlim = c(0, 1000), 
-#'    IAColumns = IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
+#'    IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
 #'    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
 #'    Condition1 = NA, Condition2 = "talker", Cond1Labels = NA, 
 #'    Cond2Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
@@ -74,7 +74,7 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #' # For plotting conditional averages (two conditions) with the included theme.
 #' # This produces plots arranged in grid format.
 #' plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
-#'    IAColumns = IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
+#'    IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
 #'    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
 #'    Condition1 = "talker", Condition2 = "Exp",
 #'    Cond1Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
@@ -217,14 +217,14 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
   
   
   if (!is.na(Condition1) & !is.na(Condition2)) {
-  
-  	GrandAvg <- data %>% select(match(sel_names,names(.)), get(Condition1), get(Condition2)) %>% 
-      tidyr::gather_("IA", "VALUE", unique(names(IAColumns)), na.rm = FALSE, convert = FALSE) %>%
-      group_by_("IA", "Time", Condition1, Condition2) %>%
-      summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
-    	rename_(CustCond1 = as.name(eval(Condition1)), CustCond2 = as.name(eval(Condition2)))
-  
-    if (type == "elogit") {
+    conms <- names(IAColumns)
+  	GrandAvg <- data %>% select_(.dots=sel_names, interp(~Condition1, Condition1 = as.name(Condition1)), interp(~Condition2, Condition2 = as.name(Condition2))) %>%
+        tidyr::gather(key=IA, value = VALUE, match(names(IAColumns),names(.)), na.rm = FALSE, convert = FALSE) %>%
+  	group_by_("IA", "Time", Condition1, Condition2) %>%
+    summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
+    rename_(CustCond1 = as.name(eval(Condition1)), CustCond2 = as.name(eval(Condition2)))
+    
+       if (type == "elogit") {
 	ylim[1] = min(GrandAvg$mean) - 0.5
 	ylim[2] = max(GrandAvg$mean) + 0.5
 	}
@@ -245,8 +245,8 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
   
   else if (!is.na(Condition1) & is.na(Condition2)) {
     
-    GrandAvg <- data %>% select(match(sel_names,names(.)), get(Condition1)) %>% 
-      tidyr::gather_("IA", "VALUE", unique(names(IAColumns)), na.rm = FALSE, convert = FALSE) %>%
+    GrandAvg <- data %>% select_(.dots=sel_names, interp(~Condition1, Condition1 = as.name(Condition1))) %>%
+      tidyr::gather(key=IA, value = VALUE, match(names(IAColumns),names(.)), na.rm = FALSE, convert = FALSE)  %>%
       group_by_("IA", "Time", Condition1) %>%
       summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
       rename_(CustCond1 = as.name(eval(Condition1)))
@@ -273,8 +273,8 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
   
   else if (is.na(Condition1) & !is.na(Condition2)) {
     
-    GrandAvg <- data %>% select(match(sel_names,names(.)), get(Condition2)) %>% 
-      tidyr::gather_("IA", "VALUE", unique(names(IAColumns)), na.rm = FALSE, convert = FALSE) %>%
+    GrandAvg <- data %>% select_(.dots=sel_names, interp(~Condition2, Condition2 = as.name(Condition2))) %>%
+      tidyr::gather(key=IA, value = VALUE, match(names(IAColumns),names(.)), na.rm = FALSE, convert = FALSE)  %>%
       group_by_("IA", "Time", Condition2) %>%
       summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
       rename_(CustCond2 = as.name(eval(Condition2)))
@@ -302,8 +302,8 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
   
   else if (is.na(Condition1) & is.na(Condition2)) {
     
-    GrandAvg <- data %>% select(match(sel_names,names(.))) %>% 
-      tidyr::gather_("IA", "VALUE", unique(names(IAColumns)), na.rm = FALSE, convert = FALSE) %>%
+    GrandAvg <- data %>% select_(.dots=sel_names) %>%
+      tidyr::gather(key=IA, value = VALUE, match(names(IAColumns),names(.)), na.rm = FALSE, convert = FALSE)  %>%
       group_by_("IA", "Time") %>%
       summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE)))
 
@@ -559,10 +559,10 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA,
 
   if (is.na(Condition1) & is.na(Condition2)) {
     
-    GrandAvg <- dat %>% select(match(sel_names,names(.))) %>% 
+    GrandAvg <- dat %>% select_(.dots=sel_names) %>% 
       group_by(Time) %>%
       summarise(mean = mean(Diff, na.rm = T), se = sd(Diff) / sqrt(length(Diff)))
-    
+
     ylim[1] = min(GrandAvg$mean) - 0.15
     ylim[2] = max(GrandAvg$mean) + 0.15
     
@@ -581,12 +581,12 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA,
     
   } else if (!is.na(Condition1) & is.na(Condition2)) {
     
-    GrandAvg <- dat %>% select(match(sel_names,names(.)), get(Condition1)) %>% 
+    GrandAvg <- dat %>% select_(.dots=sel_names, interp(~Condition1, Condition1 = as.name(Condition1))) %>% 
       group_by_("Time", Condition1) %>%
       summarise(mean = mean(Diff, na.rm = T), se = sd(Diff) / sqrt(length(Diff))) %>%
       mutate_(., Cond = interp(~Condition1, Condition1 = as.name(Condition1))) %>%
       mutate(., Cond = as.factor(Cond))
-    
+
     lev1 <- unique(levels(GrandAvg$Cond))
     for (x in 1:length(names(Cond1Labels))) {
       for(i in 1:length(lev1)) {
@@ -617,14 +617,13 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA,
     
   }  else if (!is.na(Condition1) & !is.na(Condition2)) {
     
-    GrandAvg <- dat %>% select(match(sel_names,names(.)), get(Condition1), get(Condition2)) %>% 
+    GrandAvg <- dat %>% select_(.dots=sel_names, interp(~Condition1, Condition1 = as.name(Condition1)), interp(~Condition2, Condition2 = as.name(Condition2))) %>% 
       group_by_("Time", Condition1, Condition2) %>%
       summarise(mean = mean(Diff, na.rm = T), se = sd(Diff) / sqrt(length(Diff))) %>%
       mutate_(., Cond1 = interp(~Condition1, Condition1 = as.name(Condition1)),
               Cond2 = interp(~Condition2, Condition2 = as.name(Condition2))) %>%
       mutate(., Cond1 = as.factor(Cond1), Cond2 = as.factor(Cond2))
-    
-    
+
     lev1 <- unique(levels(GrandAvg$Cond1))
     for (x in 1:length(names(Cond1Labels))) {
       for(i in 1:length(lev1)) {

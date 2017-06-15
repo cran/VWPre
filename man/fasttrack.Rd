@@ -76,4 +76,3 @@ df <- fasttrack(data = dat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid"
 			Output = "ELogit")
 }
 }
-

@@ -57,7 +57,7 @@ plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
 # For plotting conditional averages (one condition) with the included theme.
 # This produces plots arranged vertically.
 plot_avg(data = dat, type = "elogit", xlim = c(0, 1000), 
-   IAColumns = IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
+   IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
    Condition1 = "talker", Condition2 = NA, 
    Cond1Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
@@ -66,7 +66,7 @@ plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
 # For plotting conditional averages (one condition) with the included theme.
 # This produces plots arranged horizontally
 plot_avg(data = dat, type = "elogit", xlim = c(0, 1000), 
-   IAColumns = IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
+   IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
    Condition1 = NA, Condition2 = "talker", Cond1Labels = NA, 
    Cond2Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
@@ -75,7 +75,7 @@ plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
 # For plotting conditional averages (two conditions) with the included theme.
 # This produces plots arranged in grid format.
 plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
-   IAColumns = IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
+   IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
    Condition1 = "talker", Condition2 = "Exp",
    Cond1Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
@@ -83,4 +83,3 @@ plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
    ErrorBar = TRUE, VWPreTheme = TRUE)
 }
 }
-

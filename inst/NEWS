@@ -1,5 +1,37 @@
 # -----------------------------------------------
 
+# VWPre 0.9.6
+
+## Major changes:
+
+### New functions
+
+* None.
+
+### Changes to functions
+
+* None.
+
+### Vignettes
+
+* None.  
+
+## Minor changes:
+
+### Changes to functions 
+
+* plot_avg: Internal change to make the function compatible with dplyr 0.7.0. 
+* plot_avg_diff: Internal change to make the function compatible with dplyr 0.7.0. 
+* plot_indiv_app: Internal change to make the function compatible with dplyr 0.7.0. 
+
+## Bug fixes:
+
+* create_binomial: Internal change to correct a bug in the creation of the optional CustomBinom column.
+
+
+
+# -----------------------------------------------
+
 # VWPre 0.9.5
 
 ## Major changes:

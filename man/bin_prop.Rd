@@ -41,4 +41,3 @@ library(VWPre)
 df <- bin_prop(dat, NoIA = 4, BinSize = 20, SamplingRate = 1000)
 }
 }
-

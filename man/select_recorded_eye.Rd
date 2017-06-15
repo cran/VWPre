@@ -32,4 +32,3 @@ library(VWPre)
 df <- select_recorded_eye(data = dat, Recording = "LandR", WhenLandR = "Right")
 }
 }
-

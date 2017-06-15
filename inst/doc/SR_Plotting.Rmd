@@ -58,7 +58,7 @@ plot_avg(data = dat, type = "proportion", xlim = c(0, 1000),
 
 To customize the appearance of a plot (e.g., font, size, color, margins, etc.), the `VWPreTheme` parameter can be set to `FALSE`, which reverts to the default theming in `gglpot2`. 
 In this way, the user can apply a custom theme to the plot. 
-Detailed information about creating themes can be found at [ggplot2 Theme Vignette](http://docs.ggplot2.org/dev/vignettes/themes.html).
+Detailed information about creating themes can be found at [ggplot2 Theme Vignette](http://ggplot2.tidyverse.org/reference/theme.html).
 For the purpose of illustration, the default ggplot2 theme has been applied, with the axis text elements increased in size.
 
 ```{r, eval= TRUE, fig.show='hold', results='asis', message=FALSE}

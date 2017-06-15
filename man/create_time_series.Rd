@@ -42,4 +42,3 @@ df <- create_time_series(data = dat, Adjust = -100)
 df <- create_time_series(data = dat, Adjust = 100)
 }
 }
-

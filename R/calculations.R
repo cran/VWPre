@@ -430,7 +430,7 @@ create_binomial <- function(data, NoIA = NULL, ObsPerBin = NULL,
     bindcol1 <- paste("IA_", CustomBinom[1], "_Looks", sep="")
     bindcol2 <- paste("IA_", CustomBinom[2], "_Looks", sep="")
     newcol <- paste("IA_", CustomBinom[1], "_V_", CustomBinom[2], "_Looks", sep="")
-    tmp$Custom <- cbind(tmp[,bindcol1][,1],tmp[,bindcol2][,1])
+    tmp$Custom <- cbind(tmp[[bindcol1]][,1], tmp[[bindcol2]][,1])
     tmp <- rename_(tmp, .dots = setNames("Custom", newcol))
   }
   

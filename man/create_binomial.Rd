@@ -40,4 +40,3 @@ library(VWPre)
 df <- create_binomial(data = dat, NoIA = 4, ObsPerBin = 20)
 }
 }
-

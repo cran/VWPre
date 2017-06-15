@@ -110,6 +110,7 @@ collected with SR Research Eyelink eye trackers.
 \code{help(package="VWPre")}.
 }
 }
+
 \author{
 Vincent Porretta, Aki-Juhani Kyröläinen, Jacolien van Rij, Juhani Järvikivi
 
@@ -117,4 +118,3 @@ Maintainer: Vincent Porretta (\email{vincentporretta@gmail.com})
 
 University of Alberta, Canada
 }
-

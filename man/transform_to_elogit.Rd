@@ -51,4 +51,3 @@ library(VWPre)
 df <- transform_to_elogit(dat, NoIA = 4, ObsPerBin = 20, Constant = 0.5)
 }
 }
-

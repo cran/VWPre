@@ -30,4 +30,3 @@ dat2 <- rename_columns(dat, Labels = c(IA1="Target", IA2="Rhyme",
                            IA3="OnsetComp", IA4="Distractor")) 
 }
 }
-

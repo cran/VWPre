@@ -424,10 +424,12 @@ plot_indiv_app <- function (data)
       indivdata <-
         shiny::reactive({
           if (input$type == "Subjects") {
-            data <- data[data$Subject == input$subj, ]
+            # data <- data[data$Subject == input$subj, ]
+              data <- filter(data, Subject == input$subj)
           }
           else if (input$type == "Items") {
-            data <- data[data$Item == input$item, ]
+            # data <- data[data$Item == input$item, ]
+            data <- filter(data, Item == input$item)
           }
           return(data)
         })
@@ -446,21 +448,23 @@ plot_indiv_app <- function (data)
             message("Please select interest areas.")
           }
           else {
-            GrandAvg <- granddata() %>% select(match(sel_names, names(.))) %>% 
-              tidyr::gather_("IA", "VALUE", unique(Cols), na.rm = FALSE, convert = FALSE) %>%
-              group_by_("IA", "Time") %>% 
-              summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
+            GrandAvg <- granddata() %>% select(match(sel_names,names(.))) %>% 
+            tidyr::gather(key=IA, value = VALUE, match(Cols,names(.)), na.rm = FALSE, convert = FALSE) %>%            
+              group_by(IA, Time) %>% 
+            summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
               mutate(alpha = 0.25, group = "Grand Average")
-            GrandAvg$group <-
-              as.factor(GrandAvg$group)
-            IndivAvg <-
-              indivdata() %>% select(match(sel_names, names(.))) %>% 
-              tidyr::gather_("IA", "VALUE", unique(Cols), na.rm = FALSE, convert = FALSE) %>%
-              group_by_("IA", "Time") %>% 
+            GrandAvg$group <- as.factor(GrandAvg$group)
+            levels(GrandAvg$group) <- c("Grand Average", "Individual Average")
+            IndivAvg <- indivdata() %>% select(match(sel_names,names(.))) %>%
+              tidyr::gather(key=IA, value = VALUE, match(Cols,names(.)), na.rm = FALSE, convert = FALSE) %>%            
+              group_by_("IA", "Time") %>%
               summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
               mutate(alpha = 1, group = "Individual Average")
             IndivAvg$group <- as.factor(IndivAvg$group)
+            levels(IndivAvg$group) <- c("Individual Average", "Grand Average")
+
             Avg <- rbind(IndivAvg, GrandAvg)
+            Avg$group <- stats::relevel(Avg$group, ref = "Grand Average")
             if (input$scale == "Empirical Logits") {
               ylim[1] <- min(Avg$mean) - 0.25
               ylim[2] <-
@@ -471,8 +475,8 @@ plot_indiv_app <- function (data)
             }
             ggplot(Avg, aes(x = Time, y = mean, colour = IA)) +
               geom_point(alpha = 0.7) + geom_line(alpha = 0.7) +
-              geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.3, alpha = 0.7) + 
-              facet_grid(. ~ group) + ylab(scale) + scale_x_continuous(limits = c(input$mintime, input$maxtime)) + 
+              geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.3, alpha = 0.7) +
+              facet_grid(. ~ group) + ylab(scale) + scale_x_continuous(limits = c(input$mintime, input$maxtime)) +
               scale_y_continuous(limits = c(ylim[1], ylim[2])) + scale_colour_brewer(palette = "Set1") +
               theme_bw() + theme(
                 panel.grid.major.x = element_blank(),
