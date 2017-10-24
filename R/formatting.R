@@ -5,15 +5,14 @@
 #' RIGHT_INTEREST_AREA_ID, LEFT_INTEREST_AREA_LABEL, RIGHT_INTEREST_AREA_LABEL, 
 #' TIMESTAMP, and TRIAL_INDEX) and optional columns (SAMPLE_MESSAGE, LEFT_GAZE_X,
 #' LEFT_GAZE_Y, RIGHT_GAZE_X, and RIGHT_GAZE_Y). It renames the subject and item 
-#' columns, ensures required/optional columns are of the approriate data class, 
+#' columns, ensures required/optional columns are of the appropriate data class, 
 #' and creates a new column called Event which indexes each unique 
 #' series of samples corresponding to the combination of Subject and 
 #' TRIAL_INDEX (can be changed), necessary for performing subsequent operations.
 #' 
 #' @export
 #' @import dplyr
-#' @import tidyr
-#' @import lazyeval
+#' @import rlang
 #' 
 #' @param data A data frame object created from an Eyelink Sample Report.
 #' @param Subject An obligatory string containing the column name corresponding to the subject identifier.
@@ -31,13 +30,13 @@
 #' }
 prep_data <- function(data, Subject = NULL, Item = NA,
                       EventColumns=c("Subject","TRIAL_INDEX")){
-
+  
   reqcols <- data.frame(Column=c("RECORDING_SESSION_LABEL", 
                                  "LEFT_INTEREST_AREA_ID","LEFT_INTEREST_AREA_LABEL", 
                                  "RIGHT_INTEREST_AREA_ID","RIGHT_INTEREST_AREA_LABEL", 
                                  "TIMESTAMP","TRIAL_INDEX"), Present=NA)
   optcols <- data.frame(Column=c("SAMPLE_MESSAGE", "LEFT_GAZE_X", "LEFT_GAZE_Y", 
-                                 "RIGHT_GAZE_X", "RIGHT_GAZE_Y"), Present=NA)
+                                 "RIGHT_GAZE_X", "RIGHT_GAZE_Y", "EYE_TRACKED"), Present=NA)
   
   data <- tbl_df(data)
   
@@ -87,10 +86,11 @@ prep_data <- function(data, Subject = NULL, Item = NA,
     stop("Please supply the name of the subject column!")
   } else {
     subject <- Subject
+    subject <- enquo(subject)
   }
   
-  data <- rename_(data, Subject = interp(~subject, subject = as.name(subject)))
-  message(paste("   ", subject, "renamed to Subject. "))
+  data <- rename(data, Subject = !!subject)
+  message(paste("   ", quo_name(subject), "renamed to Subject. "))
   
   if (is.factor(data$Subject) == F){
     data$Subject <- as.factor(as.character(data$Subject))
@@ -98,7 +98,7 @@ prep_data <- function(data, Subject = NULL, Item = NA,
   } else {
     message("    Subject already factor.")
   }
-
+  
   item <- Item
   
   if (!is.na(item)) {
@@ -107,8 +107,9 @@ prep_data <- function(data, Subject = NULL, Item = NA,
       stop(paste(item, "is not a column name in the data."))
     }
     
-    data <- rename_(data, Item = interp(~item, item = as.name(item)))
-    message(paste("   ", item, "renamed to Item."))
+    item <- enquo(item)
+    data <- rename(data, Item = !!item)
+    message(paste("   ", quo_name(item), "renamed to Item."))
     if (is.factor(data$Item) == F){
       data$Item <- as.factor(as.character(data$Item))
       message("    Item converted to factor.")
@@ -174,7 +175,7 @@ prep_data <- function(data, Subject = NULL, Item = NA,
   
   message("Working on optional columns...")
   
-  if (nrow(missingoptcols) == 5) {
+  if (nrow(missingoptcols) == nrow(optcols)) {
     message("    No optional columns present in the data.")
   } 
   
@@ -223,6 +224,15 @@ prep_data <- function(data, Subject = NULL, Item = NA,
     }
   }
   
+  if ("EYE_TRACKED" %in% names(data)) {
+    if (is.factor(data$EYE_TRACKED) == F){
+      data$EYE_TRACKED <- as.factor(as.character(data$EYE_TRACKED))
+      message("    Optional column EYE_TRACKED converted to factor.")
+    } else {
+      message("    Optional column EYE_TRACKED already factor.")
+    }
+  }
+  
   return(ungroup(data))
 }
 
@@ -239,28 +249,34 @@ prep_data <- function(data, Subject = NULL, Item = NA,
 #' 
 #' @export
 #' @import dplyr
-#' @import lazyeval
+#' @import rlang
 #' 
 #' @param data A data table object output from \code{prep_data}.
-#' @param Msg An obligatory string containing the exact message to be found in 
-#' the column SAMPLE_MESSAGE.
+#' @param Msg An obligatory string containing the message to be found in 
+#' the column SAMPLE_MESSAGE or a regular expression for locating the 
+#' appropriate message.
 #' @return A data table object.
 #' @examples
 #' \dontrun{
-#' # To align the samples to a specifc message...
+#' # To align the samples to a specific message...
 #' library(VWPre)
 #' df <- align_msg(data = dat, Msg = "ExperimentDisplay")
+#'  
+#' # For a more complete tutorial on VWPre plotting functions:
+#' vignette("SR_Message_Alignment", package="VWPre")
 #' }
+#' 
 align_msg <- function(data, Msg = NULL) {
   
   if(is.null(Msg)){
-    stop("Please supply the message text!")
+    stop("Please supply the message text or regular expression!")
   } else {
-  msg <- Msg
+    msg <- Msg
+    msg <- enquo(msg)
   }
   
   tmp1 <- data %>% group_by(Event) %>% 
-    mutate_(Align = interp(~ifelse(SAMPLE_MESSAGE==msg, TIMESTAMP, NA), msg=as.name("msg"))) %>%
+    mutate(Align = ifelse(grepl(!!msg, SAMPLE_MESSAGE), TIMESTAMP, NA)) %>%
     filter(!is.na(Align)) %>% select(Event, Align) %>% filter(Align==min(Align))
   tmp2 <- inner_join(data, tmp1, by="Event") %>% mutate(Align = TIMESTAMP - Align)
   
@@ -280,7 +296,6 @@ align_msg <- function(data, Msg = NULL) {
 #' 
 #' @export
 #' @import dplyr
-#' @import lazyeval
 #' 
 #' @param data A data table object output by \code{\link{create_time_series}}.
 #' @param Recording A string indicating which eyes were used for recording gaze data.
@@ -295,7 +310,7 @@ align_msg <- function(data, Msg = NULL) {
 #' df <- select_recorded_eye(data = dat, Recording = "LandR", WhenLandR = "Right")
 #' }
 select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
-
+  
   if(is.null(Recording)){
     stop("Please supply the recording eye(s)!")
   }
@@ -424,7 +439,7 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 #' 
 #' @export
 #' @import dplyr
-#' @import lazyeval
+#' @import rlang
 #' 
 #' @param data A data table object output by \code{\link{relabel_na}} or 
 #' \code{\link{align_msg}}.
@@ -435,8 +450,6 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 #' If a text string, this will be the name of a column in 
 #' the data set which contains values indicating when the critical stimulus
 #' was presented relative to the zero point. 
-#' @param Adj DEPRECATED SINCE VERSION 0.9.5 - TO BE REMOVED.
-#' @param Offset DEPRECATED SINCE VERSION 0.9.0 - TO BE REMOVED.
 #' @return A data table object.
 #' @examples
 #' \dontrun{
@@ -448,24 +461,24 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 #' # or
 #' df <- create_time_series(data = dat, Adjust = 100)
 #' }
-create_time_series <- function (data, Adjust = 0, Adj = NULL, Offset = NULL) 
+create_time_series <- function (data, Adjust = 0) 
 {
   
-    if ("Adj" %in% names(match.call())) {
-    stop("'Adj' is deprecated; please use 'Adjust' instead. Please refer to the vignettes for explanation of usage.")
-    } else if ("Offset" %in% names(match.call())) {
-      stop("'Offset' is deprecated; please use 'Adjust' instead. Please refer to the vignettes for explanation of usage.")
-    }
-
+  #    if ("Adj" %in% names(match.call())) {
+  #    stop("'Adj' is deprecated; please use 'Adjust' instead. Please refer to the vignettes for explanation of usage.")
+  #    } else if ("Offset" %in% names(match.call())) {
+  #      stop("'Offset' is deprecated; please use 'Adjust' instead. Please refer to the vignettes for explanation of usage.")
+  #    }
+  
   adjust <- Adjust
   if (is.numeric(adjust)==T && !("Align" %in% colnames(data))) {
     if (adjust==0) {
       message("No adjustment applied.")
     } else {
-    message(paste(adjust, "ms adjustment applied."))
+      message(paste(adjust, "ms adjustment applied."))
     }
     data %>% arrange(., Event, TIMESTAMP) %>% group_by(Event) %>% 
-      mutate_(Time = interp(~TIMESTAMP - first(TIMESTAMP) - adjust)) %>% ungroup()
+      mutate(Time = TIMESTAMP - first(TIMESTAMP) - adjust) %>% ungroup()
   } 
   else if (is.numeric(adjust)==T && "Align" %in% colnames(data)) {
     if (adjust==0) {
@@ -474,12 +487,12 @@ create_time_series <- function (data, Adjust = 0, Adj = NULL, Offset = NULL)
       message(paste(adjust, "ms adjustment applied."))
     }
     data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
-      mutate_(Time = interp(~Align - adjust)) %>% ungroup()
+      mutate(Time = Align - adjust) %>% ungroup()
   } 
   else if (is.character(adjust)==T) {
     message(paste("Adjustment applied using values contained in", adjust))
     data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
-      mutate_(Time = interp(~Align - adjust, adjust=as.name(adjust))) %>% ungroup()
+      mutate(Time = Align - !! sym(adjust)) %>% ungroup()
   }
 }
 

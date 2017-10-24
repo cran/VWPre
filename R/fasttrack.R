@@ -10,7 +10,6 @@
 #' 
 #' @export
 #' @import dplyr
-#' @import lazyeval
 #' 
 #' @param data A data frame object created from an Eyelink Sample Report.
 #' @param Subject An obligatory string containing the column name corresponding 
@@ -51,11 +50,11 @@
 #'				Output = "ELogit")
 #' }
 fasttrack = function(data = data, Subject = NULL, Item = NA, 
-                        EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA,
-                        Adjust = 0, Recording = NULL, 
-                        WhenLandR = NA, BinSize = NULL, SamplingRate = NULL,
-                        ObsPerBin = NULL, ObsOverride = FALSE, 
-						Constant = 0.5, CustomBinom = NULL, Output = NULL) {
+                     EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA,
+                     Adjust = 0, Recording = NULL, 
+                     WhenLandR = NA, BinSize = NULL, SamplingRate = NULL,
+                     ObsPerBin = NULL, ObsOverride = FALSE, 
+                     Constant = 0.5, CustomBinom = NULL, Output = NULL) {
   
   dat <- data
   Subject <- Subject
@@ -75,7 +74,7 @@ fasttrack = function(data = data, Subject = NULL, Item = NA,
   
   message("Preparing data...")
   dat0 <- prep_data(data = dat, Subject = Subject, Item = Item, EventColumns = EventColumns)
-
+  
   message(paste("Relabelling outside of", NoIA, "interest areas...", sep = " "))
   dat1 <- relabel_na(data = dat0, NoIA = NoIA)
   rm(dat0)
@@ -105,7 +104,7 @@ fasttrack = function(data = data, Subject = NULL, Item = NA,
   
   message(paste("Preparing", Output, "output...", sep = " "))
   if(is.null(Output)) {
-	stop("Please specify the desired output type!")
+    stop("Please specify the desired output type!")
   } else if (Output == "ELogit") {
     dat5 <- transform_to_elogit(dat4, NoIA = NoIA, ObsPerBin = ObsPerBin, 
                                 Constant = Constant, ObsOverride = ObsOverride)

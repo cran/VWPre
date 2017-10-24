@@ -4,7 +4,7 @@
 \alias{create_time_series}
 \title{Create a time series column}
 \usage{
-create_time_series(data, Adjust = 0, Adj = NULL, Offset = NULL)
+create_time_series(data, Adjust = 0)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{relabel_na}} or 
@@ -17,10 +17,6 @@ shift the zero forward; negative values shift the zero backward.
 If a text string, this will be the name of a column in 
 the data set which contains values indicating when the critical stimulus
 was presented relative to the zero point.}
-
-\item{Adj}{DEPRECATED SINCE VERSION 0.9.5 - TO BE REMOVED.}
-
-\item{Offset}{DEPRECATED SINCE VERSION 0.9.0 - TO BE REMOVED.}
 }
 \value{
 A data table object.

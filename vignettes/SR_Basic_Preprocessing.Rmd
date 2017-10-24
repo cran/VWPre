@@ -98,7 +98,6 @@ dat0 <- select(dat0, -starts_with("AVERAGE"), -starts_with("DATA_"),
                -starts_with("TRIAL_START"), -starts_with("VIDEO"))
 ```
 
-
 ### Relabel NA samples as outside any interest area
 
 When the data were loaded, samples that were outside of any interest area were labeled as NA.
@@ -155,6 +154,7 @@ check_time_series(data = dat2)
 
 Another way to check that your time series has been created correctly is to use the `check_msg_time` function. 
 By providing the appropriate message text, we can see that the onset of our target now occurs at Time = 0.
+Note that the `Msg` parameter can handle exact matches or matches based on regular expressions. 
 As with `check_time_series`, the parameter `ReturnData = T` will return a summary data frame that can be used to inspect the message time of each event.
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
@@ -217,7 +217,7 @@ In order to do this, it is necessary to supply the parameters `BinSize` and `Sam
 
 Not all bin sizes work for all sampling rates, due to downsampling constraints. 
 If unsure which are appropriate for your current sampling rate, use the `ds_options` function. 
-When provided with the current sampling rate in `SamplingRate` (see above), the function will return a printed summary of the bin size options and their corresponding downsampled rate.
+When provided with the current sampling rate in `SamplingRate` (see above), the function will return a printed summary of the bin size options and their corresponding downsampled rate.  By default, this returns the whole number downsampling rates users are likely to want; however, it can also return all possible (valid) downsampling rates, even if they are not round numbers.
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
 ds_options(SamplingRate = 1000)

@@ -41,7 +41,7 @@
 #'   preprocessing.
 #' }
 #' 
-#' @section Utility functions:
+#' @section Data-checking functions:
 #' \itemize{
 #'   \item The function \code{\link{check_eye_recording}} returns a summary 
 #'   of whether or not the dataset contains gaze data in both the Right and 
@@ -64,13 +64,19 @@
 #' \itemize{
 #'   \item The function \code{\link{plot_avg}} returns a plot of the grand 
 #'   or conditional averages of proportion (or empirical logit) looks to each 
-#'   interest area along with standard error bars.
+#'   interest area along with error bars.
 #'   \item The function \code{\link{plot_avg_contour}} returns a contour plot of 
 #'   the conditional average of proportion (or empirical logit) looks to a 
 #'   given interest area over Time and a specified continuous variable. 
+#'   \item The function \code{\link{plot_avg_diff}} returns a plot of the grand 
+#'   or conditional averages of the difference between looks to two interest 
+#'   areas (proportions or empirical logits) with error bars.
+#'   \item The function \code{\link{make_pelogit_fnc}} returns a function 
+#'   that can backtransform predicted empirical logit to probability scale, 
+#'   particularly (though not exclusively) useful for plotting purposes. 
 #' }
 #' 
-#' @section Diagnostic functions:
+#' @section Interactive functions:
 #' \itemize{ 
 #'   \item The function \code{\link{plot_transformation_app}} opens a Shiny app 
 #'   for visualizing the effect of both number of observations and constant on 
@@ -96,7 +102,7 @@
 #'
 #' Maintainer: Vincent Porretta (\email{vincentporretta@@gmail.com})
 #'
-#' University of Alberta, Canada
+#' University of Windsor, Canada
 #' 
 #' @docType package
 #' @name VWPre

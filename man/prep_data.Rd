@@ -26,7 +26,7 @@ required columns (RECORDING_SESSION_LABEL, LEFT_INTEREST_AREA_ID,
 RIGHT_INTEREST_AREA_ID, LEFT_INTEREST_AREA_LABEL, RIGHT_INTEREST_AREA_LABEL, 
 TIMESTAMP, and TRIAL_INDEX) and optional columns (SAMPLE_MESSAGE, LEFT_GAZE_X,
 LEFT_GAZE_Y, RIGHT_GAZE_X, and RIGHT_GAZE_Y). It renames the subject and item 
-columns, ensures required/optional columns are of the approriate data class, 
+columns, ensures required/optional columns are of the appropriate data class, 
 and creates a new column called Event which indexes each unique 
 series of samples corresponding to the combination of Subject and 
 TRIAL_INDEX (can be changed), necessary for performing subsequent operations.

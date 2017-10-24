@@ -4,9 +4,11 @@
 \alias{plot_avg_diff}
 \title{Plots average difference between looks to interest areas.}
 \usage{
-plot_avg_diff(data, DiffCols = NULL, xlim = NA, Condition1 = NA,
-  Condition2 = NA, Cond1Labels = NA, Cond2Labels = NA, ErrorBar = TRUE,
-  VWPreTheme = TRUE)
+plot_avg_diff(data, DiffCols = NULL, xlim = NA, type = NULL,
+  Averaging = "Event", Condition1 = NULL, Condition2 = NULL,
+  Cond1Labels = NA, Cond2Labels = NA, ErrorBar = TRUE,
+  VWPreTheme = TRUE, ConfLev = 95, CItype = "simultaneous",
+  ErrorBand = FALSE, ErrorType = "SE")
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 
@@ -16,6 +18,14 @@ plot_avg_diff(data, DiffCols = NULL, xlim = NA, Condition1 = NA,
 corresponding to the interest areas.}
 
 \item{xlim}{A vector of two integers specifying the limits of the x-axis.}
+
+\item{type}{A character string indicating "proportion" or "elogit" which 
+influences how standard error and confidence intervals are calculated.}
+
+\item{Averaging}{A character string indicating how the averaging should 
+be done. "Event" (default) will produce the overall mean in the data, while
+"Subject" or "Item" (or, in principle, any other column name) will
+calculate the grand mean by that factor.}
 
 \item{Condition1}{A string containing the column name corresponding to the 
 first condition, if available.}
@@ -29,12 +39,22 @@ of the levels of the first condition.}
 \item{Cond2Labels}{A named character vector specifying the desired labels 
 of the levels of the second condition.}
 
-\item{ErrorBar}{A logical indicating whether standard error bars should 
+\item{ErrorBar}{A logical indicating whether error bars should be
 included in the plot.}
 
 \item{VWPreTheme}{A logical indicating whether the theme included with the 
-function should be applied, or ggplot2's base theme (which any other 
+function should be applied, or ggplot2's base theme (to which any other 
 custom theme could be added).}
+
+\item{ConfLev}{A number indicating the confidence level of the CI.}
+
+\item{CItype}{A string indicating "simultaneous" or "pointwise". Simultaneous
+performs a Bonferroni correction for the interval.}
+
+\item{ErrorBand}{A logical indicating whether error bands should be
+included in the plot.}
+
+\item{ErrorType}{A string indicating "SE" or "CI".}
 }
 \description{
 \code{plot_avg_diff} calculates the grand or conditional averages of 
@@ -44,22 +64,35 @@ It then plots the results.
 \examples{
 \dontrun{
 library(VWPre)
-# For plotting grand average differences...
-plot_avg_diff(data = dat, xlim = c(0, 1000), DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
+# For plotting average differences with SE bars...
+plot_avg_diff(data = dat, xlim = c(0, 1000), type = "proportion",
+             DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
              Condition1 = NA, Condition2 = NA, Cond1Labels = NA, Cond2Labels = NA,
-             ErrorBar = TRUE, VWPreTheme = TRUE)
+             ErrorBar = TRUE, VWPreTheme = TRUE, ErrorBands = FALSE, 
+             ErrorType = "SE")
              
-# For plotting conditional average differences (one condition) with the included theme.
-plot_avg_diff(data = dat, xlim = c(0, 1000), DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"), 
+# For plotting conditional average differences (one condition) with the 
+# included theme and 95\% pointwise CI bars.
+plot_avg_diff(data = dat, xlim = c(0, 1000), , type = "proportion",
+             DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
            Condition1 = "talker", Condition2 = NA, Cond1Labels = c(CH1 = "Chinese 1", 
            CH10 = "Chinese 3", CH9 = "Chinese 2", EN3 = "English 1"),
-           Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE)
+           Cond2Labels = NA, ErrorBar = TRUE, 
+           VWPreTheme = TRUE, ErrorBands = FALSE, 
+             ErrorType = "CI", ConfLev = 95, CItype = "pointwise")
            
-# For plotting conditional average differences (two conditions) with the included theme.
-plot_avg_diff(data = dat, xlim = c(0, 1000), DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"), 
+# For plotting conditional average differences (two conditions) with the 
+# included theme and 95\% simultaneous CI bands.
+plot_avg_diff(data = dat, xlim = c(0, 1000), , type = "proportion",
+             DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
            Condition1 = "talker", Condition2 = "Exp", Cond1Labels = c(CH1 = "Chinese 1", 
            CH10 = "Chinese 3", CH9 = "Chinese 2", EN3 = "English 1"),
-           Cond2Labels = c(High = "H Exp", Low = "L Exp"), ErrorBar = TRUE, 
-           VWPreTheme = TRUE)
+           Cond2Labels = c(High = "H Exp", Low = "L Exp"), ErrorBar = FALSE, 
+           VWPreTheme = TRUE, ErrorBands = TRUE, 
+             ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
+
+# For a more complete tutorial on VWPre plotting functions:
+vignette("SR_Plotting", package="VWPre")
 }
+
 }

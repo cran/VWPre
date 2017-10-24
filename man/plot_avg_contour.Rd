@@ -5,8 +5,8 @@
 \title{Plots average contour surface of looks to a given interest area.}
 \usage{
 plot_avg_contour(data, IA = NULL, type = NULL, Var = NULL,
-  VarLabel = NULL, xlim = NA, VWPreTheme = TRUE, Colors = c("gray20",
-  "gray90"))
+  Averaging = "Event", VarLabel = NULL, xlim = NA, VWPreTheme = TRUE,
+  Colors = c("gray20", "gray90"))
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 
@@ -18,6 +18,11 @@ plot_avg_contour(data, IA = NULL, type = NULL, Var = NULL,
 
 \item{Var}{A string containing the column name corresponding to the continuous
 variable.}
+
+\item{Averaging}{A character string indicating how the averaging should 
+be done. "Event" (default) will produce the overall mean in the data, while
+"Subject" or "Item" (or, in principle, any other column name) will
+calculate the grand mean by that factor.}
 
 \item{VarLabel}{A string specifying the axis label to use for \code{Var}.}
 
@@ -42,5 +47,8 @@ library(VWPre)
 plot_avg_contour(data = dat, IA = "IA_1_ELogit", type = "elogit", 
                Var = "Rating", VarLabel = "Accent Rating", xlim = c(0,1000), 
                VWPreTheme = FALSE, Colors = c("red", "white"))
+
+# For a more complete tutorial on VWPre plotting functions:
+vignette("SR_Plotting", package="VWPre")
 }
 }

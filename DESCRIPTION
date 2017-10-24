@@ -1,8 +1,8 @@
 Package: VWPre
 Type: Package
 Title: Tools for Preprocessing Visual World Data
-Version: 0.9.6
-Date: 2017-06-13
+Version: 1.0.0
+Date: 2017-10-24
 Authors@R: c(person("Vincent", "Porretta", role = c("aut", "cre"),
 		     email = "vincentporretta@gmail.com"),
 	      person("Aki-Juhani", "Kyröläinen", role = "aut"),
@@ -25,18 +25,18 @@ Description: Gaze data from the Visual World Paradigm requires significant
     collected with SR Research Eyelink eye trackers using Sample Reports created
     in SR Research Data Viewer.  While we would like to add functionality 
     for data collected with other systems in the future, the current package is 
-    considered to be feature-complete and will shortly enter maintenance mode.
-Depends: R (>= 3.3.2), dplyr (>= 0.5.0), lazyeval (>= 0.2.0), ggplot2
-        (>= 2.2.0)
-Imports: mgcv (>= 1.8-16), shiny (>= 0.14.2), tidyr (>= 0.6.0), stats
-        (>= 3.3.3)
+    considered to be feature-complete; further updates will mainly entail maintenance
+	and the addition of minor functionality.
+Depends: R (>= 3.3.2), dplyr (>= 0.7.0)
+Imports: rlang (>= 0.1.1), ggplot2 (>= 2.2.0), mgcv (>= 1.8-16), shiny
+        (>= 0.14.2), tidyr (>= 0.6.0), stats (>= 3.3.3)
 License: GPL (>= 2)
 LazyData: true
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, gridExtra, itsadug
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-06-15 01:45:23 UTC; vjp
+Packaged: 2017-10-24 13:37:51 UTC; Vincent
 Repository: CRAN
-Date/Publication: 2017-06-15 13:43:04 UTC
+Date/Publication: 2017-10-24 13:47:37 UTC

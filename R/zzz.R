@@ -13,7 +13,11 @@ if(getRversion() >= "2.15.1")
   "predict", "sd", "setNames", "capture.output",
   "Align", "HitIDL", "HitIDR", "HitLabelL", "HitLabelR", "LEFT_GAZE_X",
   "LEFT_GAZE_Y", "Present", "RIGHT_GAZE_X", "RIGHT_GAZE_Y", 
-  "SAMPLE_MESSAGE"), add = FALSE)
+  "SAMPLE_MESSAGE", "CalcCol", "Comp", "Condition", "CustCond1", "CustCond2",
+  "Custom", "DC1", "DC1m", "DC1sd", "DC2", "DC2m", "DC2sd", "IA_0_P", "IA_1_P", 
+  "IA_2_P", "IA_3_P", "IA_4_P", "IA_5_P", "IA_6_P", "IA_7_P", "IA_8_P", 
+  "IAmean", "Obs", "degfree", "error_lower", "error_upper", "group", "meanDiff", 
+  "n1", "n2", "Avg2", "StDev2"), add = FALSE)
 }
 
 .onAttach <- function(...) { 

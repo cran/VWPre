@@ -11,7 +11,6 @@
 #' 
 #' @export
 #' @import dplyr
-#' @import lazyeval
 #' 
 #' @param data A data table object output by \code{\link{select_recorded_eye}}
 #' or \code{\link{check_samplingrate}}.
@@ -46,18 +45,21 @@ bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
   if(is.null(SamplingRate)){
     stop("Please supply the sampling rate!")
   } 
-
+  
   SamplesPerBin <- (SamplingRate / 1000) * BinSize
   samplerate <-  data$Time[2] - data$Time[1]
   
   if (BinSize %% samplerate != 0) {
-    stop("Sample frequency of data is not a multiple of the target frequency.")
+    stop("Sample frequency of data is not a multiple of the target frequency. Please use the function ds_options to determine an appropriate bin size.")
   } else {
-    message("Sampling rate OK. You're good to go!")
+    message(paste("Binning information: \n", "Original rate of", SamplingRate, 
+                  "Hz with one sample every", samplerate, "ms. \n", "Downsampled rate of", 
+                  round(1000/BinSize, 2), "Hz using", BinSize, "ms bins. \n New bins contain", BinSize/samplerate, "samples."))
   }
+  
   data$DS <- data$Time %/% BinSize
   data$DS <- data$DS * BinSize 
-
+  
   message("Binning...")
   # Calculate counts
   if (NoIA >= 1) {
@@ -108,47 +110,39 @@ bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
     group_by(Event, DS) %>%
     filter(., Time %in% DS)
   
-    message("Calculating proportions...")
+  message("Calculating proportions...")
   # Calculate proportions
   if (NoIA >= 1) {
     data <- data %>%
-      #group_by(Event, DS) %>%
       mutate(., IA_0_P = IA_0_C / NSamples,
              IA_1_P = IA_1_C / NSamples)
   } 
   if (NoIA >= 2) {
     data <- data %>%
-      #group_by(Event, DS) %>%
       mutate(., IA_2_P = IA_2_C / NSamples)
   } 
   if (NoIA >= 3) {
     data <- data %>%
-      #group_by(Event, DS) %>%
       mutate(., IA_3_P = IA_3_C / NSamples)
   } 
   if (NoIA >= 4) {
     data <- data %>%
-      #group_by(Event, DS) %>%
       mutate(., IA_4_P = IA_4_C / NSamples)
   } 
   if (NoIA >= 5) {
     data <- data %>%
-      #group_by(Event, DS) %>%
       mutate(., IA_5_P = IA_5_C / NSamples)
   } 
   if (NoIA >= 6) {
     data <- data %>%
-      #group_by(Event, DS) %>%
       mutate(., IA_6_P = IA_6_C / NSamples)
   } 
   if (NoIA >= 7) {
     data <- data %>%
-      #group_by(Event, DS) %>%
       mutate(., IA_7_P = IA_7_C / NSamples)
   } 
   if (NoIA == 8) {
     data <- data %>%
-      #group_by(Event, DS) %>%
       mutate(., IA_8_P = IA_8_C / NSamples)
   }
   
@@ -184,7 +178,7 @@ bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
 #' 
 #' @export
 #' @import dplyr
-#' @import lazyeval
+#' @import rlang
 #' 
 #' @param data A data table object output by \code{\link{bin_prop}}.
 #' @param NoIA A positive integer indicating the number of interest areas defined 
@@ -206,7 +200,7 @@ bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
 #' }
 transform_to_elogit <- function(data, NoIA = NULL, ObsPerBin = NULL,
                                 Constant = 0.5, ObsOverride = FALSE) {
-
+  
   if(is.null(NoIA)){
     stop("Please supply the number of interest areas!")
   } else if (NoIA == 0) {
@@ -247,55 +241,55 @@ transform_to_elogit <- function(data, NoIA = NULL, ObsPerBin = NULL,
     return((1/(proportion * observations + constant)) + (1/((1 - proportion) * observations + constant)))
   }
   
-
+  
   if (NoIA >= 1) {
     data <- data %>% ungroup() %>% 
-      mutate_(IA_0_ELogit = interp(~ elogit(proportion=IA_0_P, observations=Obs, constant=Constant), IA_0_P = as.name("IA_0_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_0_wts = interp(~ weight(proportion=IA_0_P, observations=Obs, constant=Constant), IA_0_P = as.name("IA_0_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_1_ELogit = interp(~ elogit(proportion=IA_1_P, observations=Obs, constant=Constant), IA_1_P = as.name("IA_1_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_1_wts = interp(~ weight(proportion=IA_1_P, observations=Obs, constant=Constant), IA_1_P = as.name("IA_1_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      mutate(IA_0_ELogit = elogit(proportion=IA_0_P, observations=Obs, constant=Constant),
+             IA_0_wts = weight(proportion=IA_0_P, observations=Obs, constant=Constant),
+             IA_1_ELogit = elogit(proportion=IA_1_P, observations=Obs, constant=Constant),
+             IA_1_wts = weight(proportion=IA_1_P, observations=Obs, constant=Constant)
       )
   }
   if (NoIA >= 2) {
     data <- data %>%
-      mutate_(IA_2_ELogit = interp(~ elogit(proportion=IA_2_P, observations=Obs, constant=Constant), IA_2_P = as.name("IA_2_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_2_wts = interp(~ weight(proportion=IA_2_P, observations=Obs, constant=Constant), IA_2_P = as.name("IA_2_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      mutate(IA_2_ELogit = elogit(proportion=IA_2_P, observations=Obs, constant=Constant),
+             IA_2_wts = weight(proportion=IA_2_P, observations=Obs, constant=Constant)
       )
   }
   if (NoIA >= 3) {
     data <- data %>%
-      mutate_(IA_3_ELogit = interp(~ elogit(proportion=IA_3_P, observations=Obs, constant=Constant), IA_3_P = as.name("IA_3_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_3_wts = interp(~ weight(proportion=IA_3_P, observations=Obs, constant=Constant), IA_3_P = as.name("IA_3_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      mutate(IA_3_ELogit = elogit(proportion=IA_3_P, observations=Obs, constant=Constant),
+             IA_3_wts = weight(proportion=IA_3_P, observations=Obs, constant=Constant)
       )
   }
   if (NoIA >= 4) {
     data <- data %>%
-      mutate_(IA_4_ELogit = interp(~ elogit(proportion=IA_4_P, observations=Obs, constant=Constant), IA_4_P = as.name("IA_4_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_4_wts = interp(~ weight(proportion=IA_4_P, observations=Obs, constant=Constant), IA_4_P = as.name("IA_4_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      mutate(IA_4_ELogit = elogit(proportion=IA_4_P, observations=Obs, constant=Constant),
+             IA_4_wts = weight(proportion=IA_4_P, observations=Obs, constant=Constant)
       )
   }
   if (NoIA >= 5) {
     data <- data %>%
-      mutate_(IA_5_ELogit = interp(~ elogit(proportion=IA_5_P, observations=Obs, constant=Constant), IA_5_P = as.name("IA_5_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_5_wts = interp(~ weight(proportion=IA_5_P, observations=Obs, constant=Constant), IA_5_P = as.name("IA_5_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      mutate(IA_5_ELogit = elogit(proportion=IA_5_P, observations=Obs, constant=Constant),
+             IA_5_wts = weight(proportion=IA_5_P, observations=Obs, constant=Constant)
       )
   }
   if (NoIA >= 6) {
     data <- data %>%
-      mutate_(IA_6_ELogit = interp(~ elogit(proportion=IA_6_P, observations=Obs, constant=Constant), IA_6_P = as.name("IA_6_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_6_wts = interp(~ weight(proportion=IA_6_P, observations=Obs, constant=Constant), IA_6_P = as.name("IA_6_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      mutate(IA_6_ELogit = elogit(proportion=IA_6_P, observations=Obs, constant=Constant),
+             IA_6_wts = weight(proportion=IA_6_P, observations=Obs, constant=Constant)
       )
   }
   if (NoIA >= 7) {
     data <- data %>%
-      mutate_(IA_7_ELogit = interp(~ elogit(proportion=IA_7_P, observations=Obs, constant=Constant), IA_7_P = as.name("IA_7_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_7_wts = interp(~ weight(proportion=IA_7_P, observations=Obs, constant=Constant), IA_7_P = as.name("IA_7_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      mutate(IA_7_ELogit = elogit(proportion=IA_7_P, observations=Obs, constant=Constant),
+             IA_7_wts = weight(proportion=IA_7_P, observations=Obs, constant=Constant)
       )
   }
   if (NoIA == 8) {
     data <- data %>%
-      mutate_(IA_8_ELogit = interp(~ elogit(proportion=IA_8_P, observations=Obs, constant=Constant), IA_8_P = as.name("IA_8_P"), Obs = as.name("Obs"), Constant = as.name("Constant")),
-              IA_8_wts = interp(~ weight(proportion=IA_8_P, observations=Obs, constant=Constant), IA_8_P = as.name("IA_8_P"), Obs = as.name("Obs"), Constant = as.name("Constant"))
+      mutate(IA_8_ELogit = elogit(proportion=IA_8_P, observations=Obs, constant=Constant),
+             IA_8_wts = weight(proportion=IA_8_P, observations=Obs, constant=Constant)
       )
   }
   return(ungroup(data))
@@ -313,7 +307,7 @@ transform_to_elogit <- function(data, NoIA = NULL, ObsPerBin = NULL,
 #' 
 #' @export
 #' @import dplyr
-#' @import lazyeval
+#' @import rlang
 #' 
 #' @param data A data table object output by either \code{\link{bin_prop}} or
 #' \code{\link{transform_to_elogit}}.
@@ -427,11 +421,12 @@ create_binomial <- function(data, NoIA = NULL, ObsPerBin = NULL,
   
   
   if (!(is.null(CustomBinom))) {
+    newcol <- enquo(newcol)
     bindcol1 <- paste("IA_", CustomBinom[1], "_Looks", sep="")
     bindcol2 <- paste("IA_", CustomBinom[2], "_Looks", sep="")
     newcol <- paste("IA_", CustomBinom[1], "_V_", CustomBinom[2], "_Looks", sep="")
     tmp$Custom <- cbind(tmp[[bindcol1]][,1], tmp[[bindcol2]][,1])
-    tmp <- rename_(tmp, .dots = setNames("Custom", newcol))
+    tmp <- rename(tmp, !!newcol := Custom)
   }
   
   

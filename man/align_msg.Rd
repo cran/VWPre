@@ -9,8 +9,9 @@ align_msg(data, Msg = NULL)
 \arguments{
 \item{data}{A data table object output from \code{prep_data}.}
 
-\item{Msg}{An obligatory string containing the exact message to be found in 
-the column SAMPLE_MESSAGE.}
+\item{Msg}{An obligatory string containing the message to be found in 
+the column SAMPLE_MESSAGE or a regular expression for locating the 
+appropriate message.}
 }
 \value{
 A data table object.
@@ -24,8 +25,12 @@ column.
 }
 \examples{
 \dontrun{
-# To align the samples to a specifc message...
+# To align the samples to a specific message...
 library(VWPre)
 df <- align_msg(data = dat, Msg = "ExperimentDisplay")
+ 
+# For a more complete tutorial on VWPre plotting functions:
+vignette("SR_Message_Alignment", package="VWPre")
 }
+
 }

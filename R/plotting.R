@@ -18,18 +18,21 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #' and 2 conditions.
 #' 
 #' @export
-#' @import dplyr
-#' @import tidyr
-#' @import lazyeval
 #' @import ggplot2
-#' @import mgcv
+#' @import dplyr
+#' @import rlang
 #' 
 #' @param data A data table object output by either \code{\link{bin_prop}}. 
 #' \code{\link{transform_to_elogit}}, or \code{\link{create_binomial}}.
-#' @param type A character string indicating "proportion" or "elogit".
+#' @param type A character string indicating "proportion" or "elogit" which 
+#' influences how standard error and confidence intervals are calculated.
 #' @param xlim A vector of two integers specifying the limits of the x-axis.
 #' @param IAColumns A named character vector specifying the desired interest 
 #' area columns with custom strings for the legend.
+#' @param Averaging A character string indicating how the averaging should 
+#' be done. "Event" (default) will produce the overall mean in the data, while
+#' "Subject" or "Item" (or, in principle, any other column name) will
+#' calculate the grand mean by that factor.
 #' @param Condition1 A string containing the column name corresponding to the 
 #' first condition, if available. 
 #' @param Condition2 A string containing the column name corresponding to the 
@@ -38,295 +41,395 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #' labels of the levels of the first condition. 
 #' @param Cond2Labels A named character vector specifying the desired custom 
 #' labels of the levels of the second condition. 
-#' @param ErrorBar A logical indicating whether standard error bars should 
+#' @param ErrorBar A logical indicating whether error bars should be
 #' included in the plot.
+#' @param ErrorBand A logical indicating whether error bands should be
+#' included in the plot.
+#' @param ErrorType A string indicating "SE" or "CI". For SE, the calculation 
+#' varies for empirical logits and proportions. Further, for CI, the calculation
+#' on proportions uses the Wald method. 
+#' @param ConfLev A number indicating the confidence level of the CI.
+#' @param CItype A string indicating "simultaneous" or "pointwise". Simultaneous
+#' performs a Bonferroni correction for the interval.
 #' @param VWPreTheme A logical indicating whether the theme included with the 
 #' function should be applied, or ggplot2's base theme (to which any other 
 #' custom theme could be added).
 #' @examples
 #' \dontrun{
 #' library(VWPre)
-#' # For plotting the grand average with the included theme
+#' # For plotting the grand average with the included theme and SE bars
 #' plot_avg(data = dat, type = "elogit", xlim = c(0, 1000), 
 #'    IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
-#'    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
-#'    Condition1 = NA, Condition2 = NA, Cond1Labels = NA, Cond2Labels = NA,
-#'    ErrorBar = TRUE, VWPreTheme = TRUE) 
-#'
-#' # For plotting conditional averages (one condition) with the included theme.
-#' # This produces plots arranged vertically.
-#' plot_avg(data = dat, type = "elogit", xlim = c(0, 1000), 
-#'    IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
-#'    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
-#'    Condition1 = "talker", Condition2 = NA, 
-#'    Cond1Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
-#'    EN3 = "English 1"), Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE)
-#' 
-#' # For plotting conditional averages (one condition) with the included theme.
+#'    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"), 
+#'    Averaging = "Event", Condition1 = NA, Condition2 = NA, 
+#'    Cond1Labels = NA, Cond2Labels = NA,
+#'    ErrorBar = TRUE, VWPreTheme = TRUE, ErrorType = "SE",
+#'    ErrorBand = FALSE) 
+#'    
+#' # For plotting conditional averages (one condition) with the included theme
+#' # and 95% simultaneous CI bars.
 #' # This produces plots arranged horizontally
 #' plot_avg(data = dat, type = "elogit", xlim = c(0, 1000), 
 #'    IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
 #'    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
-#'    Condition1 = NA, Condition2 = "talker", Cond1Labels = NA, 
+#'    Averaging = "Event", Condition1 = NA, Condition2 = "talker", 
+#'    Cond1Labels = NA, 
 #'    Cond2Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
-#'    EN3 = "English 1"), ErrorBar = TRUE, VWPreTheme = TRUE)
+#'    EN3 = "English 1"), ErrorBar = TRUE, VWPreTheme = TRUE,
+#'    ErrorBands = FALSE, ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
 #' 
-#' # For plotting conditional averages (two conditions) with the included theme.
+#' # For plotting conditional averages (two conditions) for one interest area
+#' with the included theme and 95% simultaneous CI bands.
 #' # This produces plots arranged in grid format.
 #' plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
-#'    IAColumns = c(IA_1_ELogit = "Target", IA_2_ELogit = "Rhyme", 
-#'    IA_3_ELogit = "OnsetComp", IA_4_ELogit = "Distractor"),
+#'    IAColumns = c(IA_1_ELogit = "Target"), Averaging = "Event", 
 #'    Condition1 = "talker", Condition2 = "Exp",
 #'    Cond1Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
 #'    EN3 = "English 1"), Cond2Labels = c(High = "H Exp", Low = "L Exp"),
-#'    ErrorBar = TRUE, VWPreTheme = TRUE)
+#'    ErrorBar = FALSE, VWPreTheme = TRUE, ErrorBands = TRUE, 
+#'    ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
+#' 
+#' #' # For a more complete tutorial on VWPre plotting functions:
+#' vignette("SR_Plotting", package="VWPre")
 #' }
+#' 
 plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL, 
-                     Condition1 = NA, Condition2 = NA, Cond1Labels = NA, 
-                     Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE) {
+                     Averaging = "Event", Condition1 = NULL, 
+                     Condition2 = NULL, Cond1Labels = NA, 
+                     Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE,
+                     ConfLev = 95, CItype = "simultaneous",
+                     ErrorBand = FALSE, ErrorType = "SE") {
   
   if(is.null(type)){
     stop("Please supply the plot type!")
   }
   if(is.null(IAColumns)){
-    stop("Please supply the interest area columns to be plotted!")
+    stop("Please supply the interest area column(s) to be plotted!")
+  } else if (length(names(IAColumns))>8) {
+    stop("You have more than 8 interest areas; you must modify this function.")
   } else {
-    NoIA <- length(names(IAColumns))
+    missing <- names(IAColumns)[which(!(names(IAColumns) %in% colnames(data)))]
+    if(length(missing)>0) {
+      stop(paste(capture.output(print(missing)), "column(s) not present in data!"))
+    }
   }
-
+  
+  if(!(Averaging %in% colnames(data))){
+    stop(paste(Averaging, " column not present in data!"))
+  }
+  
+  if(ErrorBar==TRUE && ErrorBand==TRUE){
+    stop(paste("Please select either error bars OR error bands. 
+               For error bars set ErrorBar=TRUE and ErrorBand=FALSE.
+               For error bands set ErrorBar=FALSE and ErrorBand=TRUE."))
+  }
+  
   Theme <- VWPreTheme
   
-  if (is.na(xlim)[1]) {
+  # Set x-axis
+  if (is.na(xlim[1])) {
     xlim <- c(range(data$Time)[1], range(data$Time)[2])
+    xaxis <- unique(data$Time)
   } else {
     xlim <- xlim
+    data<-data[data$Time>=xlim[1] & data$Time<=xlim[2],]
+    xaxis <- unique(data$Time)
   }
   
+  # Set plot type and y-axis
   if (type == "proportion") {
     ylabel = "Proportion Looks"
-	ylim = c(0,1)
+    ylim = c(0,1)
   } else if (type == "elogit") {
     ylabel = "Empirical Logit Looks"
-	ylim = c(-4,4)
-    } else {
-	stop("You must specify either 'proportion' or 'elogit'.")
-	}
-  
-  if (NoIA>8) {
-    stop("You have more than 8 interest areas; you must modify this function.")
-  } else if (NoIA == 1) {
-    sel_names = c("Subject", "Time", names(IAColumns)[1])
-    leg <- function() {
-      eval(
-        scale_colour_grey(name = "Interest Area",
-                          breaks = c(names(IAColumns)[1]),
-                          labels = c(IAColumns[[1]]))
-      )
-    } 
-  } else if (NoIA == 2) {
-    sel_names = c("Subject", "Time", names(IAColumns)[1], names(IAColumns)[2])
-    my_leg <- function() {
-      eval(
-        scale_colour_grey(name = "Interest Area",
-                          breaks = c(names(IAColumns)[1], names(IAColumns)[2]),
-                          labels = c(IAColumns[[1]], IAColumns[[2]]))
-      )
-    } 
-  } else if (NoIA == 3) {
-    sel_names = c("Subject", "Time", names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3])
-    my_leg <- function() {
-      eval(
-        scale_colour_grey(name = "Interest Area",
-                          breaks = c(names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3]),
-                          labels = c(IAColumns[[1]], IAColumns[[2]], IAColumns[[3]]))
-      )
-    } 
-  } else if (NoIA == 4) {
-    sel_names = c("Subject", "Time", names(IAColumns)[1], names(IAColumns)[2], 
-                  names(IAColumns)[3], names(IAColumns)[4])
-    gath_col = "IA_"
-    my_leg <- function() {
-      eval(
-        scale_colour_grey(name = "Interest Area",
-                          breaks = c(names(IAColumns)[1], names(IAColumns)[2], 
-                                     names(IAColumns)[3], names(IAColumns)[4]),
-                          labels = c(IAColumns[[1]], IAColumns[[2]], IAColumns[[3]], 
-                                     IAColumns[[4]]))
-      )
-    } 
-  } else if (NoIA == 5) {
-    sel_names = c("Subject", "Time", names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3], 
-                  names(IAColumns)[4], names(IAColumns)[5])
-    my_leg <- function() {
-      eval(
-        scale_colour_grey(name = "Interest Area",
-                          breaks = c(names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3], 
-                                     names(IAColumns)[4], names(IAColumns)[5]),
-                          labels = c(IAColumns[[1]], IAColumns[[2]], IAColumns[[3]], 
-                                     IAColumns[[4]], IAColumns[[5]]))
-      )
-    } 
-  } else if (NoIA == 6) {
-    sel_names = c("Subject", "Time", names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3], 
-                  names(IAColumns)[4], names(IAColumns)[5], names(IAColumns)[6])
-    my_leg <- function() {
-      eval(
-        scale_colour_grey(name = "Interest Area",
-                          breaks = c(names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3], 
-                                     names(IAColumns)[4], names(IAColumns)[5], names(IAColumns)[6]),
-                          labels = c(IAColumns[[1]], IAColumns[[2]], IAColumns[[3]], 
-                                     IAColumns[[4]], IAColumns[[5]], IAColumns[[6]]))
-      )
-    } 
-  } else if (NoIA == 7) {
-    sel_names = c("Subject", "Time", names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3], 
-                  names(IAColumns)[4], names(IAColumns)[5], names(IAColumns)[6], names(IAColumns)[7])
-    my_leg <- function() {
-      eval(
-        scale_colour_grey(name = "Interest Area",
-                          breaks = c(names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3], 
-                                     names(IAColumns)[4], names(IAColumns)[5], names(IAColumns)[6], 
-                                     names(IAColumns)[7]),
-                          labels = c(IAColumns[[1]], IAColumns[[2]], IAColumns[[3]], 
-                                     IAColumns[[4]], IAColumns[[5]], IAColumns[[6]], 
-                                     IAColumns[[7]]))
-      )
-    } 
-  } else if (NoIA == 8) {
-    sel_names = c("Subject", "Time", names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3], 
-                  names(IAColumns)[4], names(IAColumns)[5], names(IAColumns)[6], 
-                  names(IAColumns)[7], names(IAColumns)[8])
-    my_leg <- function() {
-      eval(
-        scale_colour_grey(name = "Interest Area",
-                          breaks = c(names(IAColumns)[1], names(IAColumns)[2], names(IAColumns)[3], 
-                                     names(IAColumns)[4], names(IAColumns)[5], names(IAColumns)[6], 
-                                     names(IAColumns)[7], names(IAColumns)[8]),
-                          labels = c(IAColumns[[1]], IAColumns[[2]], IAColumns[[3]], 
-                                     IAColumns[[4]], IAColumns[[5]], IAColumns[[6]], 
-                                     IAColumns[[7]], IAColumns[[8]]))
-      )
-    } 
+    ylim = c(-4,4)
+  } else {
+    stop("You must specify either 'proportion' or 'elogit'.")
   }
   
-
-  my_labeller <- labeller(
-    CustCond1 = Cond1Labels,
-    CustCond2 = Cond2Labels
-  )
+  # Check condition columns
+  if(!(is.null(Condition1))) {
+    if(is.na(Condition1)) {
+      stop(paste("Please use NULL when not specifying a condition."))
+    } else if (!(Condition1 %in% colnames(data))) {
+      stop(paste(Condition1, " column not present in data!"))
+    }
+  }
+  if(!(is.null(Condition2))) {
+    if(is.na(Condition2)) {
+      stop(paste("Please use NULL when not specifying a condition."))
+    } else if (!(Condition2 %in% colnames(data))) {
+      stop(paste(Condition2, " column not present in data!"))
+    }
+  }
   
+  # Inform about Grand Average calculation
+  message(paste0("Grand average of ", ylabel, " calculated using ", Averaging, " means."))
   
-  if (!is.na(Condition1) & !is.na(Condition2)) {
-    conms <- names(IAColumns)
-  	GrandAvg <- data %>% select_(.dots=sel_names, interp(~Condition1, Condition1 = as.name(Condition1)), interp(~Condition2, Condition2 = as.name(Condition2))) %>%
-        tidyr::gather(key=IA, value = VALUE, match(names(IAColumns),names(.)), na.rm = FALSE, convert = FALSE) %>%
-  	group_by_("IA", "Time", Condition1, Condition2) %>%
-    summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
-    rename_(CustCond1 = as.name(eval(Condition1)), CustCond2 = as.name(eval(Condition2)))
-    
-       if (type == "elogit") {
-	ylim[1] = min(GrandAvg$mean) - 0.5
-	ylim[2] = max(GrandAvg$mean) + 0.5
-	}
-	
-    ggplot(GrandAvg, aes(x = Time, y = mean, colour = IA)) + 
-      geom_point() +
-      geom_line() +
-      ylab(ylabel) +
-      facet_grid(CustCond1 ~ CustCond2, labeller = my_labeller) +
-      my_leg() +
-      scale_x_continuous(limits = c(xlim[1], xlim[2])) + 
-      scale_y_continuous(limits = c(ylim[1], ylim[2])) + {
-        if (ErrorBar == TRUE) geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .3)
-      } + {
-        if (Theme == TRUE) theme_mybw()
+  # Set columns for selection
+  if(is.null(Condition1) && is.null(Condition2)){
+    sel_names = quos(UQ(sym(Averaging)), Time, names(IAColumns))
+  } else if(!is.null(Condition1) && is.null(Condition2)){
+    sel_names = quos(UQ(sym(Averaging)), Time, names(IAColumns), UQ(sym(Condition1)))
+  } else if(is.null(Condition1) && !is.null(Condition2)){
+    sel_names = quos(UQ(sym(Averaging)), Time, names(IAColumns), UQ(sym(Condition2)))
+  } else if(!is.null(Condition1) && !is.null(Condition2)){
+    sel_names = quos(UQ(sym(Averaging)), Time, names(IAColumns), UQ(sym(Condition1)), UQ(sym(Condition2)))
+  }
+  
+  # Set columns for gathering
+  gath_col = quos(names(IAColumns))
+  
+  # Set columns for grouping
+  if(is.null(Condition1) && is.null(Condition2)){
+    group_names1 = quos(UQ(sym(Averaging)), IA, Time)
+    group_names2 = quos(IA, Time)
+  } else if(!is.null(Condition1) && is.null(Condition2)){
+    group_names1 = quos(UQ(sym(Averaging)), IA, Time, UQ(sym(Condition1)))
+    group_names2 = quos(IA, Time, UQ(sym(Condition1)))
+  } else if(is.null(Condition1) && !is.null(Condition2)){
+    group_names1 = quos(UQ(sym(Averaging)), IA, Time, UQ(sym(Condition2)))
+    group_names2 = quos(IA, Time, UQ(sym(Condition2)))
+  } else if(!is.null(Condition1) && !is.null(Condition2)){
+    group_names1 = quos(UQ(sym(Averaging)), IA, Time, UQ(sym(Condition1)), UQ(sym(Condition2)))
+    group_names2 = quos(IA, Time, UQ(sym(Condition1)), UQ(sym(Condition2)))
+  }
+  
+  # Make labeller for multipanel
+  if (length(IAColumns) > 1 && (!is.na(Cond1Labels) | !is.na(Cond2Labels))) {
+    my_labeller <- labeller(
+      CustCond1 = Cond1Labels,
+      CustCond2 = Cond2Labels
+    )
+  }
+  
+  # Prepare for averaging
+  Avg <- data %>% select(!!!sel_names) %>% 
+    tidyr::gather("IA", "VALUE", !!!gath_col, na.rm = FALSE, convert = FALSE) %>%
+    group_by(!!!group_names1) %>% 
+    summarise(VALUE = mean(VALUE, na.rm = T)) %>% 
+    group_by(!!!group_names2)
+  
+  # Execute calculation
+  if(type=="elogit") {
+    Avg <- Avg %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = sd(VALUE) / sqrt(n()))
+    if(CItype=="pointwise") {
+      tval <- 1-(((100-ConfLev)/2)/100)
+    } else if (CItype=="simultaneous") {
+      tval <- 1-(((100-ConfLev)/(2*length(unique(xaxis))))/100)
+    }
+    Avg <- Avg %>% mutate(ci = stats::qt(tval,df=n-1)*se)
+  } else if (type=="proportion") {
+    Avg <- Avg %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = sqrt((mean(VALUE)*(1-mean(VALUE)))/n()))
+    if(CItype=="pointwise") {
+      zval <- 1-(((100-ConfLev)/2)/100)
+    } else if (CItype=="simultaneous") {
+      zval <- 1-(((100-ConfLev)/(2*length(unique(xaxis))))/100)
+    }
+    Avg <- Avg %>% mutate(ci = stats::qnorm(zval)*se)
+  }
+  Avg <- ungroup(Avg)
+  
+  # Prepare Condition columns and faceting or legend title
+  if (!is.null(Condition1) && is.null(Condition2)) {
+    Avg <- Avg %>%
+      rename(CustCond1 = UQ(sym(Condition1))) %>% 
+      mutate(Cond = CustCond1)
+    if (length(IAColumns)>1) {
+      my_facet <- function() {
+        eval(
+          facet_grid(CustCond1 ~ ., labeller = my_labeller)
+        )
       }
+    } else {
+      Cond <- Condition1
+    }
+  } else if (is.null(Condition1) && !is.null(Condition2)) {
+    Avg <- Avg %>%
+      rename(CustCond2 =  UQ(sym(Condition2))) %>% 
+      mutate(Cond = CustCond2)
+    if (length(IAColumns)>1) {
+      my_facet <- function() {
+        eval(
+          facet_grid(. ~ CustCond2, labeller = my_labeller)
+        )
+      }
+    } else {
+      Cond <- Condition2
+    }
+  } else if (!is.null(Condition1) && !is.null(Condition2)) {
+    Avg <- Avg %>%
+      rename(CustCond1 =  UQ(sym(Condition1)), CustCond2 =  UQ(sym(Condition2))) %>% 
+      mutate(Cond = paste(CustCond1, CustCond2, sep = "_"))
+    if (length(IAColumns)>1) {
+      my_facet <- function() {
+        eval(
+          facet_grid(CustCond1 ~ CustCond2, labeller = my_labeller)
+        )
+      }
+    } else {
+      Cond <- paste(Condition1, Condition2, sep = "_by_")
+    }
   }
   
-  else if (!is.na(Condition1) & is.na(Condition2)) {
-    
-    GrandAvg <- data %>% select_(.dots=sel_names, interp(~Condition1, Condition1 = as.name(Condition1))) %>%
-      tidyr::gather(key=IA, value = VALUE, match(names(IAColumns),names(.)), na.rm = FALSE, convert = FALSE)  %>%
-      group_by_("IA", "Time", Condition1) %>%
-      summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
-      rename_(CustCond1 = as.name(eval(Condition1)))
-    
-	if (type == "elogit") {
-	ylim[1] = min(GrandAvg$mean) - 0.5
-	ylim[2] = max(GrandAvg$mean) + 0.5
-	}
-	
-      ggplot(GrandAvg, aes(x = Time, y = mean, colour = IA)) + 
-        geom_point() +
-        geom_line() +
-        ylab(ylabel) +
-        facet_grid(CustCond1 ~ ., labeller = my_labeller) +
-        my_leg() +
-        scale_x_continuous(limits = c(xlim[1], xlim[2])) + 
-        scale_y_continuous(limits = c(ylim[1], ylim[2])) + {
-          if (ErrorBar == TRUE) geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .3)
-        } + {
-          if (Theme == TRUE) theme_mybw()
-        }
-    
+  # Setting Error
+  if(ErrorType=="SE"){
+    Avg$error_lower <- Avg$mean - Avg$se
+    Avg$error_upper <- Avg$mean + Avg$se
+  } else if(ErrorType=="CI") {
+    if(type=="elogit") {
+      Avg$error_lower <- Avg$mean - Avg$ci
+      Avg$error_upper <- Avg$mean + Avg$ci
+    } else if(type=="proportion") {
+      Avg$error_lower <- Avg$mean - Avg$ci
+      Avg$error_lower <- ifelse(Avg$error_lower < 0, 0, Avg$error_lower)
+      Avg$error_upper <- Avg$mean + Avg$ci
+      Avg$error_upper <- ifelse(Avg$error_upper > 1, 1, Avg$error_upper)
+    }
   }
   
-  else if (is.na(Condition1) & !is.na(Condition2)) {
-    
-    GrandAvg <- data %>% select_(.dots=sel_names, interp(~Condition2, Condition2 = as.name(Condition2))) %>%
-      tidyr::gather(key=IA, value = VALUE, match(names(IAColumns),names(.)), na.rm = FALSE, convert = FALSE)  %>%
-      group_by_("IA", "Time", Condition2) %>%
-      summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE))) %>%
-      rename_(CustCond2 = as.name(eval(Condition2)))
-    
-
-	if (type == "elogit") {
-	ylim[1] = min(GrandAvg$mean) - 0.5
-	ylim[2] = max(GrandAvg$mean) + 0.5
-	}
-	
-      ggplot(GrandAvg, aes(x = Time, y = mean, colour = IA)) + 
-        geom_point() +
-        geom_line() +
-        ylab(ylabel) +
-        facet_grid(. ~ CustCond2, labeller = my_labeller) +
-        my_leg() +
-        scale_x_continuous(limits = c(xlim[1], xlim[2])) + 
-        scale_y_continuous(limits = c(ylim[1], ylim[2])) + {
-          if (ErrorBar == TRUE) geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .3)
-        } + {
-          if (Theme == TRUE) theme_mybw()
-        }
-    
+  # Setting appropriate ylim
+  if (type == "elogit") {
+    ylim[1] = min(Avg$error_lower)
+    ylim[2] = max(Avg$error_upper)
+  } else if (type == "proportion") {
+    ylim[1] = min(Avg$error_lower)
+    ylim[2] = max(Avg$error_upper)
+    if (ylim[1] > 0) {
+      ylim[1] = 0
+    }
+    if (ylim[2] < 1) {
+      ylim[2] = 1
+    }
   }
   
-  else if (is.na(Condition1) & is.na(Condition2)) {
-    
-    GrandAvg <- data %>% select_(.dots=sel_names) %>%
-      tidyr::gather(key=IA, value = VALUE, match(names(IAColumns),names(.)), na.rm = FALSE, convert = FALSE)  %>%
-      group_by_("IA", "Time") %>%
-      summarise(mean = mean(VALUE, na.rm = T), se = sd(VALUE) / sqrt(length(VALUE)))
-
-	if (type == "elogit") {
-	ylim[1] = min(GrandAvg$mean) - 0.5
-	ylim[2] = max(GrandAvg$mean) + 0.5
-	}
-	
-        ggplot(GrandAvg, aes(x = Time, y = mean, colour = IA)) + 
-        geom_point() +
-        geom_line() +
-        ylab(ylabel) +
-        my_leg() +
-        scale_x_continuous(limits = c(xlim[1], xlim[2])) + 
-        scale_y_continuous(limits = c(ylim[1], ylim[2])) + {
-          if (ErrorBar == TRUE) geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .3)
-        } + {
-          if (Theme == TRUE) theme_mybw()
-        }
-    
+  # Print message regarding CIs
+  if (ErrorType=="CI" && (ErrorBand==T | ErrorBar==T)) {
+    if(CItype == "pointwise") {
+      message(paste0("Plot created with ", ConfLev, "% ", CItype, " confindence intervals."))
+    }
+    if(CItype == "simultaneous") {
+      if(type=="elogit") {
+        message(paste0("Plot created with ", ConfLev, "% ", CItype, " confindence intervals (adjusted to ", round(tval*100, 2), "% using the Bonferroni method)."))
+      } else if(type=="proportion") {
+        message(paste0("Plot created with ", ConfLev, "% ", CItype, " confindence intervals (adjusted to ", round(zval*100, 2), "% using the Bonferroni method)."))
+      }
+    }
   }
   
-}
+  # Set plot grouping
+  if (length(IAColumns) > 1) {
+    Col <- "IA"
+  } else {
+    if (!is.null(Condition1) || !is.null(Condition2)){
+      Col <- "Cond"
+    } else {
+      Col <- NULL
+    }
+  }
+  
+  # Basic plot
+  plt <- ggplot(Avg, aes_string(x = "Time", y = "mean", colour = Col)) +
+    ylab(ylabel) +
+    scale_x_continuous(limits = c(xlim[1], xlim[2])) +
+    scale_y_continuous(limits = c(ylim[1], ylim[2]))
+  
+  # Basic themeing
+  if (Theme == TRUE) {
+    plt <- plt + theme_mybw()
+  }
+  
+  # Determine/add faceting
+  if (!is.null(Condition1) || !is.null(Condition2)) {
+    if (length(IAColumns) > 1) {
+      plt <- plt + my_facet()
+    }
+  }
+  
+  # Set errorbands according to theme and plot grouping
+  if(ErrorBand==T & Theme==T) {
+    plt <- plt + aes_string(shape = Col, colour = NULL) +
+      geom_ribbon(aes_string(ymin="error_lower", ymax="error_upper", linetype=NA), fill="grey25", alpha=0.15, show.legend = F) 
+    if(!is.null(Col)) {
+      if(Col=="IA") {
+        plt <- plt + 
+          scale_shape_discrete(name="Interest Area",
+                               breaks=names(IAColumns),
+                               labels=IAColumns)
+      } else {
+        plt <- plt + 
+          scale_shape_discrete(name=Cond,
+                               breaks=unique(Avg$Cond),
+                               labels=unique(Avg$Cond))
+      }
+    } else {
+      plt <- plt
+    }
+  }
+  if(ErrorBand==T & Theme==F) {
+    plt <- plt + 
+      geom_ribbon(aes_string(ymin="error_lower", ymax="error_upper", linetype=NA, fill=Col), alpha=0.15, show.legend = F) 
+    if(!is.null(Col)) {
+      if(Col=="IA") {
+        plt <- plt + 
+          scale_colour_hue(name="Interest Area",
+                           breaks=names(IAColumns),
+                           labels=IAColumns)
+      } else {
+        plt <- plt + 
+          scale_colour_hue(name=Cond,
+                           breaks=unique(Avg$Cond),
+                           labels=unique(Avg$Cond))
+      }
+    } else {
+      plt <- plt
+    }
+  }
+  
+  # Set errorbars according to theme and plot grouping
+  if(ErrorBar==T & Theme==T) {
+    plt <- plt + 
+      geom_errorbar(aes_string(ymin="error_lower", ymax="error_upper"), width = .3) 
+    if(!is.null(Col)) {
+      if(Col=="IA") {
+        plt <- plt + 
+          scale_colour_grey(name="Interest Area",
+                            breaks=names(IAColumns),
+                            labels=IAColumns)
+      } else {
+        plt <- plt + 
+          scale_colour_grey(name=Cond,
+                            breaks=unique(Avg$Cond),
+                            labels=unique(Avg$Cond))
+      }
+    } else {
+      plt <- plt
+    }
+  }
+  if(ErrorBar==T & Theme==F) {
+    plt <- plt +
+      geom_errorbar(aes_string(ymin="error_lower", ymax="error_upper", color=Col), width = .3)
+    if(!is.null(Col)) {
+      if(Col=="IA") {
+        plt <- plt + 
+          scale_colour_hue(name="Interest Area",
+                           breaks=names(IAColumns),
+                           labels=IAColumns)
+      } else {
+        plt <- plt + 
+          scale_colour_hue(name=Cond,
+                           breaks=unique(Avg$Cond),
+                           labels=unique(Avg$Cond))
+      }
+    } else {
+      plt <- plt
+    }
+  }
+  
+  # Finish plot
+  plt + geom_point() + geom_line() 
+  
+  }
 
 
 #' Plots average contour surface of looks to a given interest area.
@@ -338,12 +441,10 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
 #' the surface and plots the results as a contour plot. 
 #' 
 #' @export
-#' @import dplyr
-#' @import tidyr
-#' @import lazyeval
 #' @import ggplot2
-#' @import mgcv
-#' 
+#' @import dplyr
+#' @import rlang
+#'  
 #' @param data A data table object output by either \code{\link{bin_prop}}. 
 #' \code{\link{transform_to_elogit}}, or \code{\link{create_binomial}}.
 #' @param IA A string specifying the column name of the IA to use. 
@@ -351,6 +452,10 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
 #' @param xlim A vector of two integers specifying the limits of the x-axis.
 #' @param Var A string containing the column name corresponding to the continuous
 #' variable.
+#' @param Averaging A character string indicating how the averaging should 
+#' be done. "Event" (default) will produce the overall mean in the data, while
+#' "Subject" or "Item" (or, in principle, any other column name) will
+#' calculate the grand mean by that factor.
 #' @param VarLabel A string specifying the axis label to use for \code{Var}.
 #' @param VWPreTheme A logical indicating whether the theme included with the 
 #' function, or ggplot2's base theme (which any other custom theme could be added).
@@ -362,44 +467,84 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
 #' plot_avg_contour(data = dat, IA = "IA_1_ELogit", type = "elogit", 
 #'                Var = "Rating", VarLabel = "Accent Rating", xlim = c(0,1000), 
 #'                VWPreTheme = FALSE, Colors = c("red", "white"))
+#' 
+#' # For a more complete tutorial on VWPre plotting functions:
+#' vignette("SR_Plotting", package="VWPre")
 #' }
 plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL, 
+                             Averaging = "Event",
                              VarLabel = NULL, xlim=NA, VWPreTheme=TRUE, 
                              Colors=c("gray20", "gray90")) {
-
+  
   if(is.null(IA)){
     stop("Please supply the interest area to be plotted!")
+  } else if(!(IA %in% colnames(data))) {
+    stop(paste(IA, "column not present in data!"))
   }
   if(is.null(type)){
     stop("Please supply the plot type!")
+  } else {
+    if(type=="proportion"){
+      LegendName <- "Mean\nproportion\n"
+    } else {
+      LegendName <- "Mean\nempirical\nlogit\n"
+    }
   }
   if(is.null(Var)){
     stop("Please supply the variable column name to be used in the contour plot!")
-  } 
+  } else if(!(Var %in% colnames(data))) {
+    stop(paste(Var, "column not present in data!"))
+  }
   
   if(is.numeric(eval(parse(text=paste0("data$", Var)))) | is.integer(eval(parse(text=paste0("data$", Var))))){
   } else {
-	stop("The contour plot variable must be of class 'numeric' or class 'integer'!")
+    stop("The contour plot variable must be of class 'numeric' or class 'integer'!")
   }
   
+  if(!(Averaging %in% colnames(data))){
+    stop(paste(Averaging, " column not present in data!"))
+  }
+  
+  # # Check condition columns
+  # if(!(is.null(Condition1))) {
+  #   if(is.na(Condition1)) {
+  #     stop(paste("Please use NULL when not specifying a condition."))
+  #   } else if (!(Condition1 %in% colnames(data))) {
+  #     stop(paste(Condition1, " column not present in data!"))
+  #   }
+  # }
+  # if(!(is.null(Condition2))) {
+  #   if(is.na(Condition2)) {
+  #     stop(paste("Please use NULL when not specifying a condition."))
+  #   } else if (!(Condition2 %in% colnames(data))) {
+  #     stop(paste(Condition2, " column not present in data!"))
+  #   }
+  # }
+  
   zlim <- c(-4,4)
-  sel_names <- c("Time", IA, Var)
   Colors <- Colors
   Theme <- VWPreTheme
+  
+  sel_names <- quos(UQ(sym(Averaging)), UQ(sym(IA)), Time, UQ(sym(Var)))
+  group_names1 = quos(UQ(sym(Averaging)), UQ(sym(IA)), UQ(sym(Var)), Time)
+  group_names2 = quos(UQ(sym(IA)), UQ(sym(Var)), Time)
+  
   
   if(is.null(VarLabel)) {
     VarLabel <- Var
   }
-
+  
   if (is.na(xlim)[1]) {
     xlim <- c(range(data$Time)[1], range(data$Time)[2])
   } else {
     xlim <- xlim
   }
   
-  Avg <- data %>% select(match(sel_names,names(.))) %>% 
-    group_by_("Time", Var) %>%
-    summarise_(mean = interp(~mean(IA, na.rm = T), IA = as.name(IA)))
+  Avg <- data %>% select(!!!sel_names) %>% 
+    group_by(!!!group_names1) %>%
+    summarise(IAmean = mean(UQ(sym(IA)))) %>% 
+    group_by(!!!group_names2) %>% 
+    summarise(mean = mean(IAmean))
   
   if (type == "proportion") {
     Avg$meanon <- round(Avg$mean*100)
@@ -461,7 +606,7 @@ plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL,
       geom_tile(aes(fill = mean)) +
       stat_contour() +
       geom_contour(color = "white") + 
-      scale_fill_gradient(name = "Mean", limit=c(zlim[1], zlim[2]), low = Colors[1], high = Colors[2]) + 
+      scale_fill_gradient(name = LegendName, limit=c(zlim[1], zlim[2]), low = Colors[1], high = Colors[2]) + 
       scale_x_continuous(expand=c(0,0)) +
       scale_y_continuous(expand=c(0,0)) +
       ylab(VarLabel) +
@@ -472,7 +617,7 @@ plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL,
       geom_tile(aes(fill = mean)) +
       stat_contour() +
       geom_contour(color = "white") + 
-      scale_fill_gradient(name = "Mean", limit=c(zlim[1], zlim[2]), low = Colors[1], high = Colors[2]) + 
+      scale_fill_gradient(name = LegendName, limit=c(zlim[1], zlim[2]), low = Colors[1], high = Colors[2]) + 
       scale_x_continuous(expand=c(0,0)) +
       scale_y_continuous(expand=c(0,0)) +
       ylab(VarLabel) 
@@ -488,17 +633,21 @@ plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL,
 #' It then plots the results.
 #' 
 #' @export
-#' @import dplyr
-#' @import tidyr
-#' @import lazyeval
 #' @import ggplot2
-#' @import mgcv
+#' @import dplyr
+#' @import rlang
 #' 
 #' @param data A data table object output by either \code{\link{bin_prop}}. 
 #' \code{\link{transform_to_elogit}}, or \code{\link{create_binomial}}.
+#' @param type A character string indicating "proportion" or "elogit" which 
+#' influences how standard error and confidence intervals are calculated.
 #' @param xlim A vector of two integers specifying the limits of the x-axis.
 #' @param DiffCols A named character vector specifying the desired columns 
 #' corresponding to the interest areas. 
+#' @param Averaging A character string indicating how the averaging should 
+#' be done. "Event" (default) will produce the overall mean in the data, while
+#' "Subject" or "Item" (or, in principle, any other column name) will
+#' calculate the grand mean by that factor.
 #' @param Condition1 A string containing the column name corresponding to the 
 #' first condition, if available. 
 #' @param Condition2 A string containing the column name corresponding to the 
@@ -507,163 +656,371 @@ plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL,
 #' of the levels of the first condition. 
 #' @param Cond2Labels A named character vector specifying the desired labels 
 #' of the levels of the second condition. 
-#' @param ErrorBar A logical indicating whether standard error bars should 
+#' @param ErrorBar A logical indicating whether error bars should be
 #' included in the plot.
+#' @param ErrorBand A logical indicating whether error bands should be
+#' included in the plot.
+#' @param ErrorType A string indicating "SE" or "CI".
+#' @param ConfLev A number indicating the confidence level of the CI.
+#' @param CItype A string indicating "simultaneous" or "pointwise". Simultaneous
+#' performs a Bonferroni correction for the interval.
 #' @param VWPreTheme A logical indicating whether the theme included with the 
-#' function should be applied, or ggplot2's base theme (which any other 
+#' function should be applied, or ggplot2's base theme (to which any other 
 #' custom theme could be added).
 #' @examples
 #' \dontrun{
 #' library(VWPre)
-#' # For plotting grand average differences...
-#' plot_avg_diff(data = dat, xlim = c(0, 1000), DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
+#' # For plotting average differences with SE bars...
+#' plot_avg_diff(data = dat, xlim = c(0, 1000), type = "proportion",
+#'              DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
 #'              Condition1 = NA, Condition2 = NA, Cond1Labels = NA, Cond2Labels = NA,
-#'              ErrorBar = TRUE, VWPreTheme = TRUE)
+#'              ErrorBar = TRUE, VWPreTheme = TRUE, ErrorBands = FALSE, 
+#'              ErrorType = "SE")
 #'              
-#' # For plotting conditional average differences (one condition) with the included theme.
-#' plot_avg_diff(data = dat, xlim = c(0, 1000), DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"), 
+#' # For plotting conditional average differences (one condition) with the 
+#' # included theme and 95% pointwise CI bars.
+#' plot_avg_diff(data = dat, xlim = c(0, 1000), , type = "proportion",
+#'              DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
 #'            Condition1 = "talker", Condition2 = NA, Cond1Labels = c(CH1 = "Chinese 1", 
 #'            CH10 = "Chinese 3", CH9 = "Chinese 2", EN3 = "English 1"),
-#'            Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE)
+#'            Cond2Labels = NA, ErrorBar = TRUE, 
+#'            VWPreTheme = TRUE, ErrorBands = FALSE, 
+#'              ErrorType = "CI", ConfLev = 95, CItype = "pointwise")
 #'            
-#' # For plotting conditional average differences (two conditions) with the included theme.
-#' plot_avg_diff(data = dat, xlim = c(0, 1000), DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"), 
+#' # For plotting conditional average differences (two conditions) with the 
+#' # included theme and 95% simultaneous CI bands.
+#' plot_avg_diff(data = dat, xlim = c(0, 1000), , type = "proportion",
+#'              DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
 #'            Condition1 = "talker", Condition2 = "Exp", Cond1Labels = c(CH1 = "Chinese 1", 
 #'            CH10 = "Chinese 3", CH9 = "Chinese 2", EN3 = "English 1"),
-#'            Cond2Labels = c(High = "H Exp", Low = "L Exp"), ErrorBar = TRUE, 
-#'            VWPreTheme = TRUE)
+#'            Cond2Labels = c(High = "H Exp", Low = "L Exp"), ErrorBar = FALSE, 
+#'            VWPreTheme = TRUE, ErrorBands = TRUE, 
+#'              ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
+#' 
+#' # For a more complete tutorial on VWPre plotting functions:
+#' vignette("SR_Plotting", package="VWPre")
 #' }
-plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA,
-                          Condition1 = NA, Condition2 = NA, Cond1Labels = NA, 
-                          Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE) {
-  dat <- data
+#' 
+plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
+                          Averaging = "Event", 
+                          Condition1 = NULL, Condition2 = NULL, Cond1Labels = NA, 
+                          Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE,
+                          ConfLev = 95, CItype = "simultaneous",
+                          ErrorBand = FALSE, ErrorType = "SE") {
+  
+  if(is.null(type)){
+    stop("Please supply the plot type!")
+  }
   
   if(is.null(DiffCols)){
     stop("Please supply the columns for the difference!")
   } else {
-  DiffCol1 <- names(DiffCols)[1]
-  DiffCol2 <- names(DiffCols)[2]
+    DiffCol1 <- names(DiffCols)[1]
+    if(!(DiffCol1 %in% colnames(data))){
+      stop(paste(DiffCol1, "column not present in data!"))
+    }
+    DiffCol2 <- names(DiffCols)[2]
+    if(!(DiffCol2 %in% colnames(data))){
+      stop(paste(DiffCol2, "column not present in data!"))
+    }
   }
   
-  ylim <- c(0,0)
-  dat <- dat %>% mutate_(., Diff = interp(~DiffCol1 - DiffCol2, DiffCol1 = as.name(DiffCol1), DiffCol2 = as.name(DiffCol2)))
-
-  Theme <- VWPreTheme
-  sel_names <- c("Time", "Diff")
+  if(!(Averaging %in% colnames(data))){
+    stop(paste(Averaging, " column not present in data!"))
+  }
   
-  if (is.na(xlim)[1]) {
-    xlim <- c(range(dat$Time)[1], range(dat$Time)[2])
+  Theme <- VWPreTheme
+  
+  if(ErrorBar==TRUE && ErrorBand==TRUE){
+    stop(paste("Please select either error bars OR error bands. 
+               For error bars set ErrorBar=TRUE and ErrorBand=FALSE.
+               For error bands set ErrorBar=FALSE and ErrorBand=TRUE."))
+  }
+  
+  # Check condition columns
+  if(!(is.null(Condition1))) {
+    if(is.na(Condition1)) {
+      stop(paste("Please use NULL when not specifying a condition."))
+    } else if (!(Condition1 %in% colnames(data))) {
+      stop(paste(Condition1, " column not present in data!"))
+    }
+  }
+  if(!(is.null(Condition2))) {
+    if(is.na(Condition2)) {
+      stop(paste("Please use NULL when not specifying a condition."))
+    } else if (!(Condition2 %in% colnames(data))) {
+      stop(paste(Condition2, " column not present in data!"))
+    }
+  }
+  
+  # Inform about Grand Average calculation
+  message(paste0("Grand average of Difference calculated using ", Averaging, " means."))
+  
+  if (is.na(xlim[1])) {
+    xlim <- c(range(data$Time)[1], range(data$Time)[2])
+    xaxis <- unique(data$Time)
   } else {
     xlim <- xlim
+    data<-data[data$Time>=xlim[1] & data$Time<=xlim[2],]
+    xaxis <- unique(data$Time)
+  }
+  
+  
+  tmpdata <- data %>% 
+    mutate(., DC1 = !!UQ(sym(DiffCol1)), DC2 = !!UQ(sym(DiffCol2)))
+  
+  # set column selection
+  if(is.null(Condition1) && is.null(Condition2)){
+    sel_names = quos(Time, DC1, DC2, UQ(sym(Averaging)))
+  } else if(!is.null(Condition1) && is.null(Condition2)){
+    sel_names = quos(Time, DC1, DC2, UQ(sym(Condition1)), UQ(sym(Averaging)))
+  } else if(is.null(Condition1) && !is.null(Condition2)){
+    sel_names = quos(Time, DC1, DC2, UQ(sym(Condition2)), UQ(sym(Averaging)))
+  } else if(!is.null(Condition1) && !is.null(Condition2)){
+    sel_names = quos(Time, DC1, DC2, UQ(sym(Condition1)), UQ(sym(Condition2)), UQ(sym(Averaging)))
+  }
+  
+  # set grouping
+  if(is.null(Condition1) && is.null(Condition2)){
+    group_names1 = quos(UQ(sym(Averaging)), Time)
+    group_names2 = quos(Time)
+  } else if(!is.null(Condition1) && is.null(Condition2)){
+    group_names1 = quos(UQ(sym(Averaging)), Time, UQ(sym(Condition1)))
+    group_names2 = quos(Time, UQ(sym(Condition1)))
+  } else if(is.null(Condition1) && !is.null(Condition2)){
+    group_names1 = quos(UQ(sym(Averaging)), Time, UQ(sym(Condition2)))
+    group_names2 = quos(Time, UQ(sym(Condition2)))
+  } else if(!is.null(Condition1) && !is.null(Condition2)){
+    group_names1 = quos(UQ(sym(Averaging)), Time, UQ(sym(Condition1)), UQ(sym(Condition2)))
+    group_names2 = quos(Time, UQ(sym(Condition1)), UQ(sym(Condition2)))
+  }
+  
+  tmpdata <- tmpdata %>% select(!!!sel_names) %>%
+    group_by(!!!group_names1) %>% 
+    summarise(DC1 = mean(DC1, na.rm = T), DC2 = mean(DC2, na.rm = T)) %>% 
+    mutate(Diff = DC1 - DC2) %>% 
+    group_by(!!!group_names2)
+  
+  if(type=="elogit") {
+    tmpdata <- tmpdata %>%
+      summarise(meanDiff = mean(Diff), DC1sd = sd(DC1), DC2sd = sd(DC2), n1 = n(), n2 = n()) %>%
+      mutate(se = sqrt( ((DC1sd^2)/n1) + ((DC2sd^2)/n2) )) %>%
+      mutate(degfree = (((((DC1sd^2)/n1) + ((DC2sd^2)/n2))^2) / (((((DC1sd^2)/n1)^2) / (n1-1)) + ((((DC2sd^2)/n2)^2) / (n2-1)))) )
+    if(CItype=="pointwise") {
+      tval <- 1-(((100-ConfLev)/2)/100)
+    } else if (CItype=="simultaneous") {
+      tval <- 1-(((100-ConfLev)/(2*length(unique(xaxis))))/100)
+    }
+    tmpdata <- tmpdata %>% mutate(ci = stats::qt(tval,df=degfree)*se)
+  } else if (type=="proportion") {
+    tmpdata <- tmpdata %>%
+      summarise(meanDiff = mean(Diff), DC1m = mean(DC1), DC2m = mean(DC2), n1 = n(), n2 = n()) %>%
+      mutate(se = sqrt(((DC1m*(1-DC1m))/n1)+((DC2m*(1-DC2m))/n2)))
+    if(CItype=="pointwise") {
+      zval <- 1-(((100-ConfLev)/2)/100)
+    } else if (CItype=="simultaneous") {
+      zval <- 1-(((100-ConfLev)/(2*length(unique(xaxis))))/100)
+    }
+    tmpdata <- tmpdata %>% mutate(ci = stats::qnorm(zval)*se)
+  }
+  # To be used for pooled variance of Elogit difference
+  # if(type=="elogit") {
+  #   tmpdata <- tmpdata %>%
+  #     summarise(meanDiff = mean(Diff), DC1sd = sd(DC1), DC2sd = sd(DC2), n1 = n(), n2 = n()) %>%
+  #     mutate(poolvar = (((n1-1)*(DC1sd^2)) + ((n2-1)*(DC2sd^2))) / (n1+n2-2)) %>%
+  #     mutate(se = sqrt( ((poolvar^2)/n1) + ((poolvar^2)/n2) ))
+  #   if(CItype=="pointwise") {
+  #     tval <- 1-(((100-ConfLev)/2)/100)
+  #   } else if (CItype=="simultaneous") {
+  #     tval <- 1-(((100-ConfLev)/(2*length(unique(xaxis))))/100)
+  #   }
+  #   tmpdata <- tmpdata %>% mutate(ci = qt(tval,df=(n1+n2-2))*se)
+  # } else if (type=="proportion") {
+  #   tmpdata <- tmpdata %>%
+  #     summarise(meanDiff = mean(Diff), DC1m = mean(DC1), DC2m = mean(DC2), n1 = n(), n2 = n()) %>%
+  #     mutate(se = sqrt(((DC1m*(1-DC1m))/n1)+((DC2m*(1-DC2m))/n2)))
+  #   if(CItype=="pointwise") {
+  #     zval <- 1-(((100-ConfLev)/2)/100)
+  #   } else if (CItype=="simultaneous") {
+  #     zval <- 1-(((100-ConfLev)/(2*length(unique(xaxis))))/100)
+  #   }
+  #   tmpdata <- tmpdata %>% mutate(ci = qnorm(zval)*se)
+  # }
+  
+  tmpdata <- ungroup(tmpdata)
+  
+  # Setting Error
+  if(ErrorType=="SE"){
+    tmpdata$error_lower <- tmpdata$meanDiff - tmpdata$se
+    tmpdata$error_upper <- tmpdata$meanDiff + tmpdata$se
+  } else if(ErrorType=="CI") {
+    tmpdata$error_lower <- tmpdata$meanDiff - tmpdata$ci
+    tmpdata$error_upper <- tmpdata$meanDiff + tmpdata$ci
+  }
+  
+  # Setting ylim
+  ylim <- c(0,0)
+  if (type == "elogit") {
+    ylim[1] = min(tmpdata$error_lower)
+    ylim[2] = max(tmpdata$error_upper)
+  } else if (type == "proportion") {
+    ylim[1] = min(tmpdata$error_lower)
+    ylim[2] = max(tmpdata$error_upper)
+  }
+  
+  
+  if (!is.null(Condition1) && !is.null(Condition2)) {
+    tmpdata <- tmpdata %>% rename(Cond1=UQ(sym(Condition1)), Cond2=UQ(sym(Condition2)))
+    tmpdata$Condition <- interaction(tmpdata$Cond1, tmpdata$Cond2, drop = T, sep = "_")
+    Cond <- TRUE
+    CondName <- paste(Condition1, Condition2, sep = "_by_")
+  }
+  if (is.null(Condition1) && !is.null(Condition2)) {
+    tmpdata <- tmpdata %>% rename(Condition=UQ(sym(Condition2)))
+    Cond <- TRUE
+    CondName <- Condition2
+  }
+  if (!is.null(Condition1) && is.null(Condition2)) {
+    tmpdata <- tmpdata %>% rename(Condition=UQ(sym(Condition1)))
+    Cond <- TRUE
+    CondName <- Condition1
+  }
+  if (is.null(Condition1) && is.null(Condition2)) {
+    Cond <- FALSE
+  }
+  
+  if (ErrorType=="CI" && (ErrorBar==TRUE || ErrorBand==TRUE)) {
+    if(CItype == "pointwise") {
+      message(paste0("Plot created with ", ConfLev, "% ", CItype, " confindence intervals."))
+    }
+    if(CItype == "simultaneous") {
+      if(type=="elogit") {
+        message(paste0("Plot created with ", ConfLev, "% ", CItype, " confindence intervals (adjusted to ", round(tval*100, 2), "% using the Bonferroni method)."))
+      } else if(type=="proportion") {
+        message(paste0("Plot created with ", ConfLev, "% ", CItype, " confindence intervals (adjusted to ", round(zval*100, 2), "% using the Bonferroni method)."))
+      }
+    }
+  }
+  
+  if (!is.null(Condition1) || !is.null(Condition2)) {
+    plt <- ggplot(tmpdata, aes(x = Time, y = meanDiff, colour = Condition)) +
+      ylab("Difference") +
+      geom_hline(yintercept=0) +
+      scale_x_continuous(limits = c(xlim[1], xlim[2])) +
+      scale_y_continuous(limits = c(ylim[1], ylim[2]))
+  } else {
+    plt <- ggplot(tmpdata, aes(x = Time, y = meanDiff)) +
+      ylab("Difference") +
+      geom_hline(yintercept=0) +
+      scale_x_continuous(limits = c(xlim[1], xlim[2])) +
+      scale_y_continuous(limits = c(ylim[1], ylim[2]))
+  }
+  
+  
+  if (Theme == TRUE) {
+    plt <- plt + theme_mybw()
+  }
+  
+  # Set errorbands according to theme
+  if(ErrorBand==T & Theme==T) {
+    if(Cond==T) {
+      plt <- plt + aes(shape = Condition, colour = NULL) +
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), fill="grey25", alpha=0.15, show.legend = F)
+      plt <- plt +
+        scale_shape_discrete(name=CondName,
+                             breaks=unique(tmpdata$Condition),
+                             labels=unique(tmpdata$Condition))
+    } else {
+      plt <- plt + 
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), fill="grey25", alpha=0.15, show.legend = F)
+      plt <- plt
+    }
+  }
+  if(ErrorBand==T & Theme==F) {
+    if(Cond==T) {
+      plt <- plt +
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA, fill=Condition), alpha=0.15, show.legend = F)
+      plt <- plt +
+        scale_colour_hue(name=CondName,
+                         breaks=unique(tmpdata$Condition),
+                         labels=unique(tmpdata$Condition))
+    } else {
+      plt <- plt +
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), alpha=0.15, show.legend = F)
+      plt <- plt
+    }
+  }
+  
+  # Set errorbars according to theme and plot grouping
+  if(ErrorBar==T & Theme==T) {
+    if(Cond==T) {
+      plt <- plt + 
+        geom_errorbar(aes(ymin=error_lower, ymax=error_upper, colour = Condition), width = .3)
+      plt <- plt +
+        scale_color_grey(name=CondName,
+                         breaks=unique(tmpdata$Condition),
+                         labels=unique(tmpdata$Condition))
+    } else {
+      plt <- plt + 
+        geom_errorbar(aes(ymin=error_lower, ymax=error_upper), width = .3)
+      plt <- plt
+    }
+  }
+  if(ErrorBar==T & Theme==F) {
+    
+    if(Cond==T) {
+      plt <- plt +
+        geom_errorbar(aes(ymin=error_lower, ymax=error_upper, color=Condition), width = .3)
+      plt <- plt +
+        scale_colour_hue(name=CondName,
+                         breaks=unique(tmpdata$Condition),
+                         labels=unique(tmpdata$Condition))
+    } else {
+      plt <- plt +
+        geom_errorbar(aes(ymin=error_lower, ymax=error_upper), width = .3)
+      plt <- plt
+    }
+  }
+  
+  plt +
+    geom_point() +
+    geom_line() +
+    ggtitle(paste("Difference between", DiffCols[[1]], "and", DiffCols[[2]], sep=" "))
+  
+  
   }
 
-  if (is.na(Condition1) & is.na(Condition2)) {
-    
-    GrandAvg <- dat %>% select_(.dots=sel_names) %>% 
-      group_by(Time) %>%
-      summarise(mean = mean(Diff, na.rm = T), se = sd(Diff) / sqrt(length(Diff)))
 
-    ylim[1] = min(GrandAvg$mean) - 0.15
-    ylim[2] = max(GrandAvg$mean) + 0.15
-    
-    ggplot(GrandAvg, aes(x = Time, y = mean)) + 
-      geom_point() +
-      geom_line() +
-      ylab("Difference") +
-      geom_hline(yintercept=0) + 
-      scale_x_continuous(limits = c(xlim[1], xlim[2])) + 
-      scale_y_continuous(limits = c(ylim[1], ylim[2])) + {
-        if (ErrorBar == TRUE) geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .3)
-      } + {
-        if (Theme == TRUE) theme_mybw()
-      } +
-      ggtitle(paste("Difference between", DiffCols[[1]], "and", DiffCols[[2]], sep=" "))
-    
-  } else if (!is.na(Condition1) & is.na(Condition2)) {
-    
-    GrandAvg <- dat %>% select_(.dots=sel_names, interp(~Condition1, Condition1 = as.name(Condition1))) %>% 
-      group_by_("Time", Condition1) %>%
-      summarise(mean = mean(Diff, na.rm = T), se = sd(Diff) / sqrt(length(Diff))) %>%
-      mutate_(., Cond = interp(~Condition1, Condition1 = as.name(Condition1))) %>%
-      mutate(., Cond = as.factor(Cond))
-
-    lev1 <- unique(levels(GrandAvg$Cond))
-    for (x in 1:length(names(Cond1Labels))) {
-      for(i in 1:length(lev1)) {
-        if (lev1[i] == names(Cond1Labels)[x]) {
-          lev1[i] <- Cond1Labels[[x]]
-        }
-      }
-    }
-    levels(GrandAvg$Cond) <- lev1
-    
-    ylim[1] = min(GrandAvg$mean) - 0.15
-    ylim[2] = max(GrandAvg$mean) + 0.15
-    
-    
-    ggplot(GrandAvg, aes(x = Time, y = mean, colour = Cond)) + 
-      geom_point() +
-      geom_line() +
-      ylab("Difference") +
-      scale_colour_grey(name = "Condition") +
-      geom_hline(yintercept=0) + 
-      scale_x_continuous(limits = c(xlim[1], xlim[2])) + 
-      scale_y_continuous(limits = c(ylim[1], ylim[2])) + {
-        if (ErrorBar == TRUE) geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .3)
-      } + {
-        if (Theme == TRUE) theme_mybw()
-      } +
-      ggtitle(paste("Difference between", DiffCols[[1]], "and", DiffCols[[2]], sep=" "))
-    
-  }  else if (!is.na(Condition1) & !is.na(Condition2)) {
-    
-    GrandAvg <- dat %>% select_(.dots=sel_names, interp(~Condition1, Condition1 = as.name(Condition1)), interp(~Condition2, Condition2 = as.name(Condition2))) %>% 
-      group_by_("Time", Condition1, Condition2) %>%
-      summarise(mean = mean(Diff, na.rm = T), se = sd(Diff) / sqrt(length(Diff))) %>%
-      mutate_(., Cond1 = interp(~Condition1, Condition1 = as.name(Condition1)),
-              Cond2 = interp(~Condition2, Condition2 = as.name(Condition2))) %>%
-      mutate(., Cond1 = as.factor(Cond1), Cond2 = as.factor(Cond2))
-
-    lev1 <- unique(levels(GrandAvg$Cond1))
-    for (x in 1:length(names(Cond1Labels))) {
-      for(i in 1:length(lev1)) {
-        if (lev1[i] == names(Cond1Labels)[x]) {
-          lev1[i] <- Cond1Labels[[x]]
-        }
-      }
-    }
-    levels(GrandAvg$Cond1) <- lev1
-    
-    lev2 <- unique(levels(GrandAvg$Cond2))
-    for (x in 1:length(names(Cond2Labels))) {
-      for(i in 1:length(lev2)) {
-        if (lev2[i] == names(Cond2Labels)[x]) {
-          lev2[i] <- Cond2Labels[[x]]
-        }
-      }
-    }
-    levels(GrandAvg$Cond2) <- lev2
-    
-    GrandAvg$Cond <- interaction(GrandAvg$Cond1, GrandAvg$Cond2, sep="_")
-    
-    ylim[1] = min(GrandAvg$mean) - 0.15
-    ylim[2] = max(GrandAvg$mean) + 0.15
-    
-    
-    ggplot(GrandAvg, aes(x = Time, y = mean, colour = Cond)) + 
-      geom_point() +
-      geom_line() +
-      ylab("Difference") +
-      scale_colour_grey(name = "Conditions") +
-      geom_hline(yintercept=0) + 
-      scale_x_continuous(limits = c(xlim[1], xlim[2])) + 
-      scale_y_continuous(limits = c(ylim[1], ylim[2])) + {
-        if (ErrorBar == TRUE) geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .3)
-      } + {
-        if (Theme == TRUE) theme_mybw()
-      } +
-      ggtitle(paste("Difference between", DiffCols[[1]], "and", DiffCols[[2]], sep=" "))
-  }  
+#' Create function for backtransforming empirical logits to proportions
+#' 
+#' \code{make_pelogit_fnc} creates a function that can transform empirical logit
+#' values back to probability scale using the number of samples and constant
+#' that were used in the original transformation. This function can then be use
+#' to backtransform value predicted by a statistical model.
+#' 
+#' @export
+#' 
+#' @param ObsPerBin A positive integer indicating the number of observations 
+#' used in the original transformation calculation. 
+#' @param Constant A positive number used in the original transformation calculation.
+#' @return A function.
+#' @examples
+#' \dontrun{
+#' library(VWPre)
+#' # Make backtransformation function
+#' pelogit <- make_pelogit_fnc(20, 0.5)
+#' } 
+make_pelogit_fnc <- function(ObsPerBin = NULL, Constant = NULL) {
   
+  if(is.null(ObsPerBin)){
+    stop("Please supply the observations per bin used in the original transformation!")
+  }
+  if(is.null(Constant)){
+    stop("Please supply the constant used in the original transformation!")
+  }
+  fun <- function(predval){
+    (((ObsPerBin*exp(predval) + Constant*exp(predval) - Constant) / (1 + exp(predval))) / ObsPerBin )
+  }
+  return(fun)
 }
 

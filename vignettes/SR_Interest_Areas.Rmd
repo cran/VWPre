@@ -158,7 +158,7 @@ The table should now look similar to the following.
 knitr::kable(head(LookUpTable, 12))
 ```
 
-### Preforming the gaze remapping
+### Performing the gaze remapping
 
 ```{r, eval=TRUE, echo=FALSE, results='asis'}
 sampledata <- dat0
@@ -173,7 +173,7 @@ remapped <- custom_ia(data = sampledata, iaLookup = LookUpTable)
 ```
 
 This function examines the gaze coordinates of each sample for each event and evaluates which interest area it falls in, based on the information contained in the lookup table.
-Because this works rowwise, it can take a bit of time for large datasets.
+Because this works row-wise, it can take a bit of time for large datasets.
 
 After the remapping is complete, you are then ready to continue preprocessing your data. 
 Please refer to the vignette `SR_Basic_Preprocessing` for further details.

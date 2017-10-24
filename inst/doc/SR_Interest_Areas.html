@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2017-06-14" />
+<meta name="date" content="2017-10-24" />
 
 <title>Relabeling Interest Areas or Defining New Post-hoc Interest Areas for SR Eyelink Data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Relabeling Interest Areas or Defining New Post-hoc Interest Areas for SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2017-06-14</em></h4>
+<h4 class="date"><em>2017-10-24</em></h4>
 
 
 
@@ -81,15 +81,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>First, ensure that you have loaded your data appropriately and that you have already carried out initial preprocessing using the functions <code>prep_data</code> and <code>relabel_NA</code>. The subsequent preprocessing requires that the interest area IDs are numerically, ranging from 0 (i.e., outside all interest areas) up to a maximum of 8. So, it’s important to check that the IDs present in the data set, conform to this. The <code>check_ia</code> functions does just this and indicates how those IDs are mapped to the interest area labels.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_ia</span>(<span class="dt">data =</span> checkdat)</code></pre></div>
 <pre><code>## Interest Area IDs for the right eye are not between 0 and 8. Please recode.</code></pre>
-<pre><code>##    ID   Label
-## 1   0 Outside
-## 2  11 Object1
-## 3 399 Object3
-## 4 234 Object2
-## 5 444 Object4</code></pre>
-<pre><code>## Interest Area IDs for the left eye are coded appropriately.</code></pre>
 <pre><code>##   ID   Label
-## 1  0 Outside</code></pre>
+##    0 Outside
+##   11 Object1
+##  234 Object2
+##  399 Object3
+##  444 Object4</code></pre>
+<pre><code>## Interest Area IDs for the left eye are coded appropriately.</code></pre>
+<pre><code>##  ID   Label
+##   0 Outside</code></pre>
 </div>
 <div id="providing-new-labels-and-ids-for-existing-interest-areas" class="section level3">
 <h3>Providing new labels and IDs for existing interest areas</h3>
@@ -105,15 +105,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <pre><code>## Left interest area labels recoded.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_ia</span>(<span class="dt">data =</span> newdat)</code></pre></div>
 <pre><code>## Interest Area IDs for the right eye are coded appropriately.</code></pre>
-<pre><code>##   ID           Label
-## 1  0         Outside
-## 2  1          Target
-## 3  3 OnsetCompetitor
-## 4  2 RhymeCompetitor
-## 5  4      Distractor</code></pre>
+<pre><code>##  ID           Label
+##   0         Outside
+##   1          Target
+##   2 RhymeCompetitor
+##   3 OnsetCompetitor
+##   4      Distractor</code></pre>
 <pre><code>## Interest Area IDs for the left eye are coded appropriately.</code></pre>
-<pre><code>##   ID   Label
-## 1  0 Outside</code></pre>
+<pre><code>##  ID   Label
+##   0 Outside</code></pre>
 </div>
 </div>
 <div id="remapping-gaze-position-to-newly-defined-interest-areas" class="section level2">
@@ -201,12 +201,12 @@ IAdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 </tbody>
 </table>
 <p>Next, create the Event column. Typically this is done using the Subject Identifier and Trial Index.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">IAdat<span class="op">$</span>Event &lt;-<span class="st"> </span><span class="kw">interaction</span>(IAdat<span class="op">$</span>RECORDING_SESSION_LABEL, IAdat<span class="op">$</span>TRIAL_INDEX, <span class="dt">drop =</span> T)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">IAdat$Event &lt;-<span class="st"> </span><span class="kw">interaction</span>(IAdat$RECORDING_SESSION_LABEL, IAdat$TRIAL_INDEX, <span class="dt">drop =</span> T)</code></pre></div>
 <p>Next you need to create a column which indicates the location of each interest area for a specific trial. If you defined this in your data source and output all columns to the eye-tracking file, these should already be included in your interest area report. In the example below, the columns (NAME_reg) indicate a numeric index (in this case Cartesian quadrants) of where the target and other objects were located per trial. This information must be unified into a single column so that it can be used later to merge in other information.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat1 &lt;-<span class="st"> </span>IAdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">ScreenLoc =</span> <span class="kw">ifelse</span>(IA_LABEL<span class="op">==</span><span class="st">&quot;Target&quot;</span>, target_reg,
-                        <span class="kw">ifelse</span>(IA_LABEL<span class="op">==</span><span class="st">&quot;RhymeComp&quot;</span>, rhymecomp_reg,
-                               <span class="kw">ifelse</span>(IA_LABEL<span class="op">==</span><span class="st">&quot;OnsetComp&quot;</span>, onsetcomp_reg,
-                                      <span class="kw">ifelse</span>(IA_LABEL<span class="op">==</span><span class="st">&quot;Distractor&quot;</span>, distractor_reg, <span class="ot">NA</span>))))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat1 &lt;-<span class="st"> </span>IAdat %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">ScreenLoc =</span> <span class="kw">ifelse</span>(IA_LABEL==<span class="st">&quot;Target&quot;</span>, target_reg,
+                        <span class="kw">ifelse</span>(IA_LABEL==<span class="st">&quot;RhymeComp&quot;</span>, rhymecomp_reg,
+                               <span class="kw">ifelse</span>(IA_LABEL==<span class="st">&quot;OnsetComp&quot;</span>, onsetcomp_reg,
+                                      <span class="kw">ifelse</span>(IA_LABEL==<span class="st">&quot;Distractor&quot;</span>, distractor_reg, <span class="ot">NA</span>))))
                   )</code></pre></div>
 <p>To create the bounding boxes of the region locations, make a dataframe that includes the top, bottom, left, and right pixel boundaries. These will, of course, be dependent on the resolution of the screen used in the experiment.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Loc_Table &lt;-<span class="st"> </span>df1 &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">ScreenLoc =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>), 
@@ -259,14 +259,14 @@ IAdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <p>This table will be merged with the interest area report, matching by ScreenLoc column.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat2 &lt;-<span class="st"> </span><span class="kw">inner_join</span>(dat1, Loc_Table, <span class="dt">by=</span><span class="st">&quot;ScreenLoc&quot;</span>)</code></pre></div>
 <p>The look-up table (as with other functions in VWPre) requires a numeric interest area ID column. This can be created directly from the <code>IA_LABEL</code> column, as follows by corresponding the Labels to the IDs.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat2<span class="op">$</span>IA_ID &lt;-<span class="st"> </span><span class="kw">case_when</span>(
-  dat2<span class="op">$</span>IA_LABEL <span class="op">==</span><span class="st"> &quot;Target&quot;</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,
-  dat2<span class="op">$</span>IA_LABEL <span class="op">==</span><span class="st"> &quot;RhymeComp&quot;</span> <span class="op">~</span><span class="st"> </span><span class="dv">2</span>,
-  dat2<span class="op">$</span>IA_LABEL <span class="op">==</span><span class="st"> &quot;OnsetComp&quot;</span> <span class="op">~</span><span class="st"> </span><span class="dv">3</span>,
-  dat2<span class="op">$</span>IA_LABEL <span class="op">==</span><span class="st"> &quot;Distractor&quot;</span> <span class="op">~</span><span class="st"> </span><span class="dv">4</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat2$IA_ID &lt;-<span class="st"> </span><span class="kw">case_when</span>(
+  dat2$IA_LABEL ==<span class="st"> &quot;Target&quot;</span> ~<span class="st"> </span><span class="dv">1</span>,
+  dat2$IA_LABEL ==<span class="st"> &quot;RhymeComp&quot;</span> ~<span class="st"> </span><span class="dv">2</span>,
+  dat2$IA_LABEL ==<span class="st"> &quot;OnsetComp&quot;</span> ~<span class="st"> </span><span class="dv">3</span>,
+  dat2$IA_LABEL ==<span class="st"> &quot;Distractor&quot;</span> ~<span class="st"> </span><span class="dv">4</span>
 )</code></pre></div>
 <p>Lastly, select only the required columns for the look-up table.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LookUpTable &lt;-<span class="st"> </span>dat2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Event, IA_LABEL, IA_ID, Top, Bottom, Left, Right)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LookUpTable &lt;-<span class="st"> </span>dat2 %&gt;%<span class="st"> </span><span class="kw">select</span>(Event, IA_LABEL, IA_ID, Top, Bottom, Left, Right)</code></pre></div>
 <p>The table should now look similar to the following.</p>
 <table>
 <thead>
@@ -392,11 +392,11 @@ IAdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 </tbody>
 </table>
 </div>
-<div id="preforming-the-gaze-remapping" class="section level3">
-<h3>Preforming the gaze remapping</h3>
+<div id="performing-the-gaze-remapping" class="section level3">
+<h3>Performing the gaze remapping</h3>
 <p>Make sure your sample report has been loaded appropriately and that you have carried out the function <code>prep_data</code>. This will ensure that the necessary columns are coded appropriately and that the Event column has been created. Then simply feed that data frame, along with the lookup table, to the function <code>custom_ia</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">remapped &lt;-<span class="st"> </span><span class="kw">custom_ia</span>(<span class="dt">data =</span> sampledata, <span class="dt">iaLookup =</span> LookUpTable)</code></pre></div>
-<p>This function examines the gaze coordinates of each sample for each event and evaluates which interest area it falls in, based on the information contained in the lookup table. Because this works rowwise, it can take a bit of time for large datasets.</p>
+<p>This function examines the gaze coordinates of each sample for each event and evaluates which interest area it falls in, based on the information contained in the lookup table. Because this works row-wise, it can take a bit of time for large datasets.</p>
 <p>After the remapping is complete, you are then ready to continue preprocessing your data. Please refer to the vignette <code>SR_Basic_Preprocessing</code> for further details.</p>
 </div>
 </div>

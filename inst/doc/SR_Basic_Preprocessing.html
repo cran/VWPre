@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2017-06-14" />
+<meta name="date" content="2017-10-24" />
 
 <title>Basic VWP Preprocessing for SR Eyelink Data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Basic VWP Preprocessing for SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2017-06-14</em></h4>
+<h4 class="date"><em>2017-10-24</em></h4>
 
 
 
@@ -101,7 +101,7 @@ VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <pre><code>## Checking required columns...</code></pre>
 <pre><code>##     All required columns are present in the data.</code></pre>
 <pre><code>## Checking optional columns...</code></pre>
-<pre><code>##     All optional columns are present in the data.</code></pre>
+<pre><code>##     The following optional is not present in the data:  EYE_TRACKED</code></pre>
 <pre><code>## Working on required columns...</code></pre>
 <pre><code>##     RECORDING_SESSION_LABEL renamed to Subject.</code></pre>
 <pre><code>##     Subject converted to factor.</code></pre>
@@ -124,15 +124,15 @@ VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <div id="remove-unnecessary-columns" class="section level3">
 <h3>Remove unnecessary columns</h3>
 <p>At this point, it is safe to remove the columns which were output by Data Viewer, but that are not needed for preprocessing in using this package. Removing these will reduce the amount of system memory consumed and result in a final dataset that consume less disk space. This is done straightforwardly using <code>dplyr::select</code>, which can also accommodate both column names and regular expressions for matching. If using the sample data set included in this package, it is not necessary to do this step, as these columns have already been removed.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat0 &lt;-<span class="st"> </span><span class="kw">select</span>(dat0, <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;AVERAGE&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;DATA_&quot;</span>), 
-               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;HTARGET&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;IP&quot;</span>), 
-               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_ACCELLERATION&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_IN_&quot;</span>), 
-               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_PUPIL&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_VELOCITY&quot;</span>), 
-               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RESOLUTION&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_ACCELLERATION&quot;</span>), 
-               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_IN_&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_PUPIL&quot;</span>), 
-               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_VELOCITY&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_INDEX&quot;</span>),
-               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_BUTTON&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;TARGET_&quot;</span>), 
-               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;TRIAL_START&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;VIDEO&quot;</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat0 &lt;-<span class="st"> </span><span class="kw">select</span>(dat0, -<span class="kw">starts_with</span>(<span class="st">&quot;AVERAGE&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;DATA_&quot;</span>), 
+               -<span class="kw">starts_with</span>(<span class="st">&quot;HTARGET&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;IP&quot;</span>), 
+               -<span class="kw">starts_with</span>(<span class="st">&quot;LEFT_ACCELLERATION&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;LEFT_IN_&quot;</span>), 
+               -<span class="kw">starts_with</span>(<span class="st">&quot;LEFT_PUPIL&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;LEFT_VELOCITY&quot;</span>), 
+               -<span class="kw">starts_with</span>(<span class="st">&quot;RESOLUTION&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_ACCELLERATION&quot;</span>), 
+               -<span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_IN_&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_PUPIL&quot;</span>), 
+               -<span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_VELOCITY&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_INDEX&quot;</span>),
+               -<span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_BUTTON&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;TARGET_&quot;</span>), 
+               -<span class="kw">starts_with</span>(<span class="st">&quot;TRIAL_START&quot;</span>), -<span class="kw">starts_with</span>(<span class="st">&quot;VIDEO&quot;</span>))</code></pre></div>
 </div>
 <div id="relabel-na-samples-as-outside-any-interest-area" class="section level3">
 <h3>Relabel NA samples as outside any interest area</h3>
@@ -147,15 +147,15 @@ VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <p>The subsequent preprocessing requires that the interest area IDs are numerically coded, with values ranging from 0 (i.e., outside all interest areas) up to a maximum of 8. So, it’s important to check that the IDs present in the data set, conform to this. The <code>check_ia</code> functions does just this and indicates how those IDs are mapped to the interest area labels.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_ia</span>(<span class="dt">data =</span> dat1)</code></pre></div>
 <pre><code>## Interest Area IDs for the right eye are coded appropriately.</code></pre>
-<pre><code>##   ID      Label
-## 1  0    Outside
-## 2  1     Target
-## 3  3  OnsetComp
-## 4  2  RhymeComp
-## 5  4 Distractor</code></pre>
+<pre><code>##  ID      Label
+##   0    Outside
+##   1     Target
+##   2  RhymeComp
+##   3  OnsetComp
+##   4 Distractor</code></pre>
 <pre><code>## Interest Area IDs for the left eye are coded appropriately.</code></pre>
-<pre><code>##   ID   Label
-## 1  0 Outside</code></pre>
+<pre><code>##  ID   Label
+##   0 Outside</code></pre>
 <p>If your interest area IDs do not conform to the required coding, or you would like to create new labels for your existing interest areas, please consult the vignette <code>SR_Interest_Areas</code>. That vignette illustrates how to relabel existing interest area codings (as well as remap the gaze data to entirely new interest areas, should you so desire).</p>
 </div>
 </div>
@@ -168,7 +168,7 @@ VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <p>The function <code>check_time_series</code> can be used to verify the time series. It outputs the unique start times present in the data. These will be the same standardized time point relative to the stimulus if you have exported your data from Data Viewer with pre-defined interest period relative to a message. By specifying the parameter <code>ReturnData = T</code>, the function can return a summary data frame that can be used to inspect the start time of each event. As you can see below, by providing <code>Adjust</code> with a postive value, we have effectively shifted the zero point forward along the number line, causing the first sample to have a negative time value.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_time_series</span>(<span class="dt">data =</span> dat2)</code></pre></div>
 <pre><code>## [1] -100</code></pre>
-<p>Another way to check that your time series has been created correctly is to use the <code>check_msg_time</code> function. By providing the appropriate message text, we can see that the onset of our target now occurs at Time = 0. As with <code>check_time_series</code>, the parameter <code>ReturnData = T</code> will return a summary data frame that can be used to inspect the message time of each event.</p>
+<p>Another way to check that your time series has been created correctly is to use the <code>check_msg_time</code> function. By providing the appropriate message text, we can see that the onset of our target now occurs at Time = 0. Note that the <code>Msg</code> parameter can handle exact matches or matches based on regular expressions. As with <code>check_time_series</code>, the parameter <code>ReturnData = T</code> will return a summary data frame that can be used to inspect the message time of each event.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> dat2, <span class="dt">Msg =</span> <span class="st">&quot;TargetOnset&quot;</span>)</code></pre></div>
 <pre><code>## # A tibble: 320 x 3
 ##      Event SAMPLE_MESSAGE  Time
@@ -206,22 +206,26 @@ VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span cla
 <pre><code>## Sampling rate(s) present in the data are: 1000 Hz.</code></pre>
 <p>Note that the <code>check_samplingrate</code> function returns a printed message indicating the sampling rate(s) present in the data. Optionally, it can return a new column called <code>SamplingRate</code> by specifying the parameter <code>ReturnData</code> as TRUE. In the event that data were collected at different sampling rates, this column can be used to subset the dataset by the sampling rate before proceeding to the next processing step.</p>
 <p>The function <code>bin_prop</code> calculates the proportion of looks (samples) to each interest area in a particular span of time (bin size). In order to do this, it is necessary to supply the parameters <code>BinSize</code> and <code>SamplingRate</code>. <code>BinSize</code> should be specified in milliseconds, representing the chunk of time within which to calculate the proportions.</p>
-<p>Not all bin sizes work for all sampling rates, due to downsampling constraints. If unsure which are appropriate for your current sampling rate, use the <code>ds_options</code> function. When provided with the current sampling rate in <code>SamplingRate</code> (see above), the function will return a printed summary of the bin size options and their corresponding downsampled rate.</p>
+<p>Not all bin sizes work for all sampling rates, due to downsampling constraints. If unsure which are appropriate for your current sampling rate, use the <code>ds_options</code> function. When provided with the current sampling rate in <code>SamplingRate</code> (see above), the function will return a printed summary of the bin size options and their corresponding downsampled rate. By default, this returns the whole number downsampling rates users are likely to want; however, it can also return all possible (valid) downsampling rates, even if they are not round numbers.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ds_options</span>(<span class="dt">SamplingRate =</span> <span class="dv">1000</span>)</code></pre></div>
-<pre><code>## Bin size: 1 ms; Downsampled rate: 1000 Hz</code></pre>
-<pre><code>## Bin size: 2 ms; Downsampled rate: 500 Hz</code></pre>
-<pre><code>## Bin size: 4 ms; Downsampled rate: 250 Hz</code></pre>
-<pre><code>## Bin size: 5 ms; Downsampled rate: 200 Hz</code></pre>
-<pre><code>## Bin size: 8 ms; Downsampled rate: 125 Hz</code></pre>
-<pre><code>## Bin size: 10 ms; Downsampled rate: 100 Hz</code></pre>
-<pre><code>## Bin size: 20 ms; Downsampled rate: 50 Hz</code></pre>
-<pre><code>## Bin size: 25 ms; Downsampled rate: 40 Hz</code></pre>
-<pre><code>## Bin size: 40 ms; Downsampled rate: 25 Hz</code></pre>
-<pre><code>## Bin size: 50 ms; Downsampled rate: 20 Hz</code></pre>
-<pre><code>## Bin size: 100 ms; Downsampled rate: 10 Hz</code></pre>
+<pre><code>## Suggested binning/downsampling options:</code></pre>
+<pre><code>## Bin size: 1 ms; Samples per bin: 1 samples; Downsampled rate: 1000 Hz</code></pre>
+<pre><code>## Bin size: 2 ms; Samples per bin: 2 samples; Downsampled rate: 500 Hz</code></pre>
+<pre><code>## Bin size: 4 ms; Samples per bin: 4 samples; Downsampled rate: 250 Hz</code></pre>
+<pre><code>## Bin size: 5 ms; Samples per bin: 5 samples; Downsampled rate: 200 Hz</code></pre>
+<pre><code>## Bin size: 8 ms; Samples per bin: 8 samples; Downsampled rate: 125 Hz</code></pre>
+<pre><code>## Bin size: 10 ms; Samples per bin: 10 samples; Downsampled rate: 100 Hz</code></pre>
+<pre><code>## Bin size: 20 ms; Samples per bin: 20 samples; Downsampled rate: 50 Hz</code></pre>
+<pre><code>## Bin size: 25 ms; Samples per bin: 25 samples; Downsampled rate: 40 Hz</code></pre>
+<pre><code>## Bin size: 40 ms; Samples per bin: 40 samples; Downsampled rate: 25 Hz</code></pre>
+<pre><code>## Bin size: 50 ms; Samples per bin: 50 samples; Downsampled rate: 20 Hz</code></pre>
+<pre><code>## Bin size: 100 ms; Samples per bin: 100 samples; Downsampled rate: 10 Hz</code></pre>
 <p>The <code>SamplingRate</code> parameter in <code>bin_prop</code> should be specified in Hertz (see <code>check_samplingrate</code>), representing the original sampling rate of the data and the <code>BinSize</code> should be specified in milliseconds (see <code>ds_options</code>), representing the span of time over which to calculate the proportion. The <code>bin_prop</code> function returns new columns corresponding to each interest area ID (e.g., <code>IA_1_C</code>, <code>IA_1_P</code>). The extension ‘_C’ indicates the count of samples in the bin and the extension ‘_P’ indicates the proportion.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat4 &lt;-<span class="st"> </span><span class="kw">bin_prop</span>(dat3, <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">BinSize =</span> <span class="dv">20</span>, <span class="dt">SamplingRate =</span> <span class="dv">1000</span>)</code></pre></div>
-<pre><code>## Sampling rate OK. You're good to go!</code></pre>
+<pre><code>## Binning information: 
+##  Original rate of 1000 Hz with one sample every 1 ms. 
+##  Downsampled rate of 50 Hz using 20 ms bins. 
+##  New bins contain 20 samples.</code></pre>
 <pre><code>## Binning...</code></pre>
 <pre><code>## Calculating proportions...</code></pre>
 <pre><code>## There are 320 data points with less than 20 samples per bin.</code></pre>
@@ -272,7 +276,7 @@ text-align: center;
 <pre><code>## Checking required columns...</code></pre>
 <pre><code>##     All required columns are present in the data.</code></pre>
 <pre><code>## Checking optional columns...</code></pre>
-<pre><code>##     All optional columns are present in the data.</code></pre>
+<pre><code>##     The following optional is not present in the data:  EYE_TRACKED</code></pre>
 <pre><code>## Working on required columns...</code></pre>
 <pre><code>##     RECORDING_SESSION_LABEL renamed to Subject.</code></pre>
 <pre><code>##     Subject converted to factor.</code></pre>
@@ -295,15 +299,15 @@ text-align: center;
 <pre><code>## LEFT_INTEREST_AREA_LABEL: Number of levels DO NOT match NoIA.</code></pre>
 <pre><code>## RIGHT_INTEREST_AREA_LABEL: Number of levels match NoIA.</code></pre>
 <pre><code>## Interest Area IDs for the right eye are coded appropriately.</code></pre>
-<pre><code>##   ID      Label
-## 1  0    Outside
-## 2  1     Target
-## 3  3  OnsetComp
-## 4  2  RhymeComp
-## 5  4 Distractor</code></pre>
+<pre><code>##  ID      Label
+##   0    Outside
+##   1     Target
+##   2  RhymeComp
+##   3  OnsetComp
+##   4 Distractor</code></pre>
 <pre><code>## Interest Area IDs for the left eye are coded appropriately.</code></pre>
-<pre><code>##   ID   Label
-## 1  0 Outside</code></pre>
+<pre><code>##  ID   Label
+##   0 Outside</code></pre>
 <pre><code>## Creating time series with 100 ms adjustment...</code></pre>
 <pre><code>## 100 ms adjustment applied.</code></pre>
 <pre><code>## [1] -100</code></pre>
@@ -318,7 +322,10 @@ text-align: center;
 <pre><code>## Sampling rate(s) present in the data are: 1000 Hz.</code></pre>
 <pre><code>## Binning 1000 Hz data into 20 ms bins...</code></pre>
 <pre><code>## Calculating proportions...</code></pre>
-<pre><code>## Sampling rate OK. You're good to go!</code></pre>
+<pre><code>## Binning information: 
+##  Original rate of 1000 Hz with one sample every 1 ms. 
+##  Downsampled rate of 50 Hz using 20 ms bins. 
+##  New bins contain 20 samples.</code></pre>
 <pre><code>## Binning...</code></pre>
 <pre><code>## Calculating proportions...</code></pre>
 <pre><code>## There are 320 data points with less than 20 samples per bin.</code></pre>
@@ -373,10 +380,10 @@ text-align: center;
 <div id="subsetting-and-ordering" class="section level3">
 <h3>Subsetting and ordering</h3>
 <p>Before embarking on a statistical analysis, it is probably necessary to take a couple steps, such as paring down the data to only include the columns which will be needed later and ensuring the data are ordered appropriately. This is straightforward using <code>dplyr</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FinalDat &lt;-<span class="st"> </span>dat5 <span class="op">%&gt;%</span><span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">FinalDat &lt;-<span class="st"> </span>dat5 %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="co"># Select just the columns you want</span>
 <span class="st">  </span><span class="kw">select</span>(., Subject, Item, Time, <span class="kw">starts_with</span>(<span class="st">&quot;IA&quot;</span>), Event, TRIAL_INDEX, Rating, 
-         InteractChinese, Exp, target, rhymecomp, onsetcomp, distractor) <span class="op">%&gt;%</span>
+         InteractChinese, Exp, target, rhymecomp, onsetcomp, distractor) %&gt;%
 <span class="st">  </span><span class="co"># Order the data by Subject, Trial, and Time</span>
 <span class="st">  </span><span class="kw">arrange</span>(., Subject, TRIAL_INDEX, Time)</code></pre></div>
 </div>

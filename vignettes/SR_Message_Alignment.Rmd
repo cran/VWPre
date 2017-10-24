@@ -43,6 +43,7 @@ aligndat <- relabel_na(data = dat0, NoIA = 4)
 
 Using the function `check_msg_time` you can see that the TIMESTAMP values associated with the message are not the same for each event.
 This indicates that alignment is required.
+Note that a regular expression (regex) can be used here as the message string.
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
 check_msg_time(data = aligndat, Msg = "VowelOnset")
@@ -50,6 +51,7 @@ check_msg_time(data = aligndat, Msg = "VowelOnset")
 
 The function `align_msg` is used to perform the alignment. 
 To do this you must specify the message text as a string to the parameter `Msg`.
+Again, this string can contain a regular expression (regex) on which to locate the message.
 The function finds the instance of the message for each event and sets that sample as the zero point.
 Consequently, this creates a new column called `Align`, which represents the time sequence relative to the message.
 
