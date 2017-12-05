@@ -195,13 +195,29 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
     group_names2 = quos(IA, Time, UQ(sym(Condition1)), UQ(sym(Condition2)))
   }
   
-  # Make labeller for multipanel
-  if (length(IAColumns) > 1 && (!is.na(Cond1Labels) | !is.na(Cond2Labels))) {
-    my_labeller <- labeller(
-      CustCond1 = Cond1Labels,
-      CustCond2 = Cond2Labels
-    )
-  }
+  # # Make labeller for multipanel
+  # if (length(IAColumns) > 1) {
+  #   if (!is.null(Condition1) || !is.null(Condition2)) {
+  #   if(is.na(Cond1Labels) && is.na(Cond2Labels)) {
+  #     my_labeller <- "label_value"
+  #   } else if (is.na(Cond1Labels) && !is.na(Cond2Labels)) {
+  #     my_labeller <- labeller(
+  #       CustCond1 = Cond1Labels
+  #       )
+  #   } else if (!is.na(Cond1Labels) && is.na(Cond2Labels)) {
+  #     my_labeller <- labeller(
+  #       CustCond2 = Cond2Labels
+  #     )
+  #   }
+  #     else {
+  #   my_labeller <- labeller(
+  #     CustCond1 = Cond1Labels,
+  #     CustCond2 = Cond2Labels
+  #   )
+  #   }
+  #   }
+  # }
+  my_labeller <- labeller()
   
   # Prepare for averaging
   Avg <- data %>% select(!!!sel_names) %>% 
@@ -230,10 +246,22 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
   }
   Avg <- ungroup(Avg)
   
-  # Prepare Condition columns and faceting or legend title
+  # Prepare Condition columns and faceting or legend title/labels
   if (!is.null(Condition1) && is.null(Condition2)) {
     Avg <- Avg %>%
-      rename(CustCond1 = UQ(sym(Condition1))) %>% 
+      rename(CustCond1 = UQ(sym(Condition1)))
+    if (any(!is.na(Cond1Labels))) {
+      lev1 <- unique(levels(Avg$CustCond1))
+      for (x in 1:length(names(Cond1Labels))) {
+        for(i in 1:length(lev1)) {
+          if (lev1[i] == names(Cond1Labels)[x]) {
+            lev1[i] <- Cond1Labels[[x]]
+          }
+        }
+      }
+      levels(Avg$CustCond1) <- lev1
+    }
+    Avg <- Avg %>%
       mutate(Cond = CustCond1)
     if (length(IAColumns)>1) {
       my_facet <- function() {
@@ -246,7 +274,19 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
     }
   } else if (is.null(Condition1) && !is.null(Condition2)) {
     Avg <- Avg %>%
-      rename(CustCond2 =  UQ(sym(Condition2))) %>% 
+      rename(CustCond2 =  UQ(sym(Condition2))) 
+    if (any(!is.na(Cond2Labels))) {
+      lev2 <- unique(levels(Avg$CustCond2))
+      for (x in 1:length(names(Cond2Labels))) {
+        for(i in 1:length(lev2)) {
+          if (lev2[i] == names(Cond2Labels)[x]) {
+            lev2[i] <- Cond2Labels[[x]]
+          }
+        }
+      }
+      levels(Avg$CustCond2) <- lev2
+    }
+    Avg <- Avg %>%
       mutate(Cond = CustCond2)
     if (length(IAColumns)>1) {
       my_facet <- function() {
@@ -259,7 +299,30 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
     }
   } else if (!is.null(Condition1) && !is.null(Condition2)) {
     Avg <- Avg %>%
-      rename(CustCond1 =  UQ(sym(Condition1)), CustCond2 =  UQ(sym(Condition2))) %>% 
+      rename(CustCond1 =  UQ(sym(Condition1)), CustCond2 =  UQ(sym(Condition2))) 
+    if (any(!is.na(Cond1Labels))) {
+      lev1 <- unique(levels(Avg$CustCond1))
+      for (x in 1:length(names(Cond1Labels))) {
+        for(i in 1:length(lev1)) {
+          if (lev1[i] == names(Cond1Labels)[x]) {
+            lev1[i] <- Cond1Labels[[x]]
+          }
+        }
+      }
+      levels(Avg$CustCond1) <- lev1
+    }
+    if (any(!is.na(Cond2Labels))) {
+      lev2 <- unique(levels(Avg$CustCond2))
+      for (x in 1:length(names(Cond2Labels))) {
+        for(i in 1:length(lev2)) {
+          if (lev2[i] == names(Cond2Labels)[x]) {
+            lev2[i] <- Cond2Labels[[x]]
+          }
+        }
+      }
+      levels(Avg$CustCond2) <- lev2
+    }
+    Avg <- Avg %>%
       mutate(Cond = paste(CustCond1, CustCond2, sep = "_"))
     if (length(IAColumns)>1) {
       my_facet <- function() {
@@ -430,6 +493,7 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
   plt + geom_point() + geom_line() 
   
   }
+
 
 
 #' Plots average contour surface of looks to a given interest area.
@@ -868,20 +932,64 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
     ylim[2] = max(tmpdata$error_upper)
   }
   
-  
+  # Determine conditioning and legend labelling
   if (!is.null(Condition1) && !is.null(Condition2)) {
     tmpdata <- tmpdata %>% rename(Cond1=UQ(sym(Condition1)), Cond2=UQ(sym(Condition2)))
+    if (any(!is.na(Cond1Labels))) {
+      lev1 <- unique(levels(tmpdata$Cond1))
+      for (x in 1:length(names(Cond1Labels))) {
+        for(i in 1:length(lev1)) {
+          if (lev1[i] == names(Cond1Labels)[x]) {
+            lev1[i] <- Cond1Labels[[x]]
+          }
+        }
+      }
+      levels(tmpdata$Cond1) <- lev1
+    }
+    if (any(!is.na(Cond2Labels))) {
+      lev2 <- unique(levels(tmpdata$Cond2))
+      for (x in 1:length(names(Cond2Labels))) {
+        for(i in 1:length(lev2)) {
+          if (lev2[i] == names(Cond2Labels)[x]) {
+            lev2[i] <- Cond2Labels[[x]]
+          }
+        }
+      }
+      levels(tmpdata$Cond2) <- lev2
+    }
     tmpdata$Condition <- interaction(tmpdata$Cond1, tmpdata$Cond2, drop = T, sep = "_")
     Cond <- TRUE
     CondName <- paste(Condition1, Condition2, sep = "_by_")
   }
   if (is.null(Condition1) && !is.null(Condition2)) {
     tmpdata <- tmpdata %>% rename(Condition=UQ(sym(Condition2)))
+    if (any(!is.na(Cond2Labels))) {
+      lev2 <- unique(levels(tmpdata$Condition))
+      for (x in 1:length(names(Cond2Labels))) {
+        for(i in 1:length(lev2)) {
+          if (lev2[i] == names(Cond2Labels)[x]) {
+            lev2[i] <- Cond2Labels[[x]]
+          }
+        }
+      }
+      levels(tmpdata$Condition) <- lev2
+    }
     Cond <- TRUE
     CondName <- Condition2
   }
   if (!is.null(Condition1) && is.null(Condition2)) {
     tmpdata <- tmpdata %>% rename(Condition=UQ(sym(Condition1)))
+    if (any(!is.na(Cond1Labels))) {
+      lev1 <- unique(levels(tmpdata$Condition))
+      for (x in 1:length(names(Cond1Labels))) {
+        for(i in 1:length(lev1)) {
+          if (lev1[i] == names(Cond1Labels)[x]) {
+            lev1[i] <- Cond1Labels[[x]]
+          }
+        }
+      }
+      levels(tmpdata$Condition) <- lev1
+    }
     Cond <- TRUE
     CondName <- Condition1
   }
@@ -989,6 +1097,7 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
   
   
   }
+
 
 
 #' Create function for backtransforming empirical logits to proportions

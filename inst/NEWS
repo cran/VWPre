@@ -1,6 +1,32 @@
 # -----------------------------------------------
 
-# VWPre 0.9._
+# VWPre 1.0.1
+
+This update is a bug fix.
+
+## Major changes:
+
+### New functions
+
+### Changes to functions
+
+### Vignettes
+
+* Vignettes have been updated to reflect changes made in this update.  
+
+## Minor changes:
+
+### Changes to functions 
+
+## Bug fixes:
+
+* plot_avg: There was a bug associated with the labeling of facets and legend when conditions were specified.  This has been corrected.
+* plot_avg_diff: There was a bug associated with the labeling of the legend when conditions were specified.  This has been corrected.
+
+
+# -----------------------------------------------
+
+# VWPre 1.0.0
 
 This update brings a number of changes to VWPre.  These are meant to bring the package functions in line with the non-standard evaluation (NSE) implemented in dplyr (>=0.7.0), requiring update of the dependency dplyr (as the previous NSE functions will eventually be deprecated).  Additionally, a number of new features have been introduced to existing functions, which should not break existing code.  Lastly, one new function has been added.  All changes are elaborated below.
 

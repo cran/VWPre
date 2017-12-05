@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2017-10-24" />
+<meta name="date" content="2017-12-04" />
 
 <title>Aligning Sample Data to a Specific Sample Message in SR Eyelink Data</title>
 
@@ -20,46 +20,244 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; min-height: 1.25em; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; }
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; color: #aaaaaa;  padding-left: 4px; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; color: initial; }
+}
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.bn { color: #40a070; } /* BaseN */
+code span.fl { color: #40a070; } /* Float */
+code span.ch { color: #4070a0; } /* Char */
+code span.st { color: #4070a0; } /* String */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.ot { color: #007020; } /* Other */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.fu { color: #06287e; } /* Function */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code span.cn { color: #880000; } /* Constant */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.im { } /* Import */
+code span.va { color: #19177c; } /* Variable */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.op { color: #666666; } /* Operator */
+code span.bu { } /* BuiltIn */
+code span.ex { } /* Extension */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.at { color: #7d9029; } /* Attribute */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 </style>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 </head>
 
@@ -70,19 +268,19 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Aligning Sample Data to a Specific Sample Message in SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2017-10-24</em></h4>
+<h4 class="date"><em>2017-12-04</em></h4>
 
 
 
 <p>Sometimes, depending on the design of the experiment, you may decide not to define an interest period in Data Viewer prior to exporting the data. If this is the case, there are some functions in VWPre which can help to align the data to your critical stimulus. Specifically, these functions search for a specific Eyelink message which was read out during the recording sequence. They will align the samples to this message, and, if necessary, also apply a variable adjustment forward or backward in time. This depends on whether the message signals the onset of the stimulus itself, or rather, serves as a reference point for the onset of the stimulus.</p>
-<div id="before-aligning" class="section level2">
+<section id="before-aligning" class="level2">
 <h2>Before aligning</h2>
 <p>In order to perform the alignment, you must first load your sample report and complete the first two preprocessing steps using the functions <code>prep_data</code> and <code>relabel_na</code> provided in this package. These step will ensure that an Event column (unique index of each recording sequence - typically the combination of Subject and Trial) is created. A description of these can be found in the <code>Basic Preprocessing</code> vignette.</p>
-</div>
-<div id="aligning-to-a-specific-message" class="section level2">
+</section>
+<section id="aligning-to-a-specific-message" class="level2">
 <h2>Aligning to a specific message</h2>
 <p>Using the function <code>check_msg_time</code> you can see that the TIMESTAMP values associated with the message are not the same for each event. This indicates that alignment is required. Note that a regular expression (regex) can be used here as the message string.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
+<pre class="sourceCode r" id="cb1"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</a></code></pre>
 <pre><code>## # A tibble: 320 x 3
 ##       Event SAMPLE_MESSAGE TIMESTAMP
 ##      &lt;fctr&gt;         &lt;fctr&gt;     &lt;dbl&gt;
@@ -98,9 +296,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 10 14001.10     VowelOnset   1114682
 ## # ... with 310 more rows</code></pre>
 <p>The function <code>align_msg</code> is used to perform the alignment. To do this you must specify the message text as a string to the parameter <code>Msg</code>. Again, this string can contain a regular expression (regex) on which to locate the message. The function finds the instance of the message for each event and sets that sample as the zero point. Consequently, this creates a new column called <code>Align</code>, which represents the time sequence relative to the message.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aligned1 &lt;-<span class="st"> </span><span class="kw">align_msg</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
+<pre class="sourceCode r" id="cb3"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">aligned1 &lt;-<span class="st"> </span><span class="kw">align_msg</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</a></code></pre>
 <p>If we check the message time again, we now see that the message occurs at time 0 in the <code>Align</code> column.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
+<pre class="sourceCode r" id="cb4"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</a></code></pre>
 <pre><code>## # A tibble: 320 x 3
 ##       Event SAMPLE_MESSAGE Align
 ##      &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
@@ -116,71 +314,71 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 10 14001.10     VowelOnset     0
 ## # ... with 310 more rows</code></pre>
 <p>To fully examine all events, you can include the parameter <code>ReturnData=TRUE</code> and assign the output to an object in your environment.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">MSGTime &lt;-<span class="st"> </span><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>, <span class="dt">ReturnData =</span> <span class="ot">TRUE</span>)</code></pre></div>
-</div>
-<div id="creating-the-time-series-column" class="section level2">
+<pre class="sourceCode r" id="cb6"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">MSGTime &lt;-<span class="st"> </span><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>, <span class="dt">ReturnData =</span> <span class="ot">TRUE</span>)</a></code></pre>
+</section>
+<section id="creating-the-time-series-column" class="level2">
 <h2>Creating the Time series column</h2>
 <p>Once you have aligned the time sequence relative to the message, you need to create the <code>Time</code> column using the function <code>create_time_series</code>. This function returns the time series column called <code>Time</code> which is required for subsequent processing, plotting, and modeling of the data. In the example here, our message relates specifically to the time at which the vowel in the word was played (because we programmed Experiment Builder to output a message for that). So, we do not need to specify an adjustment to the time series. If, however, your critical stimulus did not occur exactly at the message, but rather, before or after, an adjustment (i.e., negative or positive value in milliseconds) can be applied to the time series, to shift the zero point. This is done by specifying the <code>Adjust</code> parameter. If, on the other hand, this adjustment differed trial by trial, you can input a column name (present in your dataset) in <code>Adjust</code>, which will apply the recording event specific adjustment.</p>
 <p>A positive value (3 in the example below) provided to <code>Adjust</code> shifts the zero point to <em>after</em> the reference point (i.e., Message), effectively moving the zero point forward along the number line and causing the reference point to have a negative time value.</p>
 <table>
 <thead>
 <tr class="header">
-<th align="center"></th>
-<th align="center">Smp1</th>
-<th align="center">Smp2</th>
-<th align="center">Smp3</th>
-<th align="center">Smp4</th>
-<th align="center">Smp5</th>
-<th align="center">Smp6</th>
-<th align="center">Smp7</th>
-<th align="center">Smp8</th>
-<th align="center">Smp9</th>
-<th align="center">Smp10</th>
-<th align="center">Smp11</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">Smp1</th>
+<th style="text-align: center;">Smp2</th>
+<th style="text-align: center;">Smp3</th>
+<th style="text-align: center;">Smp4</th>
+<th style="text-align: center;">Smp5</th>
+<th style="text-align: center;">Smp6</th>
+<th style="text-align: center;">Smp7</th>
+<th style="text-align: center;">Smp8</th>
+<th style="text-align: center;">Smp9</th>
+<th style="text-align: center;">Smp10</th>
+<th style="text-align: center;">Smp11</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Before</td>
-<td align="center">-4</td>
-<td align="center">-3</td>
-<td align="center">-2</td>
-<td align="center">-1</td>
-<td align="center">0</td>
-<td align="center">1</td>
-<td align="center">2</td>
-<td align="center">3</td>
-<td align="center">4</td>
-<td align="center">5</td>
-<td align="center">6</td>
+<td style="text-align: center;">Before</td>
+<td style="text-align: center;">-4</td>
+<td style="text-align: center;">-3</td>
+<td style="text-align: center;">-2</td>
+<td style="text-align: center;">-1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">6</td>
 </tr>
 <tr class="even">
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">Old 0</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">New 0</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Old 0</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">New 0</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td align="center">After</td>
-<td align="center">-7</td>
-<td align="center">-6</td>
-<td align="center">-5</td>
-<td align="center">-4</td>
-<td align="center">-3</td>
-<td align="center">-2</td>
-<td align="center">-1</td>
-<td align="center">0</td>
-<td align="center">1</td>
-<td align="center">2</td>
-<td align="center">3</td>
+<td style="text-align: center;">After</td>
+<td style="text-align: center;">-7</td>
+<td style="text-align: center;">-6</td>
+<td style="text-align: center;">-5</td>
+<td style="text-align: center;">-4</td>
+<td style="text-align: center;">-3</td>
+<td style="text-align: center;">-2</td>
+<td style="text-align: center;">-1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
 </tr>
 </tbody>
 </table>
@@ -188,69 +386,69 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <table>
 <thead>
 <tr class="header">
-<th align="center"></th>
-<th align="center">Smp1</th>
-<th align="center">Smp2</th>
-<th align="center">Smp3</th>
-<th align="center">Smp4</th>
-<th align="center">Smp5</th>
-<th align="center">Smp6</th>
-<th align="center">Smp7</th>
-<th align="center">Smp8</th>
-<th align="center">Smp9</th>
-<th align="center">Smp10</th>
-<th align="center">Smp11</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">Smp1</th>
+<th style="text-align: center;">Smp2</th>
+<th style="text-align: center;">Smp3</th>
+<th style="text-align: center;">Smp4</th>
+<th style="text-align: center;">Smp5</th>
+<th style="text-align: center;">Smp6</th>
+<th style="text-align: center;">Smp7</th>
+<th style="text-align: center;">Smp8</th>
+<th style="text-align: center;">Smp9</th>
+<th style="text-align: center;">Smp10</th>
+<th style="text-align: center;">Smp11</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Before</td>
-<td align="center">-4</td>
-<td align="center">-3</td>
-<td align="center">-2</td>
-<td align="center">-1</td>
-<td align="center">0</td>
-<td align="center">1</td>
-<td align="center">2</td>
-<td align="center">3</td>
-<td align="center">4</td>
-<td align="center">5</td>
-<td align="center">6</td>
+<td style="text-align: center;">Before</td>
+<td style="text-align: center;">-4</td>
+<td style="text-align: center;">-3</td>
+<td style="text-align: center;">-2</td>
+<td style="text-align: center;">-1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">6</td>
 </tr>
 <tr class="even">
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">New 0</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">Old 0</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">New 0</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Old 0</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td align="center">After</td>
-<td align="center">-1</td>
-<td align="center">0</td>
-<td align="center">1</td>
-<td align="center">2</td>
-<td align="center">3</td>
-<td align="center">4</td>
-<td align="center">5</td>
-<td align="center">6</td>
-<td align="center">7</td>
-<td align="center">8</td>
-<td align="center">9</td>
+<td style="text-align: center;">After</td>
+<td style="text-align: center;">-1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">9</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aligned2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> aligned1, <span class="dt">Adjust =</span> <span class="dv">0</span>)</code></pre></div>
+<pre class="sourceCode r" id="cb7"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">aligned2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> aligned1, <span class="dt">Adjust =</span> <span class="dv">0</span>)</a></code></pre>
 <pre><code>## No adjustment applied.</code></pre>
 <p>The function <code>check_time_series</code> can be used to verify that the time series was created. The function outputs a list of the unique start values present in the data. In this example, we do not expect all events to start with the same Time value, given that we performed our own alignment without a relative interest period defined in Data Viewer. As with <code>check_msg_time</code>, the list of Events and Start Times can be returned as a data frame using the parameter <code>ReturnData</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_time_series</span>(<span class="dt">data =</span> aligned2)</code></pre></div>
+<pre class="sourceCode r" id="cb9"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">check_time_series</span>(<span class="dt">data =</span> aligned2)</a></code></pre>
 <pre><code>##   [1] -165 -280 -198 -176 -110 -384 -182 -163 -293 -445 -207 -362 -213 -157
 ##  [15] -249 -191 -204 -175 -184 -155 -185 -214 -248 -190 -164 -409 -174 -241
 ##  [29] -215 -361 -177 -242 -367 -197 -179 -178 -258 -289 -202 -257 -244 -111
@@ -262,7 +460,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## [113] -322 -159 -219 -256 -243 -279 -217 -354 -272 -234 -146 -327 -187 -232
 ## [127] -330 -220 -245 -290 -142 -141 -189 -121 -122 -156</code></pre>
 <p>Perhaps more meaningfully, we can check the message time again. We can see that our message is still the zero point in the Time series column.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned2, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</code></pre></div>
+<pre class="sourceCode r" id="cb11"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned2, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</a></code></pre>
 <pre><code>## # A tibble: 320 x 3
 ##      Event SAMPLE_MESSAGE  Time
 ##     &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
@@ -277,11 +475,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##  9 14001.2     VowelOnset     0
 ## 10 14002.2     VowelOnset     0
 ## # ... with 310 more rows</code></pre>
-</div>
-<div id="proceed-with-preprocessing" class="section level2">
+</section>
+<section id="proceed-with-preprocessing" class="level2">
 <h2>Proceed with preprocessing</h2>
 <p>At this point it is possible to proceed with preprocessing as usual. For details, please refer to the <code>Basic Preprocessing</code> vignette and continue by selecting a recording eye before binning the data.</p>
-</div>
+</section>
 
 
 
