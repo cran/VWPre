@@ -198,7 +198,7 @@ plot_avg(data = dat, type = "proportion", xlim = c(0, 1000),
 ### Difference plots
 
 The function `plot_avg_diff` can also be used to plot the average difference between looks to two interest areas.
-As with `plot_avg` upto two conditions can be supplied for conditional plotting.
+As with `plot_avg` up to two conditions can be supplied for conditional plotting.
 
 ```{r, eval= TRUE, fig.show='hold', fig.width=7, fig.height=8, results='asis', message=FALSE}
 gridExtra::grid.arrange(

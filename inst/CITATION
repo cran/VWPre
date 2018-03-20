@@ -9,3 +9,22 @@ bibentry(bibtype = "Misc",
 	     person("Juhani", "Järvikivi")),
 	 year = year,
 	 note = note)
+
+bibentry(bibtype = "InProceedings",
+  	 author = c(person("Vincent","Porretta"),
+	     person("Aki-Juhani", "Kyröläinen"),
+	     person("Jacolien","van Rij"),
+	     person("Juhani", "Järvikivi")),
+	title = "Visual world paradigm data: {F}rom preprocessing to nonlinear time-course analysis",
+  booktitle    = "Intelligent Decision Technologies 2017",
+  year         = 2018,
+  editor       = c(person("Ireneusz", "Czarnowski"), person("Robert J.", "Howlett"), person("Lakhmi C.", "Jain")),
+  booksubtitle = "Proceedings of the 9th KES International Conference on Intelligent Decision Technologies (KES-IDT 2017) -- Part II",
+  series       = "Smart Innovation, Systems and Technologies",
+  number       = "73",
+  publisher    = "Springer International Publishing",
+  location     = "Cham",
+  isbn         = "978-3-319-59424-8",
+  pages        = "268--277",
+  doi          = "10.1007/978-3-319-59424-8_25"
+  )

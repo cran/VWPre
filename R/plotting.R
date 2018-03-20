@@ -76,7 +76,7 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #'    Cond1Labels = NA, 
 #'    Cond2Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
 #'    EN3 = "English 1"), ErrorBar = TRUE, VWPreTheme = TRUE,
-#'    ErrorBands = FALSE, ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
+#'    ErrorBand = FALSE, ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
 #' 
 #' # For plotting conditional averages (two conditions) for one interest area
 #' with the included theme and 95% simultaneous CI bands.
@@ -86,7 +86,7 @@ theme_mybw <- function(base_size = 12, base_family = ""){
 #'    Condition1 = "talker", Condition2 = "Exp",
 #'    Cond1Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
 #'    EN3 = "English 1"), Cond2Labels = c(High = "H Exp", Low = "L Exp"),
-#'    ErrorBar = FALSE, VWPreTheme = TRUE, ErrorBands = TRUE, 
+#'    ErrorBar = FALSE, VWPreTheme = TRUE, ErrorBand = TRUE, 
 #'    ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
 #' 
 #' #' # For a more complete tutorial on VWPre plotting functions:
@@ -496,6 +496,7 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
 
 
 
+
 #' Plots average contour surface of looks to a given interest area.
 #' 
 #' \code{plot_avg_contour} calculates the conditional average of proportions or 
@@ -738,7 +739,7 @@ plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL,
 #' plot_avg_diff(data = dat, xlim = c(0, 1000), type = "proportion",
 #'              DiffCols = c(IA_1_P = "Target", IA_2_P = "Rhyme"),
 #'              Condition1 = NA, Condition2 = NA, Cond1Labels = NA, Cond2Labels = NA,
-#'              ErrorBar = TRUE, VWPreTheme = TRUE, ErrorBands = FALSE, 
+#'              ErrorBar = TRUE, VWPreTheme = TRUE, ErrorBand = FALSE, 
 #'              ErrorType = "SE")
 #'              
 #' # For plotting conditional average differences (one condition) with the 
@@ -748,7 +749,7 @@ plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL,
 #'            Condition1 = "talker", Condition2 = NA, Cond1Labels = c(CH1 = "Chinese 1", 
 #'            CH10 = "Chinese 3", CH9 = "Chinese 2", EN3 = "English 1"),
 #'            Cond2Labels = NA, ErrorBar = TRUE, 
-#'            VWPreTheme = TRUE, ErrorBands = FALSE, 
+#'            VWPreTheme = TRUE, ErrorBand = FALSE, 
 #'              ErrorType = "CI", ConfLev = 95, CItype = "pointwise")
 #'            
 #' # For plotting conditional average differences (two conditions) with the 
@@ -758,7 +759,7 @@ plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL,
 #'            Condition1 = "talker", Condition2 = "Exp", Cond1Labels = c(CH1 = "Chinese 1", 
 #'            CH10 = "Chinese 3", CH9 = "Chinese 2", EN3 = "English 1"),
 #'            Cond2Labels = c(High = "H Exp", Low = "L Exp"), ErrorBar = FALSE, 
-#'            VWPreTheme = TRUE, ErrorBands = TRUE, 
+#'            VWPreTheme = TRUE, ErrorBand = TRUE, 
 #'              ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
 #' 
 #' # For a more complete tutorial on VWPre plotting functions:
@@ -831,7 +832,7 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
   
   
   tmpdata <- data %>% 
-    mutate(., DC1 = !!UQ(sym(DiffCol1)), DC2 = !!UQ(sym(DiffCol2)))
+    mutate(., DC1 = UQ(sym(DiffCol1)), DC2 = UQ(sym(DiffCol2)))
   
   # set column selection
   if(is.null(Condition1) && is.null(Condition2)){

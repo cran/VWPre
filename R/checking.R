@@ -264,8 +264,9 @@ ds_options <- function(SamplingRate, OutputRates = "Suggested") {
 
 #' Check which eyes were recorded during the experiment
 #' 
-#' \code{check_eye_recording} quickly checks if the dataset contains gaze data
-#' in both the Right and Left interest area columns. It prints a summary and 
+#' \code{check_eye_recording} quickly checks which eyes contain gaze data
+#' either using the EYE_TRACKED column (if available) or the Right and 
+#' Left interest area columns. It prints a summary and 
 #' suggests which setting to use for the \code{Recording} parameter in the 
 #' function \code{\link{select_recorded_eye}}.
 #' 
@@ -280,7 +281,47 @@ ds_options <- function(SamplingRate, OutputRates = "Suggested") {
 #' check_eye_recording(dat)
 #' }
 check_eye_recording <- function(data) {
+
+if("EYE_TRACKED" %in% names(data)) {
+
+    message("Checking data using Data Viewer column EYE_TRACKED")
+
+    tmp <- as.data.frame(table(data$EYE_TRACKED))
+    if ("Both" %in% unique(tmp$Var1)) {
+    b <- 1
+    } else {
+    b <- 0
+    }
+    if ("Left" %in% unique(tmp$Var1)) {
+    l <- 1
+    } else {
+    l <- 0
+    }
+    if ("Right" %in% unique(tmp$Var1)) {
+    r <- 1
+    } else {
+    r <- 0
+    }
+ 
+  if (b > 0) {
+    if (l == 0 & r == 0) {
+    message("The dataset contains recordings for both eyes (ALL participants had both eyes tracked). \n Set the Recording parameter in select_recorded_eye() to 'LandR' and the WhenLandR parameter to either 'LEFT' or 'RIGHT'.")
+    } else {
+    message("The dataset contains recordings for both eyes (SOME participants had both eyes tracked). \n Set the Recording parameter in select_recorded_eye() to 'LorR'.")
+    }
+  } 
+  if (l > 0 && r == 0 && b == 0) {
+    message("The dataset contains recordings for ONLY the left eye. \n Set the Recording parameter in select_recorded_eye() to 'L'.")
+  } 
+  if (l == 0 && r > 0 && b == 0) {
+    message("The dataset contains recordings for ONLY the right eye. \n Set the Recording parameter in select_recorded_eye() to 'R'.")
+  }
+} 
   
+else if(!("EYE_TRACKED" %in% names(data))) {	
+
+  message("Checking gaze data using Data Viewer columns LEFT_INTEREST_AREA_ID and RIGHT_INTEREST_AREA_ID")
+ 
   if (sum(data$LEFT_INTEREST_AREA_ID) > 0 & sum(data$RIGHT_INTEREST_AREA_ID) > 0) {
     message("The dataset contains recordings for both eyes. \n If any participants had both eyes tracked, set the Recording parameter in select_recorded_eye() to 'LandR'. \n If participants had either the left OR the right eye tracked, set the Recording parameter in select_recorded_eye() to 'LorR'.")
   } else if (sum(data$LEFT_INTEREST_AREA_ID) > 0 & sum(data$RIGHT_INTEREST_AREA_ID) == 0) {
@@ -288,8 +329,9 @@ check_eye_recording <- function(data) {
   } else if (sum(data$LEFT_INTEREST_AREA_ID) == 0 & sum(data$RIGHT_INTEREST_AREA_ID) > 0) {
     message("The dataset contains recordings for ONLY the right eye. \n Set the Recording parameter in select_recorded_eye() to 'R'.")
   }
-  
 }
+}
+
 
 
 

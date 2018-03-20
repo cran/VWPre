@@ -1,5 +1,36 @@
 # -----------------------------------------------
 
+# VWPre 1.1.0
+
+This is a fairly minor update.
+
+## Major changes:
+
+### New functions
+
+* rm_extra_DVcols: This function determines if the data set contains any of the numerous DataViewer columns that are not needed for processing VWP with this package. It subsequently removes them, unless instructed otherwise (in the event the user would like to keep specific columns for other purposes).
+
+### Changes to functions
+
+* check_eye_recording: This function will now use the recent DataViewer column EYE_TRACKED, if present in the data set, otherwise it will fall back to the original mode of determining which eye(s) contain gaze data.
+* select_recorded_eye: This function will now use the recent DataViewer column EYE_TRACKED, if present in the data set, otherwise it will fall back to the original mode of determining which eye(s) contain gaze data.
+
+### Vignettes
+
+* Vignettes have been updated to reflect changes made in this update.  
+
+## Minor changes:
+
+### Changes to functions 
+
+## Bug fixes:
+
+* plot_avg_diff: There was a bug associated with the usage of the dependency rlang.  This has been fixed.
+* plot_indiv_app: There were bugs associated with the usage of the dependencies rlang and dplyr.  These have been fixed.
+
+
+# -----------------------------------------------
+
 # VWPre 1.0.1
 
 This update is a bug fix.

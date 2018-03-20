@@ -26,6 +26,8 @@ collected with SR Research Eyelink eye trackers.
   with gaze data remapped to new interest areas.
   \item The function \code{\link{align_msg}} returns a data table 
   with newly aligned sample data in a new column (Align).
+  \item The function \code{\link{rm_extra_DVcols}} removed DataViewer coumns
+  that are not necessary for preprocessing with this package.
 }
 }
 
@@ -114,6 +116,8 @@ collected with SR Research Eyelink eye trackers.
 \item The vignettes are available via \code{browseVignettes()}. 
 \item A list of all available functions is provided in 
 \code{help(package="VWPre")}.
+\item This package can be cited using the information obtained from 
+\code{citation("VWPre") or print(citation("Vwpre"), bibtex=TRUE)} 
 }
 }
 

@@ -16,15 +16,7 @@ data(VWdat)
 dat0 <- prep_data(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid")
 
 ## ---- eval= FALSE, echo=TRUE, results='asis'-----------------------------
-#  dat0 <- select(dat0, -starts_with("AVERAGE"), -starts_with("DATA_"),
-#                 -starts_with("HTARGET"), -starts_with("IP"),
-#                 -starts_with("LEFT_ACCELLERATION"), -starts_with("LEFT_IN_"),
-#                 -starts_with("LEFT_PUPIL"), -starts_with("LEFT_VELOCITY"),
-#                 -starts_with("RESOLUTION"), -starts_with("RIGHT_ACCELLERATION"),
-#                 -starts_with("RIGHT_IN_"), -starts_with("RIGHT_PUPIL"),
-#                 -starts_with("RIGHT_VELOCITY"), -starts_with("SAMPLE_INDEX"),
-#                 -starts_with("SAMPLE_BUTTON"), -starts_with("TARGET_"),
-#                 -starts_with("TRIAL_START"), -starts_with("VIDEO"))
+#  dat0 <- rm_extra_DVcols(dat0, Keep = c("RIGHT_PUPIL_SIZE", "LEFT_PUPIL_SIZE"))
 
 ## ---- eval= TRUE, echo=TRUE, results='asis'------------------------------
 dat1 <- relabel_na(data = dat0, NoIA = 4)

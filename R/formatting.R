@@ -284,6 +284,143 @@ align_msg <- function(data, Msg = NULL) {
 }
 
 
+#' Checks for and removes unnecessary DV output columns.
+#' 
+#' \code{rm_extra_DVcols} checks for unnecessary DataViewer output columns and 
+#' removes them, unless specified.
+#' 
+#' @export
+#' @import dplyr
+#' @import rlang
+#' 
+#' @param data A data frame object created from an Eyelink Sample Report.
+#' @param Keep An optional string or character vector containing the column names 
+#' of SR sample report columns the user would like to keep in the data set. 
+#' @return An object of type data table as described in \link[dplyr]{tbl_df}.
+#' @examples
+#' \dontrun{
+#' library(VWPre)
+#' df <- rm_extra_DVcols(data = dat, Keep = NULL)
+#' }
+rm_extra_DVcols <- function(data, Keep=NULL){
+
+  SR_not_needed <- c(
+    "AVERAGE_ACCELERATION_X", 
+    "AVERAGE_ACCELLERATION_X", # THIS IS A DV MISSPELLING
+    "AVERAGE_ACCELERATION_Y", 
+    "AVERAGE_ACCELLERATION_Y", # THIS IS A DV MISSPELLING
+    "AVERAGE_GAZE_X", 
+    "AVERAGE_GAZE_Y", 
+    "AVERAGE_IN_BLINK",
+    "AVERAGE_IN_SACCADE", 
+    "AVERAGE_INTEREST_AREAS",
+    "AVERAGE_INTEREST_AREA_DATA", 
+    "AVERAGE_INTEREST_AREA_DISTANCE", 
+    "AVERAGE_INTEREST_AREA_ID", 
+    "AVERAGE_INTEREST_AREA_LABEL", 
+    "AVERAGE_INTEREST_AREA_PIXEL_AREA", 
+    "AVERAGE_PUPIL_SIZE", 
+    "AVERAGE_VELOCITY_X", 
+    "AVERAGE_VELOCITY_Y", 
+    "HTARGET_DISTANCE", 
+    "HTARGET_FLAGS", 
+    "HTARGET_X", 
+    "HTARGET_Y", 
+    "IP_DURATION", 
+    "IP_END_EVENT_MATCHED", 
+    "IP_END_TIME", 
+    "IP_INDEX", 
+    "IP_LABEL", 
+    "IP_START_EVENT_MATCHED", 
+    "IP_START_TIME", 
+    "LEFT_ACCELERATION_X", 
+    "LEFT_ACCELLERATION_X", # THIS IS A DV MISSPELLING
+    "LEFT_ACCELERATION_Y", 
+    "LEFT_ACCELLERATION_Y", # THIS IS A DV MISSPELLING
+    "LEFT_FIX_INDEX", 
+    "LEFT_INTEREST_AREAS", 
+    "LEFT_INTEREST_AREA_DATA", 
+    "LEFT_INTEREST_AREA_DISTANCE",
+    "LEFT_INTEREST_AREA_PIXEL_AREA", 
+    "LEFT_PUPIL_SIZE", 
+    "LEFT_SACCADE_INDEX", 
+    "LEFT_VELOCITY_X", 
+    "LEFT_VELOCITY_Y", 
+    "RESOLUTION_X", 
+    "RESOLUTION_Y", 
+    "RIGHT_ACCELERATION_X", 
+    "RIGHT_ACCELLERATION_X", # THIS IS A DV MISSPELLING
+    "RIGHT_ACCELERATION_Y", 
+    "RIGHT_ACCELLERATION_Y", # THIS IS A DV MISSPELLING
+    "RIGHT_FIX_INDEX", 
+    "RIGHT_INTEREST_AREAS", 
+    "RIGHT_INTEREST_AREA_DATA", 
+    "RIGHT_INTEREST_AREA_DISTANCE", 
+    "RIGHT_INTEREST_AREA_PIXEL_AREA", 
+    "RIGHT_PUPIL_SIZE", 
+    "RIGHT_SACCADE_INDEX", 
+    "RIGHT_VELOCITY_X", 
+    "RIGHT_VELOCITY_Y", 
+    "SAMPLE_BUTTON", 
+    "SAMPLE_INPUT", 
+    "TARGET_ACCELERATION_X", 
+    "TARGET_ACCELLERATION_X", # THIS IS A DV MISSPELLING
+    "TARGET_ACCELERATION_Y", 
+    "TARGET_ACCELLERATION_Y", # THIS IS A DV MISSPELLING
+    "TARGET_VELOCITY_X", 
+    "TARGET_VELOCITY_Y", 
+    "TARGET_VISIBLE",
+    "TARGET_X", 
+    "TARGET_Y",
+    "TRIAL_LABEL",
+    "TRIAL_START_TIME",
+    "VIDEO_FRAME_INDEX",
+    "VIDEO_NAME"
+  )
+  
+  data <- ungroup(data)
+  
+  delcols <- data.frame(Column=SR_not_needed, Present=NA, Keep=NA)
+
+  message("Checking for extra (deletable) DV columns...")
+  
+  for (x in 1:nrow(delcols)) {
+    if (!(delcols[x,1] %in% names(data))) {
+      delcols[x,2] <- 0
+      delcols[x,3] <- 0
+    }
+    else {
+      delcols[x,2] <- 1
+      if (delcols[x,1] %in% Keep) {
+        delcols[x,3] <- 1
+      } else {
+        delcols[x,3] <- 0
+      }
+    }
+  }
+  
+  deletecols <- filter(delcols, Present==1) %>% droplevels()
+  
+  if (nrow(deletecols) == 0) {
+    stop("No deletable columns present in the data.")
+  } 
+  
+  if (!(is.null(Keep))) {
+  message("Checking for columns to keep...")
+  }
+  message("     Columns kept: ", paste(levels(droplevels(deletecols[deletecols$Keep==1,]$Column)), collapse = ", "))
+  deletecols <- filter(deletecols, Keep==0) %>% droplevels()
+  
+  del <- unique(levels(deletecols$Column))
+
+  message("Removing deletable columns...")
+  message("     Columns removed: ", paste(levels(deletecols$Column), collapse = ", "))
+  data <- select(data, -one_of(del))
+
+  return(ungroup(data))
+}
+
+
 
 
 #' Select the eye used during recording
@@ -291,18 +428,19 @@ align_msg <- function(data, Msg = NULL) {
 #' \code{select_recorded_eye} examines each event and determines which eye contains 
 #' interest area information, based on the \code{Recording} parameter (which 
 #' can be determined using \code{\link{check_eye_recording}}). 
-#' This function then selects the data from the recorded eye and copies it
-#' new columns (IA_ID and IA_LABEL). The function prints a summary of the output.  
+#' This function then selects the data from the recorded eye and copies it to
+#' new columns (IA_ID, IA_LABEL, IA_Data). The function prints a summary of the output.  
 #' 
 #' @export
 #' @import dplyr
+#' @import rlang
 #' 
 #' @param data A data table object output by \code{\link{create_time_series}}.
 #' @param Recording A string indicating which eyes were used for recording gaze data.
 #' @param WhenLandR A string indicating which eye ("Right" or "Left) to use 
 #' if gaze data is available for both eyes (i.e., Recording = "LandR"). 
-#' @return A data table with four additional columns ('EyeRecorded', 'EyeSelected',
-#' 'IA_ID','IA_LABEL') added to \code{data}.
+#' @return A data table with four additional columns ('EyeRecorded', 'EyeSelected', 
+#' 'IA_ID', 'IA_LABEL', 'IA_Data') added to \code{data}.
 #' @examples
 #' \dontrun{
 #' library(VWPre)
@@ -311,121 +449,159 @@ align_msg <- function(data, Msg = NULL) {
 #' }
 select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
   
-  if(is.null(Recording)){
-    stop("Please supply the recording eye(s)!")
+  if("EYE_TRACKED" %in% names(data)) {
+    message("Selecting gaze data using Data Viewer column EYE_TRACKED")
+  } else {
+    if(is.null(Recording)){
+      stop("Please supply the recording eye(s)!")
+    }
+    message(paste("Selecting gaze data using Data Viewer columns LEFT_INTEREST_AREA_ID and RIGHT_INTEREST_AREA_ID and the Recording argument:", Recording))
   }
   
-  if (Recording == "LandR") {
+  if("EYE_TRACKED" %in% names(data)) {	
     
-    if(is.na(WhenLandR)){
+    if(("Both" %in% unique(data$EYE_TRACKED)) & is.na(WhenLandR)){
       stop("Please specify which eye to use when Recording is set to 'LandR'!")
     }
-    
     tmp <- data %>%
       group_by(Event) %>%
-      mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
-                                       sum(RIGHT_INTEREST_AREA_ID) > 0, "Both", 
-                                     ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
-                                              sum(RIGHT_INTEREST_AREA_ID) == 0, "Left", 
-                                            ifelse(sum(LEFT_INTEREST_AREA_ID) == 0 & 
-                                                     sum(RIGHT_INTEREST_AREA_ID) > 0, 
-                                                   "Right", "NoIAData")))) %>%
+      mutate(., EyeRecorded = as.character(EYE_TRACKED)) %>% 
       do(
         mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right", 
                                        ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
                                               ifelse(EyeRecorded == "Right", EyeRecorded, 
-                                                     ifelse(EyeRecorded == "Left", EyeRecorded, 
-                                                            ifelse(EyeRecorded == "NoIAData", "Neither"))))))
-      ) %>%
-      do(
-        mutate(., IA_ID = ifelse(EyeSelected == "Right", RIGHT_INTEREST_AREA_ID, 
-                                 ifelse(EyeSelected == "Left", LEFT_INTEREST_AREA_ID,
-                                        ifelse(EyeSelected == "Neither", 0, NA))),
-               IA_LABEL = ifelse(EyeSelected == "Right", as.character(RIGHT_INTEREST_AREA_LABEL), 
-                                 ifelse(EyeSelected == "Left", as.character(LEFT_INTEREST_AREA_LABEL),
-                                        ifelse(EyeSelected == "Neither", "Outside", NA))))
+                                                     ifelse(EyeRecorded == "Left", EyeRecorded, NA)))))
       )
     
-  } else if (Recording == "LorR") {
+  } else {
     
-    tmp <- data %>%
-      group_by(Event) %>%
-      mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
-                                       sum(RIGHT_INTEREST_AREA_ID) == 0, "Left", 
-                                     ifelse(sum(LEFT_INTEREST_AREA_ID) == 0 & 
-                                              sum(RIGHT_INTEREST_AREA_ID) > 0, 
-                                            "Right", "NoIAData"))) %>%
-      do(
-        mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded, 
-                                       ifelse(EyeRecorded == "Left", EyeRecorded, 
-                                              ifelse(EyeRecorded == "NoIAData", "Neither"))))
-      ) %>%
-      do(
-        mutate(., IA_ID = ifelse(EyeSelected == "Right", RIGHT_INTEREST_AREA_ID, 
-                                 ifelse(EyeSelected == "Left", LEFT_INTEREST_AREA_ID,
-                                        ifelse(EyeSelected == "Neither", 0, NA))),
-               IA_LABEL = ifelse(EyeSelected == "Right", as.character(RIGHT_INTEREST_AREA_LABEL), 
-                                 ifelse(EyeSelected == "Left", as.character(LEFT_INTEREST_AREA_LABEL),
-                                        ifelse(EyeSelected == "Neither", "Outside", NA))))
-      )
+    if (Recording == "LandR") {
+      
+      if(is.na(WhenLandR)){
+        stop("Please specify which eye to use when Recording is set to 'LandR'!")
+      }
+      
+      tmp <- data %>%
+        group_by(Event) %>%
+        mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
+                                         sum(RIGHT_INTEREST_AREA_ID) > 0, "Both", 
+                                       ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
+                                                sum(RIGHT_INTEREST_AREA_ID) == 0, "Left", 
+                                              ifelse(sum(LEFT_INTEREST_AREA_ID) == 0 & 
+                                                       sum(RIGHT_INTEREST_AREA_ID) > 0, 
+                                                     "Right", "NoIAData")))) %>%
+        do(
+          mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right", 
+                                         ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
+                                                ifelse(EyeRecorded == "Right", EyeRecorded, 
+                                                       ifelse(EyeRecorded == "Left", EyeRecorded, 
+                                                              ifelse(EyeRecorded == "NoIAData", "Neither"))))))
+        ) 
+        
+      
+    }
     
-  } else if (Recording == "L") {
+    if (Recording == "LorR") {
+      
+      tmp <- data %>%
+        group_by(Event) %>%
+        mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
+                                         sum(RIGHT_INTEREST_AREA_ID) == 0, "Left", 
+                                       ifelse(sum(LEFT_INTEREST_AREA_ID) == 0 & 
+                                                sum(RIGHT_INTEREST_AREA_ID) > 0, 
+                                              "Right", "NoIAData"))) %>%
+        do(
+          mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded, 
+                                         ifelse(EyeRecorded == "Left", EyeRecorded, 
+                                                ifelse(EyeRecorded == "NoIAData", "Neither"))))
+        ) 
+      
+    }
     
-    tmp <- data %>%
-      group_by(Event) %>%
-      mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0, "Left", "NoIAData")) %>%
-      do(
-        mutate(., EyeSelected = ifelse(EyeRecorded == "Left", EyeRecorded, 
-                                       ifelse(EyeRecorded == "NoIAData", "Neither")))
-      ) %>%
-      do(
-        mutate(., IA_ID = ifelse(EyeSelected == "Left", LEFT_INTEREST_AREA_ID,
-                                 ifelse(EyeSelected == "Neither", 0, NA)),
-               IA_LABEL = ifelse(EyeSelected == "Left", as.character(LEFT_INTEREST_AREA_LABEL),
-                                 ifelse(EyeSelected == "Neither", "Outside", NA)))
-      )
+    if (Recording == "R" | Recording == "L") {
+    if (Recording == "R") {
+        col <- "RIGHT_INTEREST_AREA_ID"
+        col <- enquo(col)
+        val <- "Right"
+        val <- enquo(val)
+        } else {
+        col <- "LEFT_INTEREST_AREA_ID"
+        col <- enquo(col)
+        val <- "Left"
+        val <- enquo(val)
+        }
+
+      tmp <- data %>%
+        group_by(Event) %>%
+        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(col)))) > 0, quo_name(val), "NoIAData")) %>%
+         do(
+          mutate(., EyeSelected = ifelse(EyeRecorded == quo_name(val), EyeRecorded, 
+                                          ifelse(EyeRecorded == "NoIAData", "Neither")))
+         )
+    } 
     
-  } else if (Recording == "R") {
-    
-    tmp <- data %>%
-      group_by(Event) %>%
-      mutate(., EyeRecorded = ifelse(sum(RIGHT_INTEREST_AREA_ID) > 0, "Right", "NoIAData")) %>%
-      do(
-        mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded, 
-                                       ifelse(EyeRecorded == "NoIAData", "Neither")))
-      ) %>%
-      do(
-        mutate(., IA_ID = ifelse(EyeSelected == "Right", RIGHT_INTEREST_AREA_ID,
-                                 ifelse(EyeSelected == "Neither", 0, NA)),
-               IA_LABEL = ifelse(EyeSelected == "Right", as.character(RIGHT_INTEREST_AREA_LABEL),
-                                 ifelse(EyeSelected == "Neither", "Outside", NA)))
-      )
+#        if (Recording == "R") {
+#
+#      tmp <- data %>%
+#        group_by(Event) %>%
+#        mutate(., EyeRecorded = ifelse(sum(RIGHT_INTEREST_AREA_ID) > 0, "Right", "NoIAData")) %>%
+#         do(
+#          mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded, 
+#                                          ifelse(EyeRecorded == "NoIAData", "Neither")))
+#         )
+#    } 
+#   
+#   if (Recording == "L") {
+#
+#      tmp <- data %>%
+#        group_by(Event) %>%
+#        mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0, "Left", "NoIAData")) %>%
+#         do(
+#          mutate(., EyeSelected = ifelse(EyeRecorded == "Left", EyeRecorded, 
+#                                          ifelse(EyeRecorded == "NoIAData", "Neither")))
+#         )
+#    } 
     
   } 
+  
+  tmp <- tmp %>% 
+    do(
+      mutate(., IA_ID = ifelse(EyeSelected == "Right", RIGHT_INTEREST_AREA_ID, 
+                               ifelse(EyeSelected == "Left", LEFT_INTEREST_AREA_ID,
+                                      ifelse(EyeSelected == "Neither", 0, NA))),
+             IA_LABEL = ifelse(EyeSelected == "Right", as.character(RIGHT_INTEREST_AREA_LABEL), 
+                               ifelse(EyeSelected == "Left", as.character(LEFT_INTEREST_AREA_LABEL),
+                                      ifelse(EyeSelected == "Neither", "Outside", NA))))
+    )
   
   tmp$EyeRecorded <- as.factor(as.character(tmp$EyeRecorded))
   tmp$EyeSelected <- as.factor(as.character(tmp$EyeSelected))
   tmp$IA_ID <- as.numeric(as.character(tmp$IA_ID))
   tmp$IA_LABEL <- as.factor(as.character(tmp$IA_LABEL))
   
+  tmp <- tmp %>%
+    mutate(IA_Data = ifelse(sum(IA_ID) > 0, "Contains_IA_Looks", "No_IA_Looks"))
+  tmp$IA_Data <- as.factor(as.character(tmp$IA_Data))
+  
   message(paste("Gaze data summary for", length(unique(levels(tmp$Event))), "events:"))
   
-  if (Recording == "LandR") {
+  if (!(is.na(WhenLandR))) {
     message(paste(nrow(filter(tmp, Time==first(Time) & EyeRecorded=="Both")), "event(s) contained gaze data for both eyes, for which the", WhenLandR, "eye has been selected." ))
   }
   
-  if (Recording == "LandR" | Recording == "LorR" | Recording == "R" ) {
+  if (("EYE_TRACKED" %in% names(tmp)) | Recording == "LandR" | Recording == "LorR" | Recording == "R" ) {
     message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Right")), "event(s) using gaze data from the right eye."))
   }
   
-  if (Recording == "LandR" | Recording == "LorR" | Recording == "L" ) {
+  if (("EYE_TRACKED" %in% names(tmp)) | Recording == "LandR" | Recording == "LorR" | Recording == "L" ) {
     message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Left")), "event(s) using gaze data from the left eye."))
   }
   
-  message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Neither")), "event(s) with no samples falling within any interest area during the given time series."))
+  message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & IA_Data=="No_IA_Looks")), "event(s) with no samples falling within any interest area during the given time series."))
   
   return(ungroup(tmp))
 }
+
 
 
 
@@ -470,29 +646,31 @@ create_time_series <- function (data, Adjust = 0)
   #      stop("'Offset' is deprecated; please use 'Adjust' instead. Please refer to the vignettes for explanation of usage.")
   #    }
   
-  adjust <- Adjust
-  if (is.numeric(adjust)==T && !("Align" %in% colnames(data))) {
-    if (adjust==0) {
+  adjust <- enquo(Adjust)
+  # print(quo_name(adjust)) convert input expression to a string
+  # print(eval_tidy(adjust)) evaluate expression in special environment
+  if (is.numeric(eval_tidy(adjust))==T && !("Align" %in% colnames(data))) {
+    if (eval_tidy(adjust)==0) {
       message("No adjustment applied.")
     } else {
-      message(paste(adjust, "ms adjustment applied."))
+      message(paste(quo_name(adjust), "ms adjustment applied."))
     }
     data %>% arrange(., Event, TIMESTAMP) %>% group_by(Event) %>% 
-      mutate(Time = TIMESTAMP - first(TIMESTAMP) - adjust) %>% ungroup()
+      mutate(Time = TIMESTAMP - first(TIMESTAMP) - !! adjust) %>% ungroup()
   } 
-  else if (is.numeric(adjust)==T && "Align" %in% colnames(data)) {
-    if (adjust==0) {
+  else if (is.numeric(eval_tidy(adjust))==T && "Align" %in% colnames(data)) {
+    if (eval_tidy(adjust)==0) {
       message("No adjustment applied.")
     } else {
-      message(paste(adjust, "ms adjustment applied."))
+      message(paste(quo_name(adjust), "ms adjustment applied."))
     }
     data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
-      mutate(Time = Align - adjust) %>% ungroup()
+      mutate(Time = Align - !! adjust) %>% ungroup()
   } 
-  else if (is.character(adjust)==T) {
-    message(paste("Adjustment applied using values contained in", adjust))
+  else if (is.character(eval_tidy(adjust))==T) {
+    message(paste("Adjustment applied using values contained in", quo_name(adjust)))
     data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
-      mutate(Time = Align - !! sym(adjust)) %>% ungroup()
+      mutate(Time = Align - UQ(sym(eval_tidy(adjust)))) %>% ungroup()
   }
 }
 

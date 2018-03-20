@@ -17,7 +17,7 @@ if(getRversion() >= "2.15.1")
   "Custom", "DC1", "DC1m", "DC1sd", "DC2", "DC2m", "DC2sd", "IA_0_P", "IA_1_P", 
   "IA_2_P", "IA_3_P", "IA_4_P", "IA_5_P", "IA_6_P", "IA_7_P", "IA_8_P", 
   "IAmean", "Obs", "degfree", "error_lower", "error_upper", "group", "meanDiff", 
-  "n1", "n2", "Avg2", "StDev2"), add = FALSE)
+  "n1", "n2", "Avg2", "StDev2", "EYE_TRACKED", "IA_Data"), add = FALSE)
 }
 
 .onAttach <- function(...) { 

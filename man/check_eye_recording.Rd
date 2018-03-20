@@ -13,8 +13,9 @@ check_eye_recording(data)
 Text feedback and instruction.
 }
 \description{
-\code{check_eye_recording} quickly checks if the dataset contains gaze data
-in both the Right and Left interest area columns. It prints a summary and 
+\code{check_eye_recording} quickly checks which eyes contain gaze data
+either using the EYE_TRACKED column (if available) or the Right and 
+Left interest area columns. It prints a summary and 
 suggests which setting to use for the \code{Recording} parameter in the 
 function \code{\link{select_recorded_eye}}.
 }

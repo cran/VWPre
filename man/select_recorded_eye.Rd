@@ -15,15 +15,15 @@ select_recorded_eye(data, Recording = NULL, WhenLandR = NA)
 if gaze data is available for both eyes (i.e., Recording = "LandR").}
 }
 \value{
-A data table with four additional columns ('EyeRecorded', 'EyeSelected',
-'IA_ID','IA_LABEL') added to \code{data}.
+A data table with four additional columns ('EyeRecorded', 'EyeSelected', 
+'IA_ID', 'IA_LABEL', 'IA_Data') added to \code{data}.
 }
 \description{
 \code{select_recorded_eye} examines each event and determines which eye contains 
 interest area information, based on the \code{Recording} parameter (which 
 can be determined using \code{\link{check_eye_recording}}). 
-This function then selects the data from the recorded eye and copies it
-new columns (IA_ID and IA_LABEL). The function prints a summary of the output.
+This function then selects the data from the recorded eye and copies it to
+new columns (IA_ID, IA_LABEL, IA_Data). The function prints a summary of the output.
 }
 \examples{
 \dontrun{

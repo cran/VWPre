@@ -86,7 +86,7 @@ plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
    Cond1Labels = NA, 
    Cond2Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
    EN3 = "English 1"), ErrorBar = TRUE, VWPreTheme = TRUE,
-   ErrorBands = FALSE, ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
+   ErrorBand = FALSE, ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
 
 # For plotting conditional averages (two conditions) for one interest area
 with the included theme and 95\% simultaneous CI bands.
@@ -96,7 +96,7 @@ plot_avg(data = dat, type = "elogit", xlim = c(0, 1000),
    Condition1 = "talker", Condition2 = "Exp",
    Cond1Labels = c(CH1 = "Chinese 1", CH10 = "Chinese 3", CH9 = "Chinese 2", 
    EN3 = "English 1"), Cond2Labels = c(High = "H Exp", Low = "L Exp"),
-   ErrorBar = FALSE, VWPreTheme = TRUE, ErrorBands = TRUE, 
+   ErrorBar = FALSE, VWPreTheme = TRUE, ErrorBand = TRUE, 
    ErrorType = "CI", ConfLev = 95, CItype = "simultaneous")
 
 #' # For a more complete tutorial on VWPre plotting functions:

@@ -83,19 +83,13 @@ dat0 <- prep_data(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "ite
 
 At this point, it is safe to remove the columns which were output by Data Viewer, but that are not needed for preprocessing in using this package. 
 Removing these will reduce the amount of system memory consumed and result in a final dataset that consume less disk space.
-This is done straightforwardly using `dplyr::select`, which can also accommodate both column names and regular expressions for matching.
+This is done straightforwardly using the function `rm_extra_DVcols`.
+By default it will remove all the Data Viewer columns that are not needed for preprocessing (if they are present in the data).
+However, if desired, it is possible to keep specific columns from this set using the `Keep` parameter, which accommodates a string or character vector. 
 If using the sample data set included in this package, it is not necessary to do this step, as these columns have already been removed.
 
 ```{r, eval= FALSE, echo=TRUE, results='asis'}
-dat0 <- select(dat0, -starts_with("AVERAGE"), -starts_with("DATA_"), 
-               -starts_with("HTARGET"), -starts_with("IP"), 
-               -starts_with("LEFT_ACCELLERATION"), -starts_with("LEFT_IN_"), 
-               -starts_with("LEFT_PUPIL"), -starts_with("LEFT_VELOCITY"), 
-               -starts_with("RESOLUTION"), -starts_with("RIGHT_ACCELLERATION"), 
-               -starts_with("RIGHT_IN_"), -starts_with("RIGHT_PUPIL"), 
-               -starts_with("RIGHT_VELOCITY"), -starts_with("SAMPLE_INDEX"),
-               -starts_with("SAMPLE_BUTTON"), -starts_with("TARGET_"), 
-               -starts_with("TRIAL_START"), -starts_with("VIDEO"))
+dat0 <- rm_extra_DVcols(dat0, Keep = c("RIGHT_PUPIL_SIZE", "LEFT_PUPIL_SIZE"))
 ```
 
 ### Relabel NA samples as outside any interest area
@@ -166,7 +160,7 @@ check_msg_time(data = dat2, Msg = "TargetOnset")
 Depending on the design of the study, right, left, or both eyes may have been recorded during the experiment. 
 Data Viewer outputs gaze data by placing it in separate columns for each eye (`LEFT_INTEREST_AREA_ID`, `LEFT_INTEREST_AREA_LABEL`, `RIGHT_INTEREST_AREA_ID`, `RIGHT_INTEREST_AREA_LABEL`).
 However, it is preferable to have gaze data in a single set of columns, regardless of which eye was recorded during the experiment.
-The function `select_recorded_eye` provides the functionality for this purpose, returning two new columns (`IA_ID` and `IA_LABEL`).
+The function `select_recorded_eye` provides the functionality for this purpose, returning three new columns (`IA_ID`, `IA_LABEL`, `IA_Data`).
 
 The function `select_recorded_eye` requires that the parameter `Recording` be specified.
 This parameter instructs the function about which eye(s) was used to record the gaze data.

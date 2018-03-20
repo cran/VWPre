@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2017-12-04" />
+<meta name="date" content="2018-03-19" />
 
 <title>Basic VWP Preprocessing for SR Eyelink Data</title>
 
@@ -20,16 +20,24 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-a.sourceLine { display: inline-block; min-height: 1.25em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
 @media print {
 code.sourceCode { white-space: pre-wrap; }
 a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
 pre.numberSource a.sourceLine
   { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
 pre.numberSource a.sourceLine::before
   { content: attr(data-line-number);
     position: absolute; left: -5em; text-align: right; vertical-align: baseline;
@@ -37,40 +45,44 @@ pre.numberSource a.sourceLine::before
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em; }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; color: #aaaaaa;  padding-left: 4px; }
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
 @media screen {
-a.sourceLine::before { text-decoration: underline; color: initial; }
+a.sourceLine::before { text-decoration: underline; }
 }
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
 code span.dt { color: #902000; } /* DataType */
 code span.dv { color: #40a070; } /* DecVal */
-code span.bn { color: #40a070; } /* BaseN */
-code span.fl { color: #40a070; } /* Float */
-code span.ch { color: #4070a0; } /* Char */
-code span.st { color: #4070a0; } /* String */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.ot { color: #007020; } /* Other */
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.fu { color: #06287e; } /* Function */
 code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code span.cn { color: #880000; } /* Constant */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.im { } /* Import */
-code span.va { color: #19177c; } /* Variable */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.op { color: #666666; } /* Operator */
-code span.bu { } /* BuiltIn */
 code span.ex { } /* Extension */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.at { color: #7d9029; } /* Attribute */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
 code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -268,7 +280,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Basic VWP Preprocessing for SR Eyelink Data</h1>
 <h4 class="author"><em>Vincent Porretta</em></h4>
-<h4 class="date"><em>2017-12-04</em></h4>
+<h4 class="date"><em>2018-03-19</em></h4>
 
 
 
@@ -282,10 +294,10 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <section id="loading-the-package-and-the-data" class="level2">
 <h2>Loading the package and the data</h2>
 <p>First, load the sample report. By default, Data Viewer will assign “.” to missing values; therefore it is important to include this in the na.strings parameter, so R will know how to handle any missing data.</p>
-<pre class="sourceCode r" id="cb1"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(VWPre)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;1000HzData.txt&quot;</span>, <span class="dt">header =</span> T, <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>, <span class="dt">na.strings =</span> <span class="kw">c</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;NA&quot;</span>))</a></code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(VWPre)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">VWdat &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;1000HzData.txt&quot;</span>, <span class="dt">header =</span> T, <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>, <span class="dt">na.strings =</span> <span class="kw">c</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;NA&quot;</span>))</a></code></pre></div>
 <p>However, for the purposes of this vignette we will use the sample dataset included in the package.</p>
-<pre class="sourceCode r" id="cb2"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">data</span>(VWdat)</a></code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">data</span>(VWdat)</a></code></pre></div>
 </section>
 <section id="preparing-the-data" class="level2">
 <h2>Preparing the data</h2>
@@ -295,7 +307,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>Additionally, the <code>Subject</code> parameter is used to specify the column corresponding to the subject identifier. Typical Data Viewer output contains a column called <code>RECORDING_SESSION_LABEL</code> which is the name of the column containing the subject identifier. The function will rename it <code>Subject</code> and will ensure it is encoded as a factor.</p>
 <p>If your data contain a column corresponding to an item identifier please specify it in the <code>Item</code> parameter. In doing so, the function will standardize the name of the column to <code>Item</code> and will ensure it is encoded as a factor. If you don’t have an item identifier column, by default the value of this parameter is NA.</p>
 <p>Lastly, a new column called <code>Event</code> will be created which indexes each unique recording sequence and corresponds to the combination of <code>Subject</code> and <code>TRIAL_INDEX</code>. This Event variable is required internally for subsequent operations. Should you choose to define the Event variable differently, you can override the default; however, do so cautiously as this may impact the performance of subsequent operations because it must index each time sequence in the data uniquely. Upon completion, the function prints a summary indicating the results.</p>
-<pre class="sourceCode r" id="cb3"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">dat0 &lt;-<span class="st"> </span><span class="kw">prep_data</span>(<span class="dt">data =</span> VWdat, <span class="dt">Subject =</span> <span class="st">&quot;RECORDING_SESSION_LABEL&quot;</span>, <span class="dt">Item =</span> <span class="st">&quot;itemid&quot;</span>)</a></code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">dat0 &lt;-<span class="st"> </span><span class="kw">prep_data</span>(<span class="dt">data =</span> VWdat, <span class="dt">Subject =</span> <span class="st">&quot;RECORDING_SESSION_LABEL&quot;</span>, <span class="dt">Item =</span> <span class="st">&quot;itemid&quot;</span>)</a></code></pre></div>
 <pre><code>## Checking required columns...</code></pre>
 <pre><code>##     All required columns are present in the data.</code></pre>
 <pre><code>## Checking optional columns...</code></pre>
@@ -321,21 +333,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </section>
 <section id="remove-unnecessary-columns" class="level3">
 <h3>Remove unnecessary columns</h3>
-<p>At this point, it is safe to remove the columns which were output by Data Viewer, but that are not needed for preprocessing in using this package. Removing these will reduce the amount of system memory consumed and result in a final dataset that consume less disk space. This is done straightforwardly using <code>dplyr::select</code>, which can also accommodate both column names and regular expressions for matching. If using the sample data set included in this package, it is not necessary to do this step, as these columns have already been removed.</p>
-<pre class="sourceCode r" id="cb26"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">dat0 &lt;-<span class="st"> </span><span class="kw">select</span>(dat0, <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;AVERAGE&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;DATA_&quot;</span>), </a>
-<a class="sourceLine" id="cb26-2" data-line-number="2">               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;HTARGET&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;IP&quot;</span>), </a>
-<a class="sourceLine" id="cb26-3" data-line-number="3">               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_ACCELLERATION&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_IN_&quot;</span>), </a>
-<a class="sourceLine" id="cb26-4" data-line-number="4">               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_PUPIL&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;LEFT_VELOCITY&quot;</span>), </a>
-<a class="sourceLine" id="cb26-5" data-line-number="5">               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RESOLUTION&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_ACCELLERATION&quot;</span>), </a>
-<a class="sourceLine" id="cb26-6" data-line-number="6">               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_IN_&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_PUPIL&quot;</span>), </a>
-<a class="sourceLine" id="cb26-7" data-line-number="7">               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;RIGHT_VELOCITY&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_INDEX&quot;</span>),</a>
-<a class="sourceLine" id="cb26-8" data-line-number="8">               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;SAMPLE_BUTTON&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;TARGET_&quot;</span>), </a>
-<a class="sourceLine" id="cb26-9" data-line-number="9">               <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;TRIAL_START&quot;</span>), <span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&quot;VIDEO&quot;</span>))</a></code></pre>
+<p>At this point, it is safe to remove the columns which were output by Data Viewer, but that are not needed for preprocessing in using this package. Removing these will reduce the amount of system memory consumed and result in a final dataset that consume less disk space. This is done straightforwardly using the function <code>rm_extra_DVcols</code>. By default it will remove all the Data Viewer columns that are not needed for preprocessing (if they are present in the data). However, if desired, it is possible to keep specific columns from this set using the <code>Keep</code> parameter, which accommodates a string or character vector. If using the sample data set included in this package, it is not necessary to do this step, as these columns have already been removed.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">dat0 &lt;-<span class="st"> </span><span class="kw">rm_extra_DVcols</span>(dat0, <span class="dt">Keep =</span> <span class="kw">c</span>(<span class="st">&quot;RIGHT_PUPIL_SIZE&quot;</span>, <span class="st">&quot;LEFT_PUPIL_SIZE&quot;</span>))</a></code></pre></div>
 </section>
 <section id="relabel-na-samples-as-outside-any-interest-area" class="level3">
 <h3>Relabel NA samples as outside any interest area</h3>
 <p>When the data were loaded, samples that were outside of any interest area were labeled as NA. The <code>relabel_na</code> function examines the interest area columns (<code>LEFT_INTEREST_AREA_ID</code>, <code>RIGHT_INTEREST_AREA_ID</code>, <code>LEFT_INTEREST_AREA_LABEL</code>, and <code>RIGHT_INTEREST_AREA_LABEL</code>) for cells containing NAs. It then assigns 0 to the ID columns and “Outside” to the LABEL columns) to indicate those eye gaze samples which fell outside of the interest areas defined in the study. The number of interest areas you defined in your experiment should be supplied to the parameter <code>NoIA</code>.</p>
-<pre class="sourceCode r" id="cb27"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">dat1 &lt;-<span class="st"> </span><span class="kw">relabel_na</span>(<span class="dt">data =</span> dat0, <span class="dt">NoIA =</span> <span class="dv">4</span>)</a></code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">dat1 &lt;-<span class="st"> </span><span class="kw">relabel_na</span>(<span class="dt">data =</span> dat0, <span class="dt">NoIA =</span> <span class="dv">4</span>)</a></code></pre></div>
 <pre><code>## LEFT_INTEREST_AREA_LABEL: Number of levels DO NOT match NoIA.</code></pre>
 <pre><code>## RIGHT_INTEREST_AREA_LABEL: Number of levels match NoIA.</code></pre>
 <p>Notice that the output informs us that the number of levels <code>LEFT_INTEREST_AREA_LABEL</code> does not match the number of interest areas listed in <code>NoIA</code>. This is because we only have data from the right eye (hence, all samples in <code>LEFT_INTEREST_AREA_LABEL</code> are listed as “Outside”).</p>
@@ -343,7 +347,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <section id="check-encoding-of-interest-areas" class="level3">
 <h3>Check encoding of interest areas</h3>
 <p>The subsequent preprocessing requires that the interest area IDs are numerically coded, with values ranging from 0 (i.e., outside all interest areas) up to a maximum of 8. So, it’s important to check that the IDs present in the data set, conform to this. The <code>check_ia</code> functions does just this and indicates how those IDs are mapped to the interest area labels.</p>
-<pre class="sourceCode r" id="cb30"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">check_ia</span>(<span class="dt">data =</span> dat1)</a></code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">check_ia</span>(<span class="dt">data =</span> dat1)</a></code></pre></div>
 <pre><code>## Interest Area IDs for the right eye are coded appropriately.</code></pre>
 <pre><code>##  ID      Label
 ##   0    Outside
@@ -360,52 +364,55 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <section id="creating-the-time-series-column" class="level2">
 <h2>Creating the Time series column</h2>
 <p>The function <code>create_time_series</code> creates a time series (a new column called <code>Time</code>) which is required for subsequent processing, plotting, and modeling of the data. It is common to export a period of time prior to the onset of the stimulus as a baseline. In this case, an adjustment (equal to the duration of the baseline period) must be applied to the time series, specified in the <code>Adjust</code> parameter. In effect, the adjustment simply subtracts the given value to each time point. So, a positive value will shift the zero point forward (making the initial zero a negative time value), while a negative value will shift the zero point backward (making the initial zero a positive time value). An example illustrating this can be found in the vignette <code>SR_Message_Alignment</code>. In the example below, the data were exported with a 100ms pre-stimulus interval.</p>
-<pre class="sourceCode r" id="cb35"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">dat2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> dat1, <span class="dt">Adjust =</span> <span class="dv">100</span>)</a></code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">dat2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> dat1, <span class="dt">Adjust =</span> <span class="dv">100</span>)</a></code></pre></div>
 <pre><code>## 100 ms adjustment applied.</code></pre>
 <p>Note that if you have used the <code>align_msg</code> function (illustrated in the <code>SR_Align_Message</code> vignette), you may need to specify a column name in <code>Adjust</code>. That column can be used to apply the recording event specific adjustment to each . Consult that vignette for further details.</p>
 <p>The function <code>check_time_series</code> can be used to verify the time series. It outputs the unique start times present in the data. These will be the same standardized time point relative to the stimulus if you have exported your data from Data Viewer with pre-defined interest period relative to a message. By specifying the parameter <code>ReturnData = T</code>, the function can return a summary data frame that can be used to inspect the start time of each event. As you can see below, by providing <code>Adjust</code> with a postive value, we have effectively shifted the zero point forward along the number line, causing the first sample to have a negative time value.</p>
-<pre class="sourceCode r" id="cb37"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw">check_time_series</span>(<span class="dt">data =</span> dat2)</a></code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw">check_time_series</span>(<span class="dt">data =</span> dat2)</a></code></pre></div>
 <pre><code>## [1] -100</code></pre>
 <p>Another way to check that your time series has been created correctly is to use the <code>check_msg_time</code> function. By providing the appropriate message text, we can see that the onset of our target now occurs at Time = 0. Note that the <code>Msg</code> parameter can handle exact matches or matches based on regular expressions. As with <code>check_time_series</code>, the parameter <code>ReturnData = T</code> will return a summary data frame that can be used to inspect the message time of each event.</p>
-<pre class="sourceCode r" id="cb39"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> dat2, <span class="dt">Msg =</span> <span class="st">&quot;TargetOnset&quot;</span>)</a></code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> dat2, <span class="dt">Msg =</span> <span class="st">&quot;TargetOnset&quot;</span>)</a></code></pre></div>
 <pre><code>## # A tibble: 320 x 3
-##      Event SAMPLE_MESSAGE  Time
-##     &lt;fctr&gt;         &lt;fctr&gt; &lt;dbl&gt;
-##  1 14001.1    TargetOnset     0
-##  2 14002.1    TargetOnset     0
-##  3 14003.1    TargetOnset     0
-##  4 14004.1    TargetOnset     0
-##  5 14005.1    TargetOnset     0
-##  6 14006.1    TargetOnset     0
-##  7 14008.1    TargetOnset     0
-##  8 14010.1    TargetOnset     0
-##  9 14001.2    TargetOnset     0
-## 10 14002.2    TargetOnset     0
+##    Event   SAMPLE_MESSAGE  Time
+##    &lt;fctr&gt;  &lt;fctr&gt;         &lt;dbl&gt;
+##  1 14001.1 TargetOnset        0
+##  2 14002.1 TargetOnset        0
+##  3 14003.1 TargetOnset        0
+##  4 14004.1 TargetOnset        0
+##  5 14005.1 TargetOnset        0
+##  6 14006.1 TargetOnset        0
+##  7 14008.1 TargetOnset        0
+##  8 14010.1 TargetOnset        0
+##  9 14001.2 TargetOnset        0
+## 10 14002.2 TargetOnset        0
 ## # ... with 310 more rows</code></pre>
 </section>
 <section id="selecting-which-eye-to-use" class="level2">
 <h2>Selecting which eye to use</h2>
-<p>Depending on the design of the study, right, left, or both eyes may have been recorded during the experiment. Data Viewer outputs gaze data by placing it in separate columns for each eye (<code>LEFT_INTEREST_AREA_ID</code>, <code>LEFT_INTEREST_AREA_LABEL</code>, <code>RIGHT_INTEREST_AREA_ID</code>, <code>RIGHT_INTEREST_AREA_LABEL</code>). However, it is preferable to have gaze data in a single set of columns, regardless of which eye was recorded during the experiment. The function <code>select_recorded_eye</code> provides the functionality for this purpose, returning two new columns (<code>IA_ID</code> and <code>IA_LABEL</code>).</p>
+<p>Depending on the design of the study, right, left, or both eyes may have been recorded during the experiment. Data Viewer outputs gaze data by placing it in separate columns for each eye (<code>LEFT_INTEREST_AREA_ID</code>, <code>LEFT_INTEREST_AREA_LABEL</code>, <code>RIGHT_INTEREST_AREA_ID</code>, <code>RIGHT_INTEREST_AREA_LABEL</code>). However, it is preferable to have gaze data in a single set of columns, regardless of which eye was recorded during the experiment. The function <code>select_recorded_eye</code> provides the functionality for this purpose, returning three new columns (<code>IA_ID</code>, <code>IA_LABEL</code>, <code>IA_Data</code>).</p>
 <p>The function <code>select_recorded_eye</code> requires that the parameter <code>Recording</code> be specified. This parameter instructs the function about which eye(s) was used to record the gaze data. It takes one of four possible strings: “LandR”, “LorR”, “L”, or “R”. “LandR” should be used when any participant had both eyes recorded. “LorR” should be used when some participants had their left eye recorded and others had their right eye recorded “L” should be used when all participant had their left eye recorded. “R” should be used when all participant had their right eye recorded.</p>
 <p>If in doubt, use the function <code>check_eye_recording</code> which will do a quick check to see if <code>LEFT_INTEREST_AREA_ID</code> and <code>RIGHT_INTEREST_AREA_ID</code> contain data. It will then suggest the appropriate Recording parameter setting. When in complete doubt, use “LandR”. The “LandR” setting requires an additional parameter (<code>WhenLandR</code>) to be specified. This instructs the function to select either the right eye or the left eye when data exist for both.</p>
-<pre class="sourceCode r" id="cb41"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw">check_eye_recording</span>(<span class="dt">data =</span> dat2)</a></code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw">check_eye_recording</span>(<span class="dt">data =</span> dat2)</a></code></pre></div>
+<pre><code>## Checking gaze data using Data Viewer columns LEFT_INTEREST_AREA_ID and RIGHT_INTEREST_AREA_ID</code></pre>
 <pre><code>## The dataset contains recordings for ONLY the right eye. 
 ##  Set the Recording parameter in select_recorded_eye() to 'R'.</code></pre>
 <p>After executing, the function prints a summary of the output. While the function <code>check_eye_recording</code> indicated that the parameter <code>Recording</code> should be set to “R”, the example below sets the parameter to “LandR”, which can act as a “catch-all”. Consequently, in the summary, it can be seen that there were only recordings in the right eye.</p>
-<pre class="sourceCode r" id="cb43"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">dat3 &lt;-<span class="st"> </span><span class="kw">select_recorded_eye</span>(<span class="dt">data =</span> dat2, <span class="dt">Recording =</span> <span class="st">&quot;R&quot;</span>, <span class="dt">WhenLandR =</span> <span class="st">&quot;Right&quot;</span>)</a></code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1">dat3 &lt;-<span class="st"> </span><span class="kw">select_recorded_eye</span>(<span class="dt">data =</span> dat2, <span class="dt">Recording =</span> <span class="st">&quot;R&quot;</span>, <span class="dt">WhenLandR =</span> <span class="st">&quot;Right&quot;</span>)</a></code></pre></div>
+<pre><code>## Selecting gaze data using Data Viewer columns LEFT_INTEREST_AREA_ID and RIGHT_INTEREST_AREA_ID and the Recording argument: R</code></pre>
 <pre><code>## Gaze data summary for 320 events:</code></pre>
+<pre><code>## 0 event(s) contained gaze data for both eyes, for which the Right eye has been selected.</code></pre>
 <pre><code>## The final data frame contains 319 event(s) using gaze data from the right eye.</code></pre>
 <pre><code>## The final data frame contains 1 event(s) with no samples falling within any interest area during the given time series.</code></pre>
 </section>
 <section id="binning-the-data" class="level2">
 <h2>Binning the data</h2>
 <p>In order to obtain proportion looks, it is necessary to bin the data. That is, group samples in chunks of time, count the number of samples in each of the interest areas, and calculate the proportions based on the counts. The sampling rate at which the eye gaze data were recorded must be provided. For Eyelink trackers, this is typically 250Hz, 500Hz, or 1000Hz. If in doubt, use the function <code>check_samplingrate</code> to determine it. The sampling rate can then be supplied to the function <code>bin_prop</code>.</p>
-<pre class="sourceCode r" id="cb47"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="kw">check_samplingrate</span>(dat3)</a></code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="kw">check_samplingrate</span>(dat3)</a></code></pre></div>
 <pre><code>## Sampling rate(s) present in the data are: 1000 Hz.</code></pre>
 <p>Note that the <code>check_samplingrate</code> function returns a printed message indicating the sampling rate(s) present in the data. Optionally, it can return a new column called <code>SamplingRate</code> by specifying the parameter <code>ReturnData</code> as TRUE. In the event that data were collected at different sampling rates, this column can be used to subset the dataset by the sampling rate before proceeding to the next processing step.</p>
 <p>The function <code>bin_prop</code> calculates the proportion of looks (samples) to each interest area in a particular span of time (bin size). In order to do this, it is necessary to supply the parameters <code>BinSize</code> and <code>SamplingRate</code>. <code>BinSize</code> should be specified in milliseconds, representing the chunk of time within which to calculate the proportions.</p>
 <p>Not all bin sizes work for all sampling rates, due to downsampling constraints. If unsure which are appropriate for your current sampling rate, use the <code>ds_options</code> function. When provided with the current sampling rate in <code>SamplingRate</code> (see above), the function will return a printed summary of the bin size options and their corresponding downsampled rate. By default, this returns the whole number downsampling rates users are likely to want; however, it can also return all possible (valid) downsampling rates, even if they are not round numbers.</p>
-<pre class="sourceCode r" id="cb49"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw">ds_options</span>(<span class="dt">SamplingRate =</span> <span class="dv">1000</span>)</a></code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="kw">ds_options</span>(<span class="dt">SamplingRate =</span> <span class="dv">1000</span>)</a></code></pre></div>
 <pre><code>## Suggested binning/downsampling options:</code></pre>
 <pre><code>## Bin size: 1 ms; Samples per bin: 1 samples; Downsampled rate: 1000 Hz</code></pre>
 <pre><code>## Bin size: 2 ms; Samples per bin: 2 samples; Downsampled rate: 500 Hz</code></pre>
@@ -419,7 +426,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <pre><code>## Bin size: 50 ms; Samples per bin: 50 samples; Downsampled rate: 20 Hz</code></pre>
 <pre><code>## Bin size: 100 ms; Samples per bin: 100 samples; Downsampled rate: 10 Hz</code></pre>
 <p>The <code>SamplingRate</code> parameter in <code>bin_prop</code> should be specified in Hertz (see <code>check_samplingrate</code>), representing the original sampling rate of the data and the <code>BinSize</code> should be specified in milliseconds (see <code>ds_options</code>), representing the span of time over which to calculate the proportion. The <code>bin_prop</code> function returns new columns corresponding to each interest area ID (e.g., <code>IA_1_C</code>, <code>IA_1_P</code>). The extension ‘_C’ indicates the count of samples in the bin and the extension ‘_P’ indicates the proportion.</p>
-<pre class="sourceCode r" id="cb62"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1">dat4 &lt;-<span class="st"> </span><span class="kw">bin_prop</span>(dat3, <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">BinSize =</span> <span class="dv">20</span>, <span class="dt">SamplingRate =</span> <span class="dv">1000</span>)</a></code></pre>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" data-line-number="1">dat4 &lt;-<span class="st"> </span><span class="kw">bin_prop</span>(dat3, <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">BinSize =</span> <span class="dv">20</span>, <span class="dt">SamplingRate =</span> <span class="dv">1000</span>)</a></code></pre></div>
 <pre><code>## Binning information: 
 ##  Original rate of 1000 Hz with one sample every 1 ms. 
 ##  Downsampled rate of 50 Hz using 20 ms bins. 
@@ -431,7 +438,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <pre><code>## These occur at time bin(s): 1180</code></pre>
 <pre><code>## Subsequent Empirical Logit calculations may be influenced by the number of samples (depending on the number of observations requested).</code></pre>
 <p>In performing the calculation, the function effectively downsamples the data. To check this and to know the new sampling rate, simply call the function <code>check_samplingrate</code> again.</p>
-<pre class="sourceCode r" id="cb70"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" data-line-number="1"><span class="kw">check_samplingrate</span>(dat4)</a></code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1"><span class="kw">check_samplingrate</span>(dat4)</a></code></pre></div>
 <pre><code>## Sampling rate(s) present in the data are: 50 Hz.</code></pre>
 </section>
 <section id="empirical-logits" class="level2">
@@ -439,7 +446,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>Proportions are inherently bound between 0 and 1 and are therefore not suitable for many types of analysis. Logits provide a transformation resulting in an unbounded measure (as well as weights which estimate the variance). The calculations contained in this package are based on: Barr, D. J., (2008) Analyzing ‘visual world’ eyetracking data using multilevel logistic regression, <em>Journal of Memory and Language</em>, <em>59</em>(4), 457–474. However, they have been modified to allow greater flexibility.</p>
 <p>When using an empirical logit transformation it is important to keep two things in mind. The first is the number of observations (or samples) on which to base the calculation. Typically, this is the number of samples per bin, which varies depending on your original sampling rate and bin size.</p>
 <p>To determine the number of samples per bin present in the data, use the function <code>check_samples_per_bin</code>.</p>
-<pre class="sourceCode r" id="cb72"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1"><span class="kw">check_samples_per_bin</span>(dat4)</a></code></pre>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1"><span class="kw">check_samples_per_bin</span>(dat4)</a></code></pre></div>
 <pre><code>## There are 20 samples per bin.</code></pre>
 <pre><code>## One data point every 20 millisecond(s)</code></pre>
 <p>However, a user may choose to define a different number of observations (because the number of samples is inherently linked to the sampling rate). Though, it is important to note that changing this value can drastically impact the results of the transformation and weight calculations. There are some safeguards within the transformation function to prevent users from choosing inadvisable values (though these safeguards can be overridden with the parameter <code>ObsOverride</code>). So, if in doubt, it is safest to use the number of samples present in your data (as indicated by <code>check_samples_per_bin</code>). The second things to keep in mind is the constant to be added in the transformation. Note that by default the calculation uses a constant of 0.5; however, the user can specify a different value to be used.</p>
@@ -451,14 +458,14 @@ text-align: center;
 </style>
 <p>If you are interested in visualizing the effect of both number of observations and constant on the result of the empirical logit transformation and weight calculations, please refer to the vignette <code>SR_Plotting</code>, which illustrates and discusses the function <code>plot_transformation_app</code>.</p>
 <p>The function <code>transform_to_elogit</code> transforms the proportions to empirical logits and also calculates a weight for each value. The weight estimates the variance in each bin (because the variance of the logit depends on the mean). This is particularly important for regression analyses and should be specified in the model call (e.g., weight = 1 / <code>IA_1_wts</code>). As mentioned above, the function takes the number of observations in the parameter <code>ObsPerBin</code>. Here we use the number of samples per bin present in the data.</p>
-<pre class="sourceCode r" id="cb75"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1">dat5 &lt;-<span class="st"> </span><span class="kw">transform_to_elogit</span>(dat4, <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">ObsPerBin =</span> <span class="dv">20</span>)</a></code></pre>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1">dat5 &lt;-<span class="st"> </span><span class="kw">transform_to_elogit</span>(dat4, <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">ObsPerBin =</span> <span class="dv">20</span>)</a></code></pre></div>
 <pre><code>## Number of Observations equal to Number of Samples. 
 ##  Calculation will be based on Number of Samples.</code></pre>
 </section>
 <section id="binomial-data" class="level2">
 <h2>Binomial data</h2>
 <p>Some researchers may prefer to perform a binomial analysis. Therefore the function <code>create_binomial</code> uses (previously calculated) proportions and number of observations to create a success/failure column for each IA. This column is then a suitable response variable for logistic regression of the time series. As with the empirical logit transformation, a user may choose to define a number of observations that is different from the number of samples per bin. Because this can create artifacts in the scaling or more samples than are present in the data, safeguards are in place to prevent users from choosing inadvisable values (though these safeguards can be overridden with the parameter <code>ObsOverride</code>).</p>
-<pre class="sourceCode r" id="cb77"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1">dat5a &lt;-<span class="st"> </span><span class="kw">create_binomial</span>(<span class="dt">data =</span> dat4, <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">ObsPerBin =</span> <span class="dv">20</span>)</a></code></pre>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1">dat5a &lt;-<span class="st"> </span><span class="kw">create_binomial</span>(<span class="dt">data =</span> dat4, <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">ObsPerBin =</span> <span class="dv">20</span>)</a></code></pre></div>
 <pre><code>## Number of Observations equal to Number of Samples. 
 ##  Counts will remain as present in the data.</code></pre>
 <p>By default the function will create a success/failure column for each IA in the data; however, it is also possible to create a custom column comparing looks between two specific interest areas. This is done by specifying the parameter <code>CustomBinom</code> with a vector of two integers (e.g., CustomBinom = c(1,2)) in which the two integers correspond to the IDs of the desired interest areas.</p>
@@ -466,10 +473,10 @@ text-align: center;
 <section id="fastrack-function" class="level2">
 <h2>Fastrack function</h2>
 <p>For advanced users who have worked with the package functions before and who are familiar with the required steps and output, there is a meta-function, called <code>fasttrack</code>, which runs through the previous functions and outputs a dataframe with either empirical logits or binomial data. Note that using this function will still require the user to manually remove unneeded columns (see above). This meta-function takes as parameters all the required arguments to the component functions. Also, this function assumes that dynamic interest areas were used and do not need to be relabelled/reassigned. It also assumes an interest period was defined in Data Viewer relative to the critical stimulus, thus not requiring separate message alignment. Again, this is only recommended for users who have previously worked with visual world data, the functions contained in this package, and are confident that their data meet the requirements/assumptions of the <code>fasttrack</code> function.</p>
-<pre class="sourceCode r" id="cb79"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1">dat5b &lt;-<span class="st"> </span><span class="kw">fasttrack</span>(<span class="dt">data =</span> VWdat, <span class="dt">Subject =</span> <span class="st">&quot;RECORDING_SESSION_LABEL&quot;</span>, <span class="dt">Item =</span> <span class="st">&quot;itemid&quot;</span>, </a>
-<a class="sourceLine" id="cb79-2" data-line-number="2">    <span class="dt">EventColumns =</span> <span class="kw">c</span>(<span class="st">&quot;Subject&quot;</span>, <span class="st">&quot;TRIAL_INDEX&quot;</span>), <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">Adjust =</span> <span class="dv">100</span>, <span class="dt">Recording =</span> <span class="st">&quot;LandR&quot;</span>, </a>
-<a class="sourceLine" id="cb79-3" data-line-number="3">  <span class="dt">WhenLandR =</span> <span class="st">&quot;Right&quot;</span>, <span class="dt">BinSize =</span> <span class="dv">20</span>, <span class="dt">SamplingRate =</span> <span class="dv">1000</span>,</a>
-<a class="sourceLine" id="cb79-4" data-line-number="4">  <span class="dt">ObsPerBin =</span> <span class="dv">20</span>, <span class="dt">Constant =</span> <span class="fl">0.5</span>, <span class="dt">Output =</span> <span class="st">&quot;ELogit&quot;</span>)</a></code></pre>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1">dat5b &lt;-<span class="st"> </span><span class="kw">fasttrack</span>(<span class="dt">data =</span> VWdat, <span class="dt">Subject =</span> <span class="st">&quot;RECORDING_SESSION_LABEL&quot;</span>, <span class="dt">Item =</span> <span class="st">&quot;itemid&quot;</span>, </a>
+<a class="sourceLine" id="cb82-2" data-line-number="2">    <span class="dt">EventColumns =</span> <span class="kw">c</span>(<span class="st">&quot;Subject&quot;</span>, <span class="st">&quot;TRIAL_INDEX&quot;</span>), <span class="dt">NoIA =</span> <span class="dv">4</span>, <span class="dt">Adjust =</span> <span class="dv">100</span>, <span class="dt">Recording =</span> <span class="st">&quot;LandR&quot;</span>, </a>
+<a class="sourceLine" id="cb82-3" data-line-number="3">  <span class="dt">WhenLandR =</span> <span class="st">&quot;Right&quot;</span>, <span class="dt">BinSize =</span> <span class="dv">20</span>, <span class="dt">SamplingRate =</span> <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb82-4" data-line-number="4">  <span class="dt">ObsPerBin =</span> <span class="dv">20</span>, <span class="dt">Constant =</span> <span class="fl">0.5</span>, <span class="dt">Output =</span> <span class="st">&quot;ELogit&quot;</span>)</a></code></pre></div>
 <pre><code>## Preparing data...</code></pre>
 <pre><code>## Checking required columns...</code></pre>
 <pre><code>##     All required columns are present in the data.</code></pre>
@@ -507,11 +514,13 @@ text-align: center;
 <pre><code>##  ID   Label
 ##   0 Outside</code></pre>
 <pre><code>## Creating time series with 100 ms adjustment...</code></pre>
-<pre><code>## 100 ms adjustment applied.</code></pre>
+<pre><code>## Adjust ms adjustment applied.</code></pre>
 <pre><code>## [1] -100</code></pre>
+<pre><code>## Checking gaze data using Data Viewer columns LEFT_INTEREST_AREA_ID and RIGHT_INTEREST_AREA_ID</code></pre>
 <pre><code>## The dataset contains recordings for ONLY the right eye. 
 ##  Set the Recording parameter in select_recorded_eye() to 'R'.</code></pre>
 <pre><code>## Selecting recorded eye...</code></pre>
+<pre><code>## Selecting gaze data using Data Viewer columns LEFT_INTEREST_AREA_ID and RIGHT_INTEREST_AREA_ID and the Recording argument: LandR</code></pre>
 <pre><code>## Gaze data summary for 320 events:</code></pre>
 <pre><code>## 0 event(s) contained gaze data for both eyes, for which the Right eye has been selected.</code></pre>
 <pre><code>## The final data frame contains 319 event(s) using gaze data from the right eye.</code></pre>
@@ -540,11 +549,11 @@ text-align: center;
 <section id="renaming-interest-area-columns" class="level2">
 <h2>Renaming interest area columns</h2>
 <p>Some may wish to rename the interest area columns created by the functions to something more meaningful than the numeric coding scheme. To do so, use the function <code>rename_columns</code>. This will convert column names like <code>IA_1_C</code> and <code>IA_2_P</code> to <code>IA_Target_C</code> and <code>IA_Rhyme_P</code>, respectively. This will perform the operation on all the <code>IA_</code> columns for upto 8 interest areas.</p>
-<pre class="sourceCode r" id="cb135"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" data-line-number="1">dat6 &lt;-<span class="st"> </span><span class="kw">rename_columns</span>(dat5, <span class="dt">Labels =</span> <span class="kw">c</span>(<span class="dt">IA1=</span><span class="st">&quot;Target&quot;</span>, <span class="dt">IA2=</span><span class="st">&quot;Rhyme&quot;</span>, </a>
-<a class="sourceLine" id="cb135-2" data-line-number="2">                                       <span class="dt">IA3=</span><span class="st">&quot;OnsetComp&quot;</span>, <span class="dt">IA4=</span><span class="st">&quot;Distractor&quot;</span>)) </a></code></pre>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1">dat6 &lt;-<span class="st"> </span><span class="kw">rename_columns</span>(dat5, <span class="dt">Labels =</span> <span class="kw">c</span>(<span class="dt">IA1=</span><span class="st">&quot;Target&quot;</span>, <span class="dt">IA2=</span><span class="st">&quot;Rhyme&quot;</span>, </a>
+<a class="sourceLine" id="cb140-2" data-line-number="2">                                       <span class="dt">IA3=</span><span class="st">&quot;OnsetComp&quot;</span>, <span class="dt">IA4=</span><span class="st">&quot;Distractor&quot;</span>)) </a></code></pre></div>
 <pre><code>## Renaming 4 interest areas.</code></pre>
 <p>You can now check the column names in the data.</p>
-<pre class="sourceCode r" id="cb137"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" data-line-number="1"><span class="kw">colnames</span>(dat6) </a></code></pre>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1"><span class="kw">colnames</span>(dat6) </a></code></pre></div>
 <p>[1] “Subject” “LEFT_GAZE_X”<br />
 [3] “LEFT_GAZE_Y” “LEFT_INTEREST_AREA_ID”<br />
 [5] “LEFT_INTEREST_AREA_LABEL” “RIGHT_GAZE_X”<br />
@@ -560,35 +569,35 @@ text-align: center;
 [25] “Event” “Time”<br />
 [27] “EyeRecorded” “EyeSelected”<br />
 [29] “IA_ID” “IA_LABEL”<br />
-[31] “DS” “NSamples”<br />
-[33] “IA_outside_C” “IA_Target_C”<br />
-[35] “IA_Rhyme_C” “IA_OnsetComp_C”<br />
-[37] “IA_Distractor_C” “IA_outside_P”<br />
-[39] “IA_Target_P” “IA_Rhyme_P”<br />
-[41] “IA_OnsetComp_P” “IA_Distractor_P”<br />
-[43] “Obs” “IA_outside_ELogit”<br />
-[45] “IA_outside_wts” “IA_Target_ELogit”<br />
-[47] “IA_Target_wts” “IA_Rhyme_ELogit”<br />
-[49] “IA_Rhyme_wts” “IA_OnsetComp_ELogit”<br />
-[51] “IA_OnsetComp_wts” “IA_Distractor_ELogit”<br />
-[53] “IA_Distractor_wts”</p>
+[31] “IA_Data” “DS”<br />
+[33] “NSamples” “IA_outside_C”<br />
+[35] “IA_Target_C” “IA_Rhyme_C”<br />
+[37] “IA_OnsetComp_C” “IA_Distractor_C”<br />
+[39] “IA_outside_P” “IA_Target_P”<br />
+[41] “IA_Rhyme_P” “IA_OnsetComp_P”<br />
+[43] “IA_Distractor_P” “Obs”<br />
+[45] “IA_outside_ELogit” “IA_outside_wts”<br />
+[47] “IA_Target_ELogit” “IA_Target_wts”<br />
+[49] “IA_Rhyme_ELogit” “IA_Rhyme_wts”<br />
+[51] “IA_OnsetComp_ELogit” “IA_OnsetComp_wts”<br />
+[53] “IA_Distractor_ELogit” “IA_Distractor_wts”</p>
 </section>
 <section id="saving-the-data" class="level2">
 <h2>Saving the data</h2>
 <section id="subsetting-and-ordering" class="level3">
 <h3>Subsetting and ordering</h3>
 <p>Before embarking on a statistical analysis, it is probably necessary to take a couple steps, such as paring down the data to only include the columns which will be needed later and ensuring the data are ordered appropriately. This is straightforward using <code>dplyr</code>.</p>
-<pre class="sourceCode r" id="cb138"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" data-line-number="1">FinalDat &lt;-<span class="st"> </span>dat5 <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb138-2" data-line-number="2"><span class="st">  </span><span class="co"># Select just the columns you want</span></a>
-<a class="sourceLine" id="cb138-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(., Subject, Item, Time, <span class="kw">starts_with</span>(<span class="st">&quot;IA&quot;</span>), Event, TRIAL_INDEX, Rating, </a>
-<a class="sourceLine" id="cb138-4" data-line-number="4">         InteractChinese, Exp, target, rhymecomp, onsetcomp, distractor) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb138-5" data-line-number="5"><span class="st">  </span><span class="co"># Order the data by Subject, Trial, and Time</span></a>
-<a class="sourceLine" id="cb138-6" data-line-number="6"><span class="st">  </span><span class="kw">arrange</span>(., Subject, TRIAL_INDEX, Time)</a></code></pre>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb143-1" data-line-number="1">FinalDat &lt;-<span class="st"> </span>dat5 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb143-2" data-line-number="2"><span class="st">  </span><span class="co"># Select just the columns you want</span></a>
+<a class="sourceLine" id="cb143-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(., Subject, Item, Time, <span class="kw">starts_with</span>(<span class="st">&quot;IA&quot;</span>), Event, TRIAL_INDEX, Rating, </a>
+<a class="sourceLine" id="cb143-4" data-line-number="4">         InteractChinese, Exp, target, rhymecomp, onsetcomp, distractor) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb143-5" data-line-number="5"><span class="st">  </span><span class="co"># Order the data by Subject, Trial, and Time</span></a>
+<a class="sourceLine" id="cb143-6" data-line-number="6"><span class="st">  </span><span class="kw">arrange</span>(., Subject, TRIAL_INDEX, Time)</a></code></pre></div>
 </section>
 <section id="saving-to-a-file" class="level3">
 <h3>Saving to a file</h3>
 <p>Save the resulting dataset to a .rda file and use compression to make it more compact (though this will add to the amount of time it takes to save).</p>
-<pre class="sourceCode r" id="cb139"><code class="sourceCode r"><a class="sourceLine" id="cb139-1" data-line-number="1"><span class="kw">save</span>(FinalDat, <span class="dt">file =</span> <span class="st">&quot;FinalDat.rda&quot;</span>, <span class="dt">compress =</span> <span class="st">&quot;xz&quot;</span>)</a></code></pre>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1"><span class="kw">save</span>(FinalDat, <span class="dt">file =</span> <span class="st">&quot;FinalDat.rda&quot;</span>, <span class="dt">compress =</span> <span class="st">&quot;xz&quot;</span>)</a></code></pre></div>
 </section>
 </section>
 <section id="plotting" class="level2">

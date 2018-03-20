@@ -461,7 +461,7 @@ plot_indiv_app <- function (data)
           Cols <- cols()
           Cols <- enquo(Cols)
           Ind <- INDIV()
-          #Ind <- enquo(Ind)
+          Ind <- enquo(Ind)
           scale <- SCALE()
           error <- ERROR()
           conflev <- CONFLEV()
@@ -470,13 +470,13 @@ plot_indiv_app <- function (data)
             message("Please select interest areas.")
           }
           else {
-            avgdat <- bind_rows(granddata(), indivdata())
+            avgdat <- rbind(granddata(), indivdata())
             xaxis <- unique(avgdat$Time)
             avgdat$group <- as.factor(avgdat$group)
             
-            Avg <- avgdat %>% select(UQ(sym(Ind)), !!!sel_names) %>%
+            Avg <- avgdat %>% select(!!Ind, !!!sel_names) %>%
               tidyr::gather(key=IA, value = VALUE, !!!Cols, na.rm = FALSE, convert = FALSE) %>%
-              group_by(UQ(sym(Ind)), IA, Time, group) %>% 
+              group_by(!!Ind, IA, Time, group) %>% 
               summarise(VALUE = mean(VALUE, na.rm = T)) %>% 
               group_by(IA, Time, group)
             
@@ -514,7 +514,7 @@ plot_indiv_app <- function (data)
                 AvgI <- AvgI %>% mutate(ci = 0)
               }
             }
-            Avg <- bind_rows(AvgG, AvgI) %>% ungroup()
+            Avg <- rbind(AvgG, AvgI) %>% ungroup()
             
             # Setting Error
             if(error!="None") {
