@@ -20,6 +20,9 @@
 #' }
 relabel_na <- function(data, NoIA = NULL){
   
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
+  
   if(is.null(NoIA)){
     stop("Please supply the number of interest areas!")
   }
@@ -44,7 +47,7 @@ relabel_na <- function(data, NoIA = NULL){
   levels(data$LEFT_INTEREST_AREA_LABEL)[NoIA+1] <- "Outside"
   data$LEFT_INTEREST_AREA_LABEL[is.na(data$LEFT_INTEREST_AREA_LABEL)] = "Outside"
   
-  return(ungroup(data))
+  return(droplevels(ungroup(data)))
   
 }
 
@@ -80,12 +83,15 @@ relabel_na <- function(data, NoIA = NULL){
 #' 
 recode_ia <- function(data, IDs = NULL, Labels = NULL) {
   
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
+  
   data <- data
   IDs <- IDs
-  x <- setNames(names(IDs), IDs)
+  x <- stats::setNames(names(IDs), IDs)
   IDs <- as.list(x)
   Labels <- Labels
-  y <- setNames(names(Labels), Labels)
+  y <- stats::setNames(names(Labels), Labels)
   Labels <- as.list(y)
   
   if(!(is.null(IDs))) {
@@ -114,8 +120,7 @@ recode_ia <- function(data, IDs = NULL, Labels = NULL) {
     
   }
   
-  data <- droplevels(data)
-  return(ungroup(data))
+  return(droplevels(ungroup(data)))
   
 }
 
@@ -146,6 +151,9 @@ recode_ia <- function(data, IDs = NULL, Labels = NULL) {
 #' }
 #' 
 custom_ia <- function(data, iaLookup=NULL) {
+  
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
   
   boxhit <- function(Xpos = Xpos, Ypos = Ypos, lookup = lookup, event = event) {
     lookuptmp <- filter(lookup, Event==event)
@@ -218,6 +226,6 @@ custom_ia <- function(data, iaLookup=NULL) {
            LEFT_INTEREST_AREA_LABEL = HitLabelL, 
            LEFT_INTEREST_AREA_ID = HitIDL)
   
-  return(ungroup(hitdat))
+  return(droplevels(ungroup(hitdat)))
 }
 

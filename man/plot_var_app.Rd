@@ -18,7 +18,7 @@ a given time window.
 \examples{
 \dontrun{
 library(VWPre)
-# For plotting the grand average with the included theme
+# For plotting variability in the data
 plot_var_app(data = dat) 
 }
 }

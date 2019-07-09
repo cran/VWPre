@@ -1,5 +1,6 @@
-year <- sub("-.*", "", meta$Date)
-note <- sprintf("R package version %s", meta$Version)
+#year <- sub("-.*", "", meta$Date)
+#note <- sprintf("Version %s", meta$Version, )
+note <- paste0(sprintf("Version %s", meta$Version), sprintf(", updated %s", meta$Date))
 
 bibentry(bibtype = "Misc",
 	 title = "{VWPre}: Tools for Preprocessing Visual World Data",
@@ -7,7 +8,8 @@ bibentry(bibtype = "Misc",
 	     person("Aki-Juhani", "Kyröläinen"),
 	     person("Jacolien","van Rij"),
 	     person("Juhani", "Järvikivi")),
-	 year = year,
+	 url = "https://CRAN.R-project.org/package=VWPre",
+	 year = 2016,
 	 note = note)
 
 bibentry(bibtype = "InProceedings",

@@ -15,7 +15,9 @@ each eye.
 }
 \description{
 \code{check_ia} examines both the interest area IDs and interest area labels
-(and their mapping) for both eyes. It returns a summary of the information.
+(and their mapping) for both eyes. It returns a summary of the information
+and will stop if the data are not consistent with the requirements for
+further processing.
 }
 \examples{
 \dontrun{

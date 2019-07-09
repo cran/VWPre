@@ -4,8 +4,8 @@
 \alias{prep_data}
 \title{Check the classes of specific columns and re-assigns as necessary.}
 \usage{
-prep_data(data, Subject = NULL, Item = NA, EventColumns = c("Subject",
-  "TRIAL_INDEX"))
+prep_data(data, Subject = NULL, Item = NA,
+  EventColumns = c("Subject", "TRIAL_INDEX"))
 }
 \arguments{
 \item{data}{A data frame object created from an Eyelink Sample Report.}
@@ -18,7 +18,7 @@ prep_data(data, Subject = NULL, Item = NA, EventColumns = c("Subject",
 the Event variable; by default, Subject and TRIAL_INDEX.}
 }
 \value{
-An object of type data table as described in \link[dplyr]{tbl_df}.
+An object of type data table as described in \link[tibble]{tibble}.
 }
 \description{
 \code{prep_data} converts the data frame to a data table and examines the 

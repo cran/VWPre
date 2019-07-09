@@ -13,7 +13,7 @@ rm_extra_DVcols(data, Keep = NULL)
 of SR sample report columns the user would like to keep in the data set.}
 }
 \value{
-An object of type data table as described in \link[dplyr]{tbl_df}.
+An object of type data table as described in \link[tibble]{tibble}.
 }
 \description{
 \code{rm_extra_DVcols} checks for unnecessary DataViewer output columns and 

@@ -31,6 +31,9 @@
 #' }
 bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
   
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
+  
   if(is.null(NoIA)){
     stop("Please supply the number of interest areas!")
   } else if (NoIA == 0) {
@@ -146,13 +149,34 @@ bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
       mutate(., IA_8_P = IA_8_C / NSamples)
   }
   
-  tmp <- data %>% filter(NSamples != SamplesPerBin) %>% group_by(Event) 
-  message(paste("There are", nrow(tmp), "data points with less than", SamplesPerBin, "samples per bin."))
-  message("These can be examined and/or removed using the column 'NSamples'.")
-  message(paste("These occur at time bin(s):", capture.output(cat(unique(tmp$Time))), collapse = "\n"))
-  message("Subsequent Empirical Logit calculations may be influenced by the number of samples (depending on the number of observations requested).")
+  # tmp <- data %>% filter(NSamples != SamplesPerBin) %>% group_by(Event) 
+  # message(paste("There are", nrow(tmp), "data points with less than", SamplesPerBin, "samples per bin."))
+  # message("These can be examined and/or removed using the column 'NSamples'.")
+  # message(paste("These occur at time bin(s):", utils::capture.output(cat(unique(tmp$Time))), collapse = "\n"))
+  # message("Subsequent Empirical Logit calculations may be influenced by the number of samples (depending on the number of observations requested).")
   
-  return(ungroup(data))
+  if(length(unique(data$NSamples)) > 1){
+
+    tmp <- data %>%  group_by(Event) %>% 
+        mutate(IsMaxTime = ifelse(Time == max(Time), T, F)) %>%
+        filter(NSamples != SamplesPerBin) 
+ 
+    message(paste("There are", nrow(tmp), "data points with less than", SamplesPerBin, "samples per bin."))
+    message("These can be examined and/or removed using the column 'NSamples'.")
+    message("Subsequent Empirical Logit calculations may be influenced by the number of samples (depending on the number of observations requested).")
+
+  if(all(tmp$IsMaxTime==T)) {
+    message(paste("These all occur in the last bin of the time series (typical of Data Viewer output)."))
+      
+    } else {
+      message("")
+      warning(paste("Differing number of samples occur throughout the time series, at time bin(s):", utils::capture.output(cat(unique(tmp$Time))),
+                    "\n  This may indicate sampling issues, perhaps due to the removal of data prior to binning.\n  Because of this, tranformation to Empirical Logits should be done with caution.", collapse = "\n"))
+    }
+  
+  }
+  
+  return(droplevels(ungroup(data)))
 }
 
 
@@ -200,6 +224,9 @@ bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
 #' }
 transform_to_elogit <- function(data, NoIA = NULL, ObsPerBin = NULL,
                                 Constant = 0.5, ObsOverride = FALSE) {
+  
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
   
   if(is.null(NoIA)){
     stop("Please supply the number of interest areas!")
@@ -292,7 +319,7 @@ transform_to_elogit <- function(data, NoIA = NULL, ObsPerBin = NULL,
              IA_8_wts = weight(proportion=IA_8_P, observations=Obs, constant=Constant)
       )
   }
-  return(ungroup(data))
+  return(droplevels(ungroup(data)))
 }
 
 
@@ -330,6 +357,9 @@ transform_to_elogit <- function(data, NoIA = NULL, ObsPerBin = NULL,
 #' }
 create_binomial <- function(data, NoIA = NULL, ObsPerBin = NULL,
                             ObsOverride = FALSE, CustomBinom = NULL) {
+  
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
   
   data <- data %>% ungroup()
   
@@ -430,5 +460,5 @@ create_binomial <- function(data, NoIA = NULL, ObsPerBin = NULL,
   }
   
   
-  return(tmp)
+  return(droplevels(tmp))
 }

@@ -24,7 +24,9 @@ is found.
 \description{
 \code{check_msg_time} examines the time point of a specific Sample Message
 for each event. Depending on the format of the data, it will use one of three
-columns: TIMESTAMP, Align, or Time.
+columns: TIMESTAMP, Align, or Time.  If times at which the message occurs 
+are equal, it will return a single value.  Optionally, the result can be 
+output to a dataframe containing all event-level information.
 }
 \examples{
 \dontrun{

@@ -19,7 +19,7 @@
 #' @param Item An optional string containing the column name corresponding to the item identifier; by default, NA.
 #' @param EventColumns A vector specifying the columns which will be used for creating 
 #' the Event variable; by default, Subject and TRIAL_INDEX. 
-#' @return An object of type data table as described in \link[dplyr]{tbl_df}.
+#' @return An object of type data table as described in \link[tibble]{tibble}.
 #' @examples
 #' \dontrun{
 #' # Typical DataViewer output contains a column called "RECORDING_SESSION_LABEL"
@@ -31,212 +31,175 @@
 prep_data <- function(data, Subject = NULL, Item = NA,
                       EventColumns=c("Subject","TRIAL_INDEX")){
   
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type = "UseOther", suggest = "ppl_prep_data()")
+  
   reqcols <- data.frame(Column=c("RECORDING_SESSION_LABEL", 
-                                 "LEFT_INTEREST_AREA_ID","LEFT_INTEREST_AREA_LABEL", 
-                                 "RIGHT_INTEREST_AREA_ID","RIGHT_INTEREST_AREA_LABEL", 
-                                 "TIMESTAMP","TRIAL_INDEX"), Present=NA)
+                                 "LEFT_INTEREST_AREA_ID",
+								 "LEFT_INTEREST_AREA_LABEL", 
+                                 "RIGHT_INTEREST_AREA_ID",
+								 "RIGHT_INTEREST_AREA_LABEL", 
+                                 "TIMESTAMP",
+								 "TRIAL_INDEX"),
+						Present=NA, 
+						Mode=c("factor", 
+								"numeric", 
+								"factor",
+								"numeric", 
+								"factor",
+								"numeric", 
+								"numeric"),
+						stringsAsFactors = F)
   optcols <- data.frame(Column=c("SAMPLE_MESSAGE", "LEFT_GAZE_X", "LEFT_GAZE_Y", 
-                                 "RIGHT_GAZE_X", "RIGHT_GAZE_Y", "EYE_TRACKED"), Present=NA)
+                                 "RIGHT_GAZE_X", "RIGHT_GAZE_Y", "LEFT_IN_BLINK", 
+                                 "RIGHT_IN_BLINK", "LEFT_IN_SACCADE", 
+                                 "RIGHT_IN_SACCADE", "EYE_TRACKED"),
+						Present=NA,
+						Mode=c("factor", 
+								"numeric", 
+								"numeric",
+								"numeric", 
+								"numeric",
+								"numeric", 
+								"numeric",
+								"numeric", 
+								"numeric",
+								"factor"),
+						stringsAsFactors = F)
   
-  data <- tbl_df(data)
-  
-  message("Checking required columns...")
-  
-  for (x in 1:nrow(reqcols)) {
-    if (!(reqcols[x,1] %in% names(data))) {
-      reqcols[x,2] <- 0
-    }
-    else {
-      reqcols[x,2] <- 1
-    }
-  }
-  
-  missingcols <- filter(reqcols, Present==0)
-  
-  if (nrow(missingcols) > 0) {
-    stop(paste("\n The following column is required to process the data: ", unique(as.factor(missingcols$Column))))
-  } else {
-    message("    All required columns are present in the data.")
-  }
-  
-  
-  message("Checking optional columns...")
-  
-  for (x in 1:nrow(optcols)) {
-    if (!(optcols[x,1] %in% names(data))) {
-      optcols[x,2] <- 0
-    }
-    else {
-      optcols[x,2] <- 1
-    }
-  }
-  
-  missingoptcols <- filter(optcols, Present==0)
-  
-  if (nrow(missingoptcols) > 0) {
-    message(paste("    The following optional is not present in the data: ", unique(as.factor(missingoptcols$Column)), "\n"))
-  } else {
-    message("    All optional columns are present in the data.")
-  }
-  
-  
-  message("Working on required columns...")
-  
-  if(is.null(Subject)){
-    stop("Please supply the name of the subject column!")
-  } else {
-    subject <- Subject
-    subject <- enquo(subject)
-  }
-  
-  data <- rename(data, Subject = !!subject)
-  message(paste("   ", quo_name(subject), "renamed to Subject. "))
-  
-  if (is.factor(data$Subject) == F){
-    data$Subject <- as.factor(as.character(data$Subject))
-    message("    Subject converted to factor.")
-  } else {
-    message("    Subject already factor.")
-  }
-  
-  item <- Item
-  
-  if (!is.na(item)) {
+  {## SHARED CODE BEGINS HERE ## 
     
-    if (!(item %in% names(data))) {
-      stop(paste(item, "is not a column name in the data."))
+    data <- as_tibble(data)
+    
+    message("Checking required columns...")
+    
+    for (x in 1:nrow(reqcols)) {
+      if (!(reqcols[x,1] %in% names(data))) {
+        reqcols[x,2] <- 0
+      }
+      else {
+        reqcols[x,2] <- 1
+      }
     }
     
-    item <- enquo(item)
-    data <- rename(data, Item = !!item)
-    message(paste("   ", quo_name(item), "renamed to Item."))
-    if (is.factor(data$Item) == F){
-      data$Item <- as.factor(as.character(data$Item))
-      message("    Item converted to factor.")
+    missingcols <- filter(reqcols, Present==0)
+    
+    if (nrow(missingcols) > 0) {
+      stop(paste("\n The following column is required to process the data: ", unique(as.factor(missingcols$Column))))
     } else {
-      message("    Item already factor.")
+      message("    All required columns are present in the data.")
+    }
+    
+    
+    message("Checking optional columns...")
+    
+    for (x in 1:nrow(optcols)) {
+      if (!(optcols[x,1] %in% names(data))) {
+        optcols[x,2] <- 0
+      }
+      else {
+        optcols[x,2] <- 1
+      }
+    }
+    
+    missingoptcols <- filter(optcols, Present==0)
+    
+    if (nrow(missingoptcols) > 0) {
+      message(paste("    The following optional is not present in the data: ", unique(as.factor(missingoptcols$Column)), "\n"))
+    } else {
+      message("    All optional columns are present in the data.")
+    }
+    
+    # Conversion helper function
+    .conversionhelper <- function(data, columnname, datamode){
+      if(datamode=="numeric"){
+        if (is.numeric(data[, columnname]) == F){
+          if(is.factor(data[, columnname]) == T){
+            data[, columnname] <- lapply(data[, columnname], as.character)
+          }
+          conv <- lapply(data[, columnname], as.numeric)
+          message(paste0("    ", columnname, " converted to numeric."))
+        } else {
+          conv <- data[, columnname]
+          message(paste0("    ", columnname, " already numeric."))
+        } 
+      } 
+      if(datamode=="factor"){
+        if (is.factor(data[, columnname]) == F){
+          conv <- lapply(data[, columnname], factor)
+          message(paste0("    ", columnname, " converted to factor."))
+        } else {
+          conv <- data[, columnname]
+          message(paste0("    ", columnname, " already factor."))
+        } 
+      }
+      return(conv)
+    }
+    
+    message("Working on required columns...")
+    
+    # Work on Subject
+    if(is.null(Subject)){
+      stop("Please supply the name of the subject column!")
+    } else {
+      subject <- Subject
+      subject <- enquo(subject)
+    }
+    
+    data <- rename(data, Subject = !!subject)
+    message(paste("   ", quo_name(subject), "renamed to Subject. "))
+    reqcols[1,"Column"] <- "Subject"
+    
+    # Work on Item
+    item <- Item
+    if (!is.na(item)) {
+      if (!(item %in% names(data))) {
+        stop(paste(item, "is not a column name in the data."))
+      }
+      item <- enquo(item)
+      data <- rename(data, Item = !!item)
+      message(paste("   ", quo_name(item), "renamed to Item."))
+      reqcols <- rbind(reqcols, c("Item", "factor", 1))
+    } else {
+      reqcols <- rbind(reqcols, c("Item", "factor", 0))
+      message("    No Item column specified.")
+    }
+    
+    # Check and convert
+    rc <- filter(reqcols, Present==1)
+    for(i in 1:nrow(rc)){
+      data[, rc[i,1]] <- .conversionhelper(data, rc[i,1], rc[i,3])
+    }
+    
+    
+    # Event column
+    if (!(EventColumns[1] %in% names(data))) {
+      stop(paste(EventColumns[1], "is not a column name in the data."))
+    }
+    if (!(EventColumns[2] %in% names(data))) {
+      stop(paste(EventColumns[2], "is not a column name in the data."))
+    }
+    #data$Event <- interaction(data[,EventColumns], drop=TRUE)
+    data$Event <- as.factor(as.character(paste(data[[EventColumns[1]]], data[[EventColumns[2]]], sep = ".")))
+    message(paste("    Event variable created from", EventColumns[1], "and", EventColumns[2]), "")
+    
+    
+    message("Working on optional columns...")
+    
+    if (nrow(missingoptcols) == nrow(optcols)) {
+      message("    No optional columns present in the data.")
     } 
-  } else {
-    message("    No Item column specified.")
-  }
-  
-  if (is.numeric(data$LEFT_INTEREST_AREA_ID) == F){
-    data$LEFT_INTEREST_AREA_ID <- as.numeric(as.character(data$LEFT_INTEREST_AREA_ID))
-    message("    LEFT_INTEREST_AREA_ID converted to numeric.")
-  } else {
-    message("    LEFT_INTEREST_AREA_ID already numeric.")
-  }
-  
-  if (is.numeric(data$RIGHT_INTEREST_AREA_ID) == F){
-    data$RIGHT_INTEREST_AREA_ID <- as.numeric(as.character(data$RIGHT_INTEREST_AREA_ID))
-    message("    RIGHT_INTEREST_AREA_ID converted to numeric.")
-  } else {
-    message("    RIGHT_INTEREST_AREA_ID already numeric.")
-  }
-  
-  if (is.factor(data$LEFT_INTEREST_AREA_LABEL) == F){
-    data$LEFT_INTEREST_AREA_LABEL <- as.factor(as.character(data$LEFT_INTEREST_AREA_LABEL))
-    message("    LEFT_INTEREST_AREA_LABEL converted to factor.")
-  } else {
-    message("    LEFT_INTEREST_AREA_LABEL already factor.")
-  }
-  
-  if (is.factor(data$RIGHT_INTEREST_AREA_LABEL) == F){
-    data$RIGHT_INTEREST_AREA_LABEL <- as.factor(as.character(data$RIGHT_INTEREST_AREA_LABEL))
-    message("    RIGHT_INTEREST_AREA_LABEL converted to factor.")
-  } else {
-    message("    RIGHT_INTEREST_AREA_LABEL already factor.")
-  }
-  
-  if (is.numeric(data$TIMESTAMP) == F){
-    data$TIMESTAMP <- as.numeric(as.character(data$TIMESTAMP))
-    message("    TIMESTAMP converted to numeric.")
-  } else {
-    message("    TIMESTAMP already numeric.")
-  }
-  
-  if (is.numeric(data$TRIAL_INDEX) == F){
-    data$TRIAL_INDEX <- as.numeric(as.character(data$TRIAL_INDEX))
-    message("    TRIAL_INDEX converted to numeric.")
-  } else {
-    message("    TRIAL_INDEX already numeric.")
-  }
-  
-  if (!(EventColumns[1] %in% names(data))) {
-    stop(paste(EventColumns[1], "is not a column name in the data."))
-  }
-  if (!(EventColumns[2] %in% names(data))) {
-    stop(paste(EventColumns[2], "is not a column name in the data."))
-  }
-  
-  data$Event <- interaction(data[,EventColumns], drop=TRUE)
-  message(paste("    Event variable created from", EventColumns[1], "and", EventColumns[2]), "")
-  
-  
-  message("Working on optional columns...")
-  
-  if (nrow(missingoptcols) == nrow(optcols)) {
-    message("    No optional columns present in the data.")
-  } 
-  
-  if ("SAMPLE_MESSAGE" %in% names(data)) {
-    if (is.factor(data$SAMPLE_MESSAGE) == F){
-      data$SAMPLE_MESSAGE <- as.factor(as.character(data$SAMPLE_MESSAGE))
-      message("    Optional column SAMPLE_MESSAGE converted to factor.")
-    } else {
-      message("    Optional column SAMPLE_MESSAGE already factor.")
+    
+    # Check and convert
+    oc <- filter(optcols, Present==1)
+    for(i in 1:nrow(oc)){
+      data[,oc[i,1]] <- .conversionhelper(data, oc[i,1], oc[i,3])
     }
-  }
+    
+    } ## SHARED CODE ENDS HERE ##
   
-  if ("LEFT_GAZE_X" %in% names(data)) {
-    if (is.numeric(data$LEFT_GAZE_X) == F){
-      data$LEFT_GAZE_X <- as.numeric(as.character(data$LEFT_GAZE_X))
-      message("    Optional column LEFT_GAZE_X converted to numeric.")
-    } else {
-      message("    Optional column LEFT_GAZE_X already numeric.")
-    }
-  }
-  
-  if ("LEFT_GAZE_Y" %in% names(data)) {
-    if (is.numeric(data$LEFT_GAZE_Y) == F){
-      data$LEFT_GAZE_Y <- as.numeric(as.character(data$LEFT_GAZE_Y))
-      message("    Optional column LEFT_GAZE_Y converted to numeric.")
-    } else {
-      message("    Optional column LEFT_GAZE_Y already numeric.")
-    }
-  }
-  
-  if ("RIGHT_GAZE_X" %in% names(data)) {
-    if (is.numeric(data$RIGHT_GAZE_X) == F){
-      data$RIGHT_GAZE_X <- as.numeric(as.character(data$RIGHT_GAZE_X))
-      message("    Optional column RIGHT_GAZE_X converted to numeric.")
-    } else {
-      message("    Optional column RIGHT_GAZE_X already numeric.")
-    }
-  }
-  
-  if ("RIGHT_GAZE_Y" %in% names(data)) {
-    if (is.numeric(data$RIGHT_GAZE_Y) == F){
-      data$RIGHT_GAZE_Y <- as.numeric(as.character(data$RIGHT_GAZE_Y))
-      message("    Optional column RIGHT_GAZE_Y converted to numeric.")
-    } else {
-      message("    Optional column RIGHT_GAZE_Y already numeric.")
-    }
-  }
-  
-  if ("EYE_TRACKED" %in% names(data)) {
-    if (is.factor(data$EYE_TRACKED) == F){
-      data$EYE_TRACKED <- as.factor(as.character(data$EYE_TRACKED))
-      message("    Optional column EYE_TRACKED converted to factor.")
-    } else {
-      message("    Optional column EYE_TRACKED already factor.")
-    }
-  }
-  
-  return(ungroup(data))
+    return(droplevels(ungroup(data)))
 }
-
-
 
 
 #' Aligns samples to a specific message.
@@ -268,8 +231,11 @@ prep_data <- function(data, Subject = NULL, Item = NA,
 #' 
 align_msg <- function(data, Msg = NULL) {
   
+  # Check for message in call and data
   if(is.null(Msg)){
     stop("Please supply the message text or regular expression!")
+  } else if(!any(grepl(Msg, unique(levels(data$SAMPLE_MESSAGE))))) {
+    stop("The message text or regular expression does not return any match!")
   } else {
     msg <- Msg
     msg <- enquo(msg)
@@ -280,9 +246,8 @@ align_msg <- function(data, Msg = NULL) {
     filter(!is.na(Align)) %>% select(Event, Align) %>% filter(Align==min(Align))
   tmp2 <- inner_join(data, tmp1, by="Event") %>% mutate(Align = TIMESTAMP - Align)
   
-  return(ungroup(tmp2))
+  return(droplevels(ungroup(tmp2)))
 }
-
 
 #' Checks for and removes unnecessary DV output columns.
 #' 
@@ -291,12 +256,11 @@ align_msg <- function(data, Msg = NULL) {
 #' 
 #' @export
 #' @import dplyr
-#' @import rlang
 #' 
 #' @param data A data frame object created from an Eyelink Sample Report.
 #' @param Keep An optional string or character vector containing the column names 
 #' of SR sample report columns the user would like to keep in the data set. 
-#' @return An object of type data table as described in \link[dplyr]{tbl_df}.
+#' @return An object of type data table as described in \link[tibble]{tibble}.
 #' @examples
 #' \dontrun{
 #' library(VWPre)
@@ -304,6 +268,10 @@ align_msg <- function(data, Msg = NULL) {
 #' }
 rm_extra_DVcols <- function(data, Keep=NULL){
 
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type = "UseOther", suggest = "ppl_rm_extra_DVcols")
+
+  # Define columns for VWP processing
   SR_not_needed <- c(
     "AVERAGE_ACCELERATION_X", 
     "AVERAGE_ACCELLERATION_X", # THIS IS A DV MISSPELLING
@@ -378,50 +346,52 @@ rm_extra_DVcols <- function(data, Keep=NULL){
     "VIDEO_NAME"
   )
   
-  data <- ungroup(data)
-  
-  delcols <- data.frame(Column=SR_not_needed, Present=NA, Keep=NA)
-
-  message("Checking for extra (deletable) DV columns...")
-  
-  for (x in 1:nrow(delcols)) {
-    if (!(delcols[x,1] %in% names(data))) {
-      delcols[x,2] <- 0
-      delcols[x,3] <- 0
-    }
-    else {
-      delcols[x,2] <- 1
-      if (delcols[x,1] %in% Keep) {
-        delcols[x,3] <- 1
-      } else {
+  {## SHARED CODE BEGINS HERE ## 
+    
+    data <- ungroup(data)
+    
+    delcols <- data.frame(Column=SR_not_needed, Present=NA, Keep=NA)
+    
+    message("Checking the data for extra (deletable) DV columns.")
+    
+    for (x in 1:nrow(delcols)) {
+      if (!(delcols[x,1] %in% names(data))) {
+        delcols[x,2] <- 0
         delcols[x,3] <- 0
       }
+      else {
+        delcols[x,2] <- 1
+        if (delcols[x,1] %in% Keep) {
+          delcols[x,3] <- 1
+        } else {
+          delcols[x,3] <- 0
+        }
+      }
     }
-  }
-  
-  deletecols <- filter(delcols, Present==1) %>% droplevels()
-  
-  if (nrow(deletecols) == 0) {
-    stop("No deletable columns present in the data.")
-  } 
-  
-  if (!(is.null(Keep))) {
-  message("Checking for columns to keep...")
-  }
-  message("     Columns kept: ", paste(levels(droplevels(deletecols[deletecols$Keep==1,]$Column)), collapse = ", "))
-  deletecols <- filter(deletecols, Keep==0) %>% droplevels()
-  
-  del <- unique(levels(deletecols$Column))
+    
+    deletecols <- filter(delcols, Present==1) %>% droplevels()
+    
+    if (nrow(deletecols) == 0) {
+      stop("No deletable columns present in the data.")
+    } 
+    
+    if (!(is.null(Keep))) {
+      message("Checking for columns to keep...")
+    }
+    message("     Columns kept by request: ", paste(levels(droplevels(deletecols[deletecols$Keep==1,]$Column)), collapse = ", "))
+    deletecols <- filter(deletecols, Keep==0) %>% droplevels()
+    
+    del <- unique(levels(deletecols$Column))
+    
+    message("Removing deletable columns...")
+    message("     Columns removed: ", paste(levels(deletecols$Column), collapse = ", "))
+    data <- select(data, -one_of(del))
 
-  message("Removing deletable columns...")
-  message("     Columns removed: ", paste(levels(deletecols$Column), collapse = ", "))
-  data <- select(data, -one_of(del))
+	return(droplevels(ungroup(data)))
 
-  return(ungroup(data))
+	} ## SHARED CODE ENDS HERE ##
+  
 }
-
-
-
 
 #' Select the eye used during recording
 #' 
@@ -436,7 +406,10 @@ rm_extra_DVcols <- function(data, Keep=NULL){
 #' @import rlang
 #' 
 #' @param data A data table object output by \code{\link{create_time_series}}.
-#' @param Recording A string indicating which eyes were used for recording gaze data.
+#' @param Recording A string indicating which eyes were used for recording gaze data 
+#' ("R" when only right eye recording is present, "L" when only left eye recording 
+#' is present, "LorR" when either the left or the right eye was recorded, "LandR"
+#' when both the left and the right eyes were recorded).
 #' @param WhenLandR A string indicating which eye ("Right" or "Left) to use 
 #' if gaze data is available for both eyes (i.e., Recording = "LandR"). 
 #' @return A data table with four additional columns ('EyeRecorded', 'EyeSelected', 
@@ -449,161 +422,174 @@ rm_extra_DVcols <- function(data, Keep=NULL){
 #' }
 select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
   
-  if("EYE_TRACKED" %in% names(data)) {
-    message("Selecting gaze data using Data Viewer column EYE_TRACKED")
-  } else {
-    if(is.null(Recording)){
-      stop("Please supply the recording eye(s)!")
-    }
-    message(paste("Selecting gaze data using Data Viewer columns LEFT_INTEREST_AREA_ID and RIGHT_INTEREST_AREA_ID and the Recording argument:", Recording))
-  }
+  .check_for_PupilPre(type = "UseOther", suggest = "ppl_select_recorded_eye")
   
-  if("EYE_TRACKED" %in% names(data)) {	
-    
-    if(("Both" %in% unique(data$EYE_TRACKED)) & is.na(WhenLandR)){
-      stop("Please specify which eye to use when Recording is set to 'LandR'!")
-    }
-    tmp <- data %>%
-      group_by(Event) %>%
-      mutate(., EyeRecorded = as.character(EYE_TRACKED)) %>% 
-      do(
-        mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right", 
-                                       ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
-                                              ifelse(EyeRecorded == "Right", EyeRecorded, 
-                                                     ifelse(EyeRecorded == "Left", EyeRecorded, NA)))))
-      )
-    
-  } else {
-    
-    if (Recording == "LandR") {
-      
-      if(is.na(WhenLandR)){
-        stop("Please specify which eye to use when Recording is set to 'LandR'!")
-      }
-      
-      tmp <- data %>%
-        group_by(Event) %>%
-        mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
-                                         sum(RIGHT_INTEREST_AREA_ID) > 0, "Both", 
-                                       ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
-                                                sum(RIGHT_INTEREST_AREA_ID) == 0, "Left", 
-                                              ifelse(sum(LEFT_INTEREST_AREA_ID) == 0 & 
-                                                       sum(RIGHT_INTEREST_AREA_ID) > 0, 
-                                                     "Right", "NoIAData")))) %>%
-        do(
-          mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right", 
-                                         ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
-                                                ifelse(EyeRecorded == "Right", EyeRecorded, 
-                                                       ifelse(EyeRecorded == "Left", EyeRecorded, 
-                                                              ifelse(EyeRecorded == "NoIAData", "Neither"))))))
-        ) 
-        
-      
-    }
-    
-    if (Recording == "LorR") {
-      
-      tmp <- data %>%
-        group_by(Event) %>%
-        mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0 & 
-                                         sum(RIGHT_INTEREST_AREA_ID) == 0, "Left", 
-                                       ifelse(sum(LEFT_INTEREST_AREA_ID) == 0 & 
-                                                sum(RIGHT_INTEREST_AREA_ID) > 0, 
-                                              "Right", "NoIAData"))) %>%
-        do(
-          mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded, 
-                                         ifelse(EyeRecorded == "Left", EyeRecorded, 
-                                                ifelse(EyeRecorded == "NoIAData", "Neither"))))
-        ) 
-      
-    }
-    
-    if (Recording == "R" | Recording == "L") {
-    if (Recording == "R") {
-        col <- "RIGHT_INTEREST_AREA_ID"
-        col <- enquo(col)
-        val <- "Right"
-        val <- enquo(val)
-        } else {
-        col <- "LEFT_INTEREST_AREA_ID"
-        col <- enquo(col)
-        val <- "Left"
-        val <- enquo(val)
-        }
+  # Establish which columns needed
+	lcol <- "LEFT_INTEREST_AREA_ID"
+	rcol <- "RIGHT_INTEREST_AREA_ID"
+	
+	{## SHARED CODE BEGINS HERE ## 
+	  
+	  if("EYE_TRACKED" %in% names(data)) {
+	    message("Selecting gaze data using Data Viewer column EYE_TRACKED")
+	  } else {
+	    if(is.null(Recording)){
+	      stop("Please supply the recording eye(s)!")
+	    }
+	    message(paste("Selecting gaze data using Data Viewer columns", lcol, "and", rcol, "and the Recording argument:", Recording))
+	  }
+	  
+	  if("EYE_TRACKED" %in% names(data)) {	
+	    
+	    if(("Both" %in% unique(data$EYE_TRACKED)) & is.na(WhenLandR)){
+	      stop("Please specify which eye to use when Recording is set to 'LandR'!")
+	    }
+	    tmp <- data %>%
+	      group_by(Event) %>%
+	      mutate(., EyeRecorded = as.character(EYE_TRACKED)) %>% 
+	      do(
+	        mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right", 
+	                                       ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
+	                                              ifelse(EyeRecorded == "Right", EyeRecorded, 
+	                                                     ifelse(EyeRecorded == "Left", EyeRecorded, NA)))))
+	      )
+	    
+	  } else {
+	    
+	    # Prep columns for dplyr
+	    lcol <- enquo(lcol)
+	    rcol <- enquo(rcol)
+	    
+	    if (Recording == "LandR") {
+	      
+	      if(is.na(WhenLandR)){
+	        stop("Please specify which eye to use when Recording is set to 'LandR'!")
+	      }
+	      
+	      tmp <- data %>%
+	        group_by(Event) %>%
+	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) > 0 &&
+	                                         sum(UQ(sym(eval_tidy(rcol))), na.rm = T) > 0, "Both",
+	                                       ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) > 0 &&
+	                                                sum(UQ(sym(eval_tidy(rcol))), na.rm = T) == 0, "Left",
+	                                              ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) == 0 &&
+	                                                       sum(UQ(sym(eval_tidy(rcol))), na.rm = T) > 0, "Right", "NoData")))) %>%
+	        do(
+	          mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right",
+	                                         ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
+	                                                ifelse(EyeRecorded == "Right", EyeRecorded,
+	                                                       ifelse(EyeRecorded == "Left", EyeRecorded,
+	                                                              ifelse(EyeRecorded == "NoData", "Neither"))))))
+	        )
+	      
+	      
+	    }
+	    
+	    if (Recording == "LorR") {
+	      
+	      tmp <- data %>%
+	        group_by(Event) %>%
+	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) > 0 &
+	                                         sum(UQ(sym(eval_tidy(rcol))), na.rm = T) == 0, "Left",
+	                                       ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) == 0 &
+	                                                sum(UQ(sym(eval_tidy(rcol))), na.rm = T) > 0,
+	                                              "Right", "NoData"))) %>%
+	        do(
+	          mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded,
+	                                         ifelse(EyeRecorded == "Left", EyeRecorded,
+	                                                ifelse(EyeRecorded == "NoData", "Neither"))))
+	        )
+	      
+	    }
+	    
+	    if (Recording == "R" | Recording == "L") {
+	      if (Recording == "R") {
+	        col <- rcol
+	        val <- "Right"
+	        val <- enquo(val)
+	      } else {
+	        col <- lcol
+	        val <- "Left"
+	        val <- enquo(val)
+	      }
+	      
+	      tmp <- data %>%
+	        group_by(Event) %>%
+	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(col))), na.rm = T) > 0, quo_name(val), "NoData")) %>%
+	        do(
+	          mutate(., EyeSelected = ifelse(EyeRecorded == quo_name(val), EyeRecorded,
+	                                         ifelse(EyeRecorded == "NoData", "Neither")))
+	        ) %>% ungroup()
+	    }
+	    
+	    
+	  }
+	  
+	} ## SHARED CODE ENDS HERE ##
 
-      tmp <- data %>%
-        group_by(Event) %>%
-        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(col)))) > 0, quo_name(val), "NoIAData")) %>%
-         do(
-          mutate(., EyeSelected = ifelse(EyeRecorded == quo_name(val), EyeRecorded, 
-                                          ifelse(EyeRecorded == "NoIAData", "Neither")))
-         )
-    } 
-    
-#        if (Recording == "R") {
-#
-#      tmp <- data %>%
-#        group_by(Event) %>%
-#        mutate(., EyeRecorded = ifelse(sum(RIGHT_INTEREST_AREA_ID) > 0, "Right", "NoIAData")) %>%
-#         do(
-#          mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded, 
-#                                          ifelse(EyeRecorded == "NoIAData", "Neither")))
-#         )
-#    } 
-#   
-#   if (Recording == "L") {
-#
-#      tmp <- data %>%
-#        group_by(Event) %>%
-#        mutate(., EyeRecorded = ifelse(sum(LEFT_INTEREST_AREA_ID) > 0, "Left", "NoIAData")) %>%
-#         do(
-#          mutate(., EyeSelected = ifelse(EyeRecorded == "Left", EyeRecorded, 
-#                                          ifelse(EyeRecorded == "NoIAData", "Neither")))
-#         )
-#    } 
-    
-  } 
-  
-  tmp <- tmp %>% 
-    do(
-      mutate(., IA_ID = ifelse(EyeSelected == "Right", RIGHT_INTEREST_AREA_ID, 
+  # Transfer columns
+
+	  tmp <- tmp %>% group_by(Event) %>%
+		do(
+		mutate(., IA_ID = ifelse(EyeSelected == "Right", RIGHT_INTEREST_AREA_ID,
                                ifelse(EyeSelected == "Left", LEFT_INTEREST_AREA_ID,
                                       ifelse(EyeSelected == "Neither", 0, NA))),
-             IA_LABEL = ifelse(EyeSelected == "Right", as.character(RIGHT_INTEREST_AREA_LABEL), 
+             IA_LABEL = ifelse(EyeSelected == "Right", as.character(RIGHT_INTEREST_AREA_LABEL),
                                ifelse(EyeSelected == "Left", as.character(LEFT_INTEREST_AREA_LABEL),
                                       ifelse(EyeSelected == "Neither", "Outside", NA))))
-    )
-  
+		)
+		
+		if(all(c("RIGHT_GAZE_X", "RIGHT_GAZE_Y", "RIGHT_IN_BLINK", "RIGHT_IN_SACCADE") %in% colnames(tmp)) | 
+		all(c("LEFT_GAZE_X", "LEFT_GAZE_Y", "LEFT_IN_BLINK", "LEFT_IN_SACCADE") %in% colnames(tmp))) {
+		tmp <- tmp %>% group_by(Event) %>%
+        mutate(., Gaze_X = ifelse(EyeSelected == "Right", RIGHT_GAZE_X,
+                               ifelse(EyeSelected == "Left", LEFT_GAZE_X, NA)),
+               Gaze_Y = ifelse(EyeSelected == "Right", RIGHT_GAZE_Y,
+                               ifelse(EyeSelected == "Left", LEFT_GAZE_Y, NA)),
+               In_Blink = ifelse(EyeSelected == "Right", RIGHT_IN_BLINK,
+                                 ifelse(EyeSelected == "Left", LEFT_IN_BLINK, NA)),
+               In_Saccade = ifelse(EyeSelected == "Right", RIGHT_IN_SACCADE,
+                                 ifelse(EyeSelected == "Left", LEFT_IN_SACCADE, NA))
+        )
+		
+		tmp$Gaze_X <- as.numeric(as.character(tmp$Gaze_X))
+		tmp$Gaze_Y <- as.numeric(as.character(tmp$Gaze_Y))
+		tmp$In_Blink <- as.numeric(as.character(tmp$In_Blink))
+		tmp$In_Saccade <- as.numeric(as.character(tmp$In_Saccade))
+		
+		}
+		
+		tmp$IA_ID <- as.numeric(as.character(tmp$IA_ID))
+		tmp$IA_LABEL <- as.factor(as.character(tmp$IA_LABEL))
+		tmp <- tmp %>%
+			mutate(IA_Data = ifelse(sum(IA_ID) > 0, "Contains_IA_Looks", "No_IA_Looks"))
+		tmp$IA_Data <- as.factor(as.character(tmp$IA_Data))
+
   tmp$EyeRecorded <- as.factor(as.character(tmp$EyeRecorded))
   tmp$EyeSelected <- as.factor(as.character(tmp$EyeSelected))
-  tmp$IA_ID <- as.numeric(as.character(tmp$IA_ID))
-  tmp$IA_LABEL <- as.factor(as.character(tmp$IA_LABEL))
-  
-  tmp <- tmp %>%
-    mutate(IA_Data = ifelse(sum(IA_ID) > 0, "Contains_IA_Looks", "No_IA_Looks"))
-  tmp$IA_Data <- as.factor(as.character(tmp$IA_Data))
-  
+
   message(paste("Gaze data summary for", length(unique(levels(tmp$Event))), "events:"))
-  
+
   if (!(is.na(WhenLandR))) {
-    message(paste(nrow(filter(tmp, Time==first(Time) & EyeRecorded=="Both")), "event(s) contained gaze data for both eyes, for which the", WhenLandR, "eye has been selected." ))
+    n <- tmp %>% group_by(Event) %>% summarise(T1 = min(Time), Eye = EyeSelected[1]) %>% filter(Eye=="Both") %>% droplevels()
+    message(paste(nrow(n), "event(s) contained gaze data for both eyes, for which the", WhenLandR, "eye has been selected." ))
   }
-  
+
   if (("EYE_TRACKED" %in% names(tmp)) | Recording == "LandR" | Recording == "LorR" | Recording == "R" ) {
-    message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Right")), "event(s) using gaze data from the right eye."))
+    n <- tmp %>% group_by(Event) %>% summarise(T1 = min(Time), Eye = EyeSelected[1]) %>% filter(Eye=="Right") %>% droplevels()
+    message(paste("The final data frame contains", nrow(n), "event(s) using gaze data from the right eye."))
   }
-  
+
   if (("EYE_TRACKED" %in% names(tmp)) | Recording == "LandR" | Recording == "LorR" | Recording == "L" ) {
-    message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & EyeSelected=="Left")), "event(s) using gaze data from the left eye."))
+    n <- tmp %>% group_by(Event) %>% summarise(T1 = min(Time), Eye = EyeSelected[1]) %>% filter(Eye=="Left") %>% droplevels()
+    message(paste("The final data frame contains", nrow(n), "event(s) using gaze data from the left eye."))
   }
+
+  n <- tmp %>% group_by(Event) %>% summarise(T1 = min(Time), Data = IA_Data[1]) %>% filter(Data=="No_IA_Looks") %>% droplevels()
+  message(paste("The final data frame contains", nrow(n), "event(s) with no samples falling within any interest area during the given time series."))
   
-  message(paste("The final data frame contains", nrow(filter(tmp, Time==first(Time) & IA_Data=="No_IA_Looks")), "event(s) with no samples falling within any interest area during the given time series."))
-  
-  return(ungroup(tmp))
+  return(droplevels(ungroup(tmp)))
 }
-
-
-
 
 
 #' Create a time series column

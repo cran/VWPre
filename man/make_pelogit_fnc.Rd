@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{make_pelogit_fnc}
 \alias{make_pelogit_fnc}
-\title{Create function for backtransforming empirical logits to proportions}
+\title{Create function for back-transforming empirical logits to proportions}
 \usage{
 make_pelogit_fnc(ObsPerBin = NULL, Constant = NULL)
 }

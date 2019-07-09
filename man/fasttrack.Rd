@@ -5,10 +5,10 @@
 \title{Fast-track basic preprocessing}
 \usage{
 fasttrack(data = data, Subject = NULL, Item = NA,
-  EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA, Adjust = 0,
-  Recording = NULL, WhenLandR = NA, BinSize = NULL, SamplingRate = NULL,
-  ObsPerBin = NULL, ObsOverride = FALSE, Constant = 0.5,
-  CustomBinom = NULL, Output = NULL)
+  EventColumns = c("Subject", "TRIAL_INDEX"), NoIA = NoIA,
+  Adjust = 0, Recording = NULL, WhenLandR = NA, BinSize = NULL,
+  SamplingRate = NULL, ObsPerBin = NULL, ObsOverride = FALSE,
+  Constant = 0.5, CustomBinom = NULL, Output = NULL)
 }
 \arguments{
 \item{data}{A data frame object created from an Eyelink Sample Report.}

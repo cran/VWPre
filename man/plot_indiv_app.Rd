@@ -17,7 +17,7 @@ given subject/item.
 \examples{
 \dontrun{
 library(VWPre)
-# For plotting the grand average with the included theme
+# For plotting subject/item averages
 plot_indiv_app(data = dat)
 } 
 }

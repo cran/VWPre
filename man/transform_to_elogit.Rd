@@ -4,8 +4,8 @@
 \alias{transform_to_elogit}
 \title{Transforms proportion looks to empirical logits.}
 \usage{
-transform_to_elogit(data, NoIA = NULL, ObsPerBin = NULL, Constant = 0.5,
-  ObsOverride = FALSE)
+transform_to_elogit(data, NoIA = NULL, ObsPerBin = NULL,
+  Constant = 0.5, ObsOverride = FALSE)
 }
 \arguments{
 \item{data}{A data table object output by \code{\link{bin_prop}}.}

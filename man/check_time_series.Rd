@@ -21,7 +21,8 @@ to the onset of the auditory stimulus.
 for each event. If they are equal, it will return a single value.  The returned
 value(s) will vary depending on the interest period (if defined), message 
 alignment (if completed), and the Adjustment parameter (`Adj`) supplied to 
-\code{\link{create_time_series}}.
+\code{\link{create_time_series}}. Optionally, the result can be output to a 
+dataframe containing all event-level information.
 }
 \examples{
 \dontrun{

@@ -9,7 +9,10 @@ select_recorded_eye(data, Recording = NULL, WhenLandR = NA)
 \arguments{
 \item{data}{A data table object output by \code{\link{create_time_series}}.}
 
-\item{Recording}{A string indicating which eyes were used for recording gaze data.}
+\item{Recording}{A string indicating which eyes were used for recording gaze data 
+("R" when only right eye recording is present, "L" when only left eye recording 
+is present, "LorR" when either the left or the right eye was recorded, "LandR"
+when both the left and the right eyes were recorded).}
 
 \item{WhenLandR}{A string indicating which eye ("Right" or "Left) to use 
 if gaze data is available for both eyes (i.e., Recording = "LandR").}

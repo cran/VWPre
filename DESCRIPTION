@@ -1,8 +1,8 @@
 Package: VWPre
 Type: Package
 Title: Tools for Preprocessing Visual World Data
-Version: 1.1.0
-Date: 2018-03-18
+Version: 1.2.0
+Date: 2019-07-08
 Authors@R: c(person("Vincent", "Porretta", role = c("aut", "cre"),
 		     email = "vincentporretta@gmail.com"),
 	      person("Aki-Juhani", "Kyröläinen", role = "aut"),
@@ -27,16 +27,16 @@ Description: Gaze data from the Visual World Paradigm requires significant
     for data collected with other systems in the future, the current package is 
     considered to be feature-complete; further updates will mainly entail maintenance
 	and the addition of minor functionality.
-Depends: R (>= 3.3.0), dplyr (>= 0.7.0)
+Depends: R (>= 3.5.0), dplyr (>= 0.7.0)
 Imports: rlang (>= 0.1.1), ggplot2 (>= 2.2.0), mgcv (>= 1.8-16), shiny
         (>= 0.14.2), tidyr (>= 0.6.0), stats (>= 3.3.2)
-License: GPL (>= 2)
+License: GPL-3 | file LICENSE
 LazyData: true
 Suggests: knitr, rmarkdown, gridExtra, itsadug
 VignetteBuilder: knitr
 Encoding: UTF-8
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2018-03-19 21:59:08 UTC; vjp
+Packaged: 2019-07-09 16:11:50 UTC; vjp
 Repository: CRAN
-Date/Publication: 2018-03-20 07:14:45 UTC
+Date/Publication: 2019-07-09 16:50:12 UTC

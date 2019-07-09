@@ -5,8 +5,8 @@
 \title{Plots average contour surface of looks to a given interest area.}
 \usage{
 plot_avg_contour(data, IA = NULL, type = NULL, Var = NULL,
-  Averaging = "Event", VarLabel = NULL, xlim = NA, VWPreTheme = TRUE,
-  Colors = c("gray20", "gray90"))
+  Averaging = "Event", VarLabel = NULL, xlim = NA,
+  VWPreTheme = TRUE, Colors = c("gray20", "gray90"))
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 

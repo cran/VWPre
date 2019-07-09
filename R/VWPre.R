@@ -35,6 +35,15 @@
 #'   regression. 
 #' }
 #' 
+#' @section Trackloss functions:
+#' \itemize{
+#'   \item The function \code{\link{mark_trackloss}} returns a data table
+#'   with data information regarding trackloss of the sample. 
+#'   \item The function \code{\link{rm_trackloss_events}} returns a data table 
+#'   from which events without the minimum amount of quality data have been
+#'   removed.
+#' }
+#' 
 #' @section Fasttrack formatting function:
 #' \itemize{
 #'   \item The function \code{\link{fasttrack}} a meta-function that returns a 
@@ -60,6 +69,8 @@
 #'   interest area IDs and Labels present in the data.
 #'   \item The function \code{\link{check_msg_time}} returns a summary of the 
 #'   the time value at a given sample message for each recording event.
+#'   \item The function \code{\link{check_all_msgs}} returns all messages
+#'   in the data and their time stamp.
 #' }
 #' 
 #' @section Plotting functions:
@@ -73,6 +84,9 @@
 #'   \item The function \code{\link{plot_avg_diff}} returns a plot of the grand 
 #'   or conditional averages of the difference between looks to two interest 
 #'   areas (proportions or empirical logits) with error bars.
+#'   \item The function \code{\link{plot_avg_cdiff}} returns a plot of the 
+#'   average difference between two conditions for looks to a given interest 
+#'   area (proportions or empirical logits) with error bars.
 #'   \item The function \code{\link{make_pelogit_fnc}} returns a function 
 #'   that can backtransform predicted empirical logit to probability scale, 
 #'   particularly (though not exclusively) useful for plotting purposes. 
@@ -94,11 +108,11 @@
 #' 
 #' @section Notes:
 #' \itemize{
-#' \item The vignettes are available via \code{browseVignettes()}. 
+#' \item The vignettes are available via \code{browseVignettes(package = "VWPre")}. 
 #' \item A list of all available functions is provided in 
-#' \code{help(package="VWPre")}.
+#' \code{help(package = "VWPre")}.
 #' \item This package can be cited using the information obtained from 
-#' \code{citation("VWPre") or print(citation("Vwpre"), bibtex=TRUE)} 
+#' \code{citation("VWPre") or print(citation("VWPre"), bibtex = TRUE)} 
 #' }
 #'
 #' @author

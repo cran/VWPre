@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plot_avg_diff}
 \alias{plot_avg_diff}
-\title{Plots average difference between looks to interest areas.}
+\title{Plots average difference between looks to two interest areas.}
 \usage{
 plot_avg_diff(data, DiffCols = NULL, xlim = NA, type = NULL,
   Averaging = "Event", Condition1 = NULL, Condition2 = NULL,

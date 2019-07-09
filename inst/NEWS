@@ -1,5 +1,56 @@
 # -----------------------------------------------
 
+# VWPre 1.2.0
+
+This is a fairly major update, however, it should not break any previous functionality.  The reason for this is that we have modified the functions of the package to operate with a new sister package "PupilPre" which is designed to depend on VWPre in order to prepare pupil size data collected with SR eye-trackers.  To accommodate this functionally and compatibility, there has been some internal reorganization to use helper functions that allow PupilPre to call similar subroutines. If you do not install/load PupilPre, you should not notice any difference in functionality.
+
+## Major changes:
+
+### New functions
+
+* check_all_messages: This function outputs all sample messages present in the data; the result can optionally be output to a dataframe containing event-level information.
+* plot_avg_cdiff: This function facilitates the plotting of difference between two conditions for a single interest area.
+* mark_trackloss: This function uses blink information and/or gaze coordinates to identify samples corresponding to trackloss.
+* rm_trackloss_events: This function removes events that do not meet the minimum specified criterion for the amount of quality (i.e., containing too much trackloss).
+
+### Changes to functions
+
+* check_ia: This function has been changed to return more verbose information regarding the encoding of interest area ID and labels. Thanks to John Matthews for helping to demonstrate the need for this extended functionality.
+* check_time_series: This function has been changed to return more concise information. However, the output remains the same if returning the data to a dataframe.
+* check_msg_time: This function has been changed to return more concise information. However, the output remains the same if returning the data to a dataframe.
+* prep_data: This function has been changed to accommodate pupil size data processing and now underlyingly calls .prep_data_sub.
+* check_eye_recording: This function has been changed to accommodate pupil size data processing and now underlyingly calls .check_eye_recording_sub.
+* select_recorded_eye: This function has been changed to accommodate pupil size data processing and now underlyingly calls .select_recorded_eye_sub.
+* rm_extra_DVcols: This function has been changed to accommodate pupil size data processing and now underlyingly calls .rm_extra_DVcols_sub.
+* plot_avg: This function has been changed to accommodate pupil size data visualization and now underlyingly calls .plot_avg_sub.
+* plot_avg_contour: This function has been changed to accommodate pupil size data visualization and now underlyingly calls .plot_avg_contour_sub.
+
+### Vignettes
+
+* Vignettes have been updated to reflect changes made in this update.  
+
+## Minor changes:
+
+### Changes to functions 
+* fasttrack: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* bin_prop: Now checks to see if PupilPre is attached by calling .check_for_PupilPre and supplies additional information regarding the number of samples in each bin.
+* transform_to_elogit: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* create_binomial: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* rename_columns: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* relabel_na: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* recode_ia: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* custom_ia: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* plot_transformation_app: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* plot_var_app: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* plot_indiv_app: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* make_pelogit_fnc: Now checks to see if PupilPre is attached by calling .check_for_PupilPre.
+* check_samples_per_bin: Now supplies additional information regarding the number of samples in each bin and how this may affect the empirical logit transformation.
+
+## Bug fixes:
+
+
+# -----------------------------------------------
+
 # VWPre 1.1.0
 
 This is a fairly minor update.

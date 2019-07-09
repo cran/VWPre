@@ -17,6 +17,11 @@
 #' }
 plot_transformation_app <- function ()
 {
+
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
+  
+
   shiny::shinyApp(
     ui = shiny::fluidPage(
       shiny::titlePanel("Empirical Logit Transformation"),
@@ -139,11 +144,14 @@ plot_transformation_app <- function ()
 #' @examples
 #' \dontrun{
 #' library(VWPre)
-#' # For plotting the grand average with the included theme
+#' # For plotting variability in the data
 #' plot_var_app(data = dat) 
 #' }
-plot_var_app <- function (data)
-{
+plot_var_app <- function (data) {
+  
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
+  
   dat <- data
   shiny::shinyApp(
     ui = shiny::fluidPage(
@@ -238,13 +246,13 @@ plot_var_app <- function (data)
           
           if (scale == "Empirical Logits") {
             dat1 <- dat1 %>%
-              summarise(Avg = mean(CalcCol), StDev = sd(CalcCol)) %>%
-              ungroup() %>% mutate(., Zscore = (Avg - mean(Avg)) / sd(Avg))
+              summarise(Avg = mean(CalcCol, na.rm = T), StDev = stats::sd(CalcCol, na.rm = T)) %>%
+              ungroup() %>% mutate(., Zscore = (Avg - mean(Avg, na.rm = T)) / stats::sd(Avg, na.rm = T))
           } else
             if (scale == "Proportions") {
               dat1 <- dat1 %>%
-                summarise(Avg = mean(CalcCol), StDev = sqrt((mean(CalcCol)*(1-mean(CalcCol)))/n())) %>%
-                ungroup() %>% mutate(Avg2 = mean(Avg), StDev2 = sqrt((mean(Avg)*(1-mean(Avg)))/nrow(.))) %>%
+                summarise(Avg = mean(CalcCol, na.rm = T), StDev = sqrt((mean(CalcCol, na.rm = T)*(1-mean(CalcCol, na.rm = T)))/n())) %>%
+                ungroup() %>% mutate(Avg2 = mean(Avg, na.rm = T), StDev2 = sqrt((mean(Avg, na.rm = T)*(1-mean(Avg, na.rm = T)))/nrow(.))) %>%
 				mutate(., Zscore = (Avg - Avg2) / StDev2)
             }
           
@@ -286,11 +294,14 @@ plot_var_app <- function (data)
 #' @examples
 #' \dontrun{
 #' library(VWPre)
-#' # For plotting the grand average with the included theme
+#' # For plotting subject/item averages
 #' plot_indiv_app(data = dat)
 #' } 
-plot_indiv_app <- function (data)
-{
+plot_indiv_app <- function (data) {
+
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
+  
   shiny::shinyApp(
     ui = shiny::fluidPage(
       shiny::titlePanel("Individual Averages"),
@@ -484,7 +495,7 @@ plot_indiv_app <- function (data)
             AvgI <- filter(Avg, group == "Individual Average")
             
             if(scale=="Empirical Logits") {
-              AvgG <- AvgG %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = sd(VALUE) / sqrt(n()))
+              AvgG <- AvgG %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = stats::sd(VALUE, na.rm = T) / sqrt(n()))
               AvgI <- AvgI %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = 0)
               if(error=="Pointwise Confidence") {
                 t <- 1-(((100-input$conflev)/2)/100)

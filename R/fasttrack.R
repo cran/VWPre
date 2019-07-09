@@ -55,6 +55,9 @@ fasttrack = function(data = data, Subject = NULL, Item = NA,
                      WhenLandR = NA, BinSize = NULL, SamplingRate = NULL,
                      ObsPerBin = NULL, ObsOverride = FALSE, 
                      Constant = 0.5, CustomBinom = NULL, Output = NULL) {
+	
+  # Check if PupilPre is installed
+  .check_for_PupilPre(type="NotAvailable")
   
   dat <- data
   Subject <- Subject
@@ -115,6 +118,6 @@ fasttrack = function(data = data, Subject = NULL, Item = NA,
   
   rm(dat4)
   
-  return(ungroup(dat5))
+  return(droplevels(ungroup(dat5)))
   
 }
