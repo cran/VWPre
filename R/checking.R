@@ -25,7 +25,7 @@ check_time_series <- function(data, ReturnData = FALSE) {
   event_start_table = data %>% group_by(Event) %>% summarise(Start_Time = min(Time))
   # message(paste(utils::capture.output(unique(event_start_table$Start_Time)), collapse = "\n"))
   message(paste(utils::capture.output(distinct(event_start_table[, "Start_Time"], Start_Time)), collapse = "\n"))
-  if(ReturnData==T) {
+  if(ReturnData==TRUE) {
     return(droplevels(ungroup(event_start_table)))
   }else {
     message("Set ReturnData to TRUE to output full, event-specific information.")
@@ -71,16 +71,16 @@ check_msg_time <- function(data, Msg = NULL, ReturnData = FALSE) {
   
   if(!("Time" %in% colnames(data)) && !("Align" %in% colnames(data))) {
     tmp <- data %>% filter(grepl(!!msg, SAMPLE_MESSAGE)) %>% select(Event, SAMPLE_MESSAGE, TIMESTAMP)
-    message(paste(utils::capture.output(print(distinct(tmp[, c("SAMPLE_MESSAGE", "TIMESTAMP")], TIMESTAMP, .keep_all = T))), collapse = "\n"))
+    message(paste(utils::capture.output(print(distinct(tmp[, c("SAMPLE_MESSAGE", "TIMESTAMP")], TIMESTAMP, .keep_all = TRUE))), collapse = "\n"))
   } else if (!("Time" %in% colnames(data)) && ("Align" %in% colnames(data))) {
     tmp <- data %>% filter(grepl(!!msg, SAMPLE_MESSAGE)) %>% select(Event, SAMPLE_MESSAGE, Align)
-    message(paste(utils::capture.output(print(distinct(tmp[, c("SAMPLE_MESSAGE", "Align")], Align, .keep_all = T))), collapse = "\n"))
+    message(paste(utils::capture.output(print(distinct(tmp[, c("SAMPLE_MESSAGE", "Align")], Align, .keep_all = TRUE))), collapse = "\n"))
   } else if ("Time" %in% colnames(data)) {
     tmp <- data %>% filter(grepl(!!msg, SAMPLE_MESSAGE)) %>% select(Event, SAMPLE_MESSAGE, Time)
-    message(paste(utils::capture.output(print(distinct(tmp[, c("SAMPLE_MESSAGE", "Time")], Time, .keep_all = T))), collapse = "\n"))
+    message(paste(utils::capture.output(print(distinct(tmp[, c("SAMPLE_MESSAGE", "Time")], Time, .keep_all = TRUE))), collapse = "\n"))
   }
   
-  if(ReturnData==T) {
+  if(ReturnData==TRUE) {
     return(droplevels(tmp))
   } else {
     message("Set ReturnData to TRUE to output full, event-specific information.")
@@ -116,11 +116,11 @@ check_samples_per_bin <- function (data) {
     message("Subsequent Empirical Logit calculations may be influenced by the number of samples (depending on the number of observations requested).")
 
     tmp <- data %>% group_by(Event) %>% 
-        mutate(IsMaxTime = ifelse(Time == max(Time), T, F)) %>% 
+        mutate(IsMaxTime = ifelse(Time == max(Time), TRUE, FALSE)) %>% 
         filter(NSamples != samples) 
     
     
-    if(all(tmp$IsMaxTime==T)) {
+    if(all(tmp$IsMaxTime==TRUE)) {
     message(paste("These all occur in the last bin of the time series (typical of Data Viewer output)."))
       
     } else {
@@ -271,8 +271,8 @@ rename_columns <- function(data, Labels = NULL) {
     tmp<-stats::setNames(tmp, gsub(names(Labels)[x],Labels[[x]],names(tmp)))
   }
   
-  custcol <- data.frame(C1 = grep("[_0-9]+[_V_]+[0-9_]", names(tmp), value = T),
-                        C2 = rep(NA, length(grep("[_0-9]+[_V_]+[0-9_]", names(tmp), value = T))))
+  custcol <- data.frame(C1 = grep("[_0-9]+[_V_]+[0-9_]", names(tmp), value = TRUE),
+                        C2 = rep(NA, length(grep("[_0-9]+[_V_]+[0-9_]", names(tmp), value = TRUE))))
   
   if (nrow(custcol) > 0) {
     for (y in 1:nrow(custcol)) {
@@ -325,10 +325,10 @@ check_all_msgs <- function(data, ReturnData = FALSE) {
   msgs <- data %>% filter(!is.na(data$SAMPLE_MESSAGE)) %>% 
     select(!!!selcols)
     
-  if(ReturnData==F) {
+  if(ReturnData==FALSE) {
     message(paste(utils::capture.output(print(distinct(msgs[, "SAMPLE_MESSAGE"], SAMPLE_MESSAGE))), collapse = "\n"))
     message("Set ReturnData to TRUE to output full, event-specific information.")
-  } else if(ReturnData==T) {
+  } else if(ReturnData==TRUE) {
     return(droplevels(msgs))
   }
 }
@@ -377,7 +377,7 @@ check_eye_recording <- function(data) {
     
     message(paste0("Checking gaze data using Data Viewer columns ", eval_tidy(lcol), " and ", eval_tidy(rcol), "."))
     tmp <- data %>% group_by(Event) %>% 
-      summarize(left = sum(UQ(sym(eval_tidy(lcol))), na.rm = T), right = sum(UQ(sym(eval_tidy(rcol))), na.rm = T)) %>%
+      summarize(left = sum(UQ(sym(eval_tidy(lcol))), na.rm = TRUE), right = sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE)) %>%
       mutate(Var1 = ifelse(left > 0 & right > 0, "Both", 
                            ifelse(left > 0 & right == 0, "Left", 
                                   ifelse(left == 0 & right > 0, "Right", NA))))
@@ -484,8 +484,8 @@ check_ia <- function(data) {
   L_bad_labels <- filter(Lias, N > 1)
 
   # Print mappings
-  message(paste(utils::capture.output(print(as.data.frame(Rias[,2:1]), row.names=F)), collapse = "\n"))
-  message(paste(utils::capture.output(print(as.data.frame(Lias[,2:1]), row.names=F)), collapse = "\n"))
+  message(paste(utils::capture.output(print(as.data.frame(Rias[,2:1]), row.names=FALSE)), collapse = "\n"))
+  message(paste(utils::capture.output(print(as.data.frame(Lias[,2:1]), row.names=FALSE)), collapse = "\n"))
   
   # Determine messages
   if (R_bad_id > 0) {

@@ -246,13 +246,13 @@ plot_var_app <- function (data) {
           
           if (scale == "Empirical Logits") {
             dat1 <- dat1 %>%
-              summarise(Avg = mean(CalcCol, na.rm = T), StDev = stats::sd(CalcCol, na.rm = T)) %>%
-              ungroup() %>% mutate(., Zscore = (Avg - mean(Avg, na.rm = T)) / stats::sd(Avg, na.rm = T))
+              summarise(Avg = mean(CalcCol, na.rm = TRUE), StDev = stats::sd(CalcCol, na.rm = TRUE)) %>%
+              ungroup() %>% mutate(., Zscore = (Avg - mean(Avg, na.rm = TRUE)) / stats::sd(Avg, na.rm = TRUE))
           } else
             if (scale == "Proportions") {
               dat1 <- dat1 %>%
-                summarise(Avg = mean(CalcCol, na.rm = T), StDev = sqrt((mean(CalcCol, na.rm = T)*(1-mean(CalcCol, na.rm = T)))/n())) %>%
-                ungroup() %>% mutate(Avg2 = mean(Avg, na.rm = T), StDev2 = sqrt((mean(Avg, na.rm = T)*(1-mean(Avg, na.rm = T)))/nrow(.))) %>%
+                summarise(Avg = mean(CalcCol, na.rm = TRUE), StDev = sqrt((mean(CalcCol, na.rm = TRUE)*(1-mean(CalcCol, na.rm = TRUE)))/n())) %>%
+                ungroup() %>% mutate(Avg2 = mean(Avg, na.rm = TRUE), StDev2 = sqrt((mean(Avg, na.rm = TRUE)*(1-mean(Avg, na.rm = TRUE)))/nrow(.))) %>%
 				mutate(., Zscore = (Avg - Avg2) / StDev2)
             }
           
@@ -488,15 +488,15 @@ plot_indiv_app <- function (data) {
             Avg <- avgdat %>% select(!!Ind, !!!sel_names) %>%
               tidyr::gather(key=IA, value = VALUE, !!!Cols, na.rm = FALSE, convert = FALSE) %>%
               group_by(!!Ind, IA, Time, group) %>% 
-              summarise(VALUE = mean(VALUE, na.rm = T)) %>% 
+              summarise(VALUE = mean(VALUE, na.rm = TRUE)) %>% 
               group_by(IA, Time, group)
             
             AvgG <- filter(Avg, group == "Grand Average")
             AvgI <- filter(Avg, group == "Individual Average")
             
             if(scale=="Empirical Logits") {
-              AvgG <- AvgG %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = stats::sd(VALUE, na.rm = T) / sqrt(n()))
-              AvgI <- AvgI %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = 0)
+              AvgG <- AvgG %>% summarise(mean = mean(VALUE, na.rm = TRUE), n=n(), se = stats::sd(VALUE, na.rm = TRUE) / sqrt(n()))
+              AvgI <- AvgI %>% summarise(mean = mean(VALUE, na.rm = TRUE), n=n(), se = 0)
               if(error=="Pointwise Confidence") {
                 t <- 1-(((100-input$conflev)/2)/100)
               } else if (error=="Simultaneous Confidence") {
@@ -510,8 +510,8 @@ plot_indiv_app <- function (data) {
                 AvgI <- AvgI %>% mutate(ci = 0)
               }
             } else if (scale=="Proportions") {
-              AvgG <- AvgG %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = sqrt((mean(VALUE)*(1-mean(VALUE)))/n()))
-              AvgI <- AvgI %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = 0)
+              AvgG <- AvgG %>% summarise(mean = mean(VALUE, na.rm = TRUE), n=n(), se = sqrt((mean(VALUE)*(1-mean(VALUE)))/n()))
+              AvgI <- AvgI %>% summarise(mean = mean(VALUE, na.rm = TRUE), n=n(), se = 0)
               if(error=="Pointwise Confidence") {
                 z <- 1-(((100-conflev)/2)/100)
               } else if (error=="Simultaneous Confidence") {

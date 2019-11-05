@@ -7,12 +7,13 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2019-07-09" />
+<meta name="date" content="2019-11-04" />
 
 <title>Aligning Data to a Specific Sample Message</title>
 
@@ -20,9 +21,9 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -32,14 +33,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -48,9 +51,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -96,7 +99,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -303,7 +306,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Aligning Data to a Specific Sample Message</h1>
 <h4 class="author">Vincent Porretta</h4>
-<h4 class="date">2019-07-09</h4>
+<h4 class="date">2019-11-04</h4>
 
 
 
@@ -315,7 +318,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="aligning-to-a-specific-message" class="section level2">
 <h2>Aligning to a specific message</h2>
 <p>Using the function <code>check_msg_time</code> you can see that the TIMESTAMP values associated with the message are not the same for each event. This indicates that alignment is required. Note that a regular expression (regex) can be used here as the message string.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 9 x 2
 ##   SAMPLE_MESSAGE TIMESTAMP
 ##   &lt;fct&gt;              &lt;dbl&gt;
@@ -330,7 +333,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 9 VowelOnset       1207406</code></pre>
 <pre><code>## Set ReturnData to TRUE to output full, event-specific information.</code></pre>
 <p>If you are not sure which messages are in your data set, you can use the function <code>check_all_msgs</code>. This will print all the messages (along with Event, Subject, Trial, and Timestamp). By specifiying <code>ReturnData = TRUE</code>, you can assign the output to a dataframe for further sorting, etc.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">check_all_msgs</span>(<span class="dt">data =</span> aligndat)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">check_all_msgs</span>(<span class="dt">data =</span> aligndat)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 1
 ##   SAMPLE_MESSAGE
 ##   &lt;fct&gt;         
@@ -340,16 +343,16 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 4 TIMER_search</code></pre>
 <pre><code>## Set ReturnData to TRUE to output full, event-specific information.</code></pre>
 <p>The function <code>align_msg</code> is used to perform the alignment. To do this you must specify the message text as a string to the parameter <code>Msg</code>. Again, this string can contain a regular expression (regex) on which to locate the message. The function finds the instance of the message for each event and sets that sample as the zero point. Consequently, this creates a new column called <code>Align</code>, which represents the time sequence relative to the message.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">aligned1 &lt;-<span class="st"> </span><span class="kw">align_msg</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>aligned1 &lt;-<span class="st"> </span><span class="kw">align_msg</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
 <p>If we check the message time again, we now see that the message occurs at time 0 in the <code>Align</code> column.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 2
 ##   SAMPLE_MESSAGE Align
 ##   &lt;fct&gt;          &lt;dbl&gt;
 ## 1 VowelOnset         0</code></pre>
 <pre><code>## Set ReturnData to TRUE to output full, event-specific information.</code></pre>
 <p>To fully examine all events, you can include the parameter <code>ReturnData=TRUE</code> and assign the output to an object in your environment.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">MSGTime &lt;-<span class="st"> </span><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>, <span class="dt">ReturnData =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>MSGTime &lt;-<span class="st"> </span><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>, <span class="dt">ReturnData =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="creating-the-time-series-column" class="section level2">
 <h2>Creating the Time series column</h2>
@@ -480,10 +483,10 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">aligned2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> aligned1, <span class="dt">Adjust =</span> <span class="dv">0</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>aligned2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> aligned1, <span class="dt">Adjust =</span> <span class="dv">0</span>)</span></code></pre></div>
 <pre><code>## No adjustment applied.</code></pre>
 <p>The function <code>check_time_series</code> can be used to verify that the time series was created. The function outputs a list of the unique start values present in the data. In this example, we do not expect all events to start with the same Time value, given that we performed our own alignment without a relative interest period defined in Data Viewer. As with <code>check_msg_time</code>, the list of Events and Start Times can be returned as a data frame using the parameter <code>ReturnData</code>.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">check_time_series</span>(<span class="dt">data =</span> aligned2)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">check_time_series</span>(<span class="dt">data =</span> aligned2)</span></code></pre></div>
 <pre><code>## # A tibble: 9 x 1
 ##   Start_Time
 ##        &lt;dbl&gt;
@@ -498,7 +501,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 9       -211</code></pre>
 <pre><code>## Set ReturnData to TRUE to output full, event-specific information.</code></pre>
 <p>Perhaps more meaningfully, we can check the message time again. We can see that our message is still the zero point in the Time series column.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned2, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned2, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 2
 ##   SAMPLE_MESSAGE  Time
 ##   &lt;fct&gt;          &lt;dbl&gt;
@@ -510,6 +513,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>At this point it is possible to proceed with preprocessing as usual. For details, please refer to the <a href="VWPre_Basic_Preprocessing.html">Basic Preprocessing</a> vignette and continue by selecting a recording eye before binning the data.</p>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

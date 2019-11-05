@@ -232,12 +232,12 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
     Avg <- data %>% select(!!!sel_names) %>% 
       tidyr::gather("IA", "VALUE", !!!gath_col, na.rm = FALSE, convert = FALSE) %>%
       group_by(!!!group_names1) %>% 
-      summarise(VALUE = mean(VALUE, na.rm = T)) %>% 
+      summarise(VALUE = mean(VALUE, na.rm = TRUE)) %>% 
       group_by(!!!group_names2)
     
     # Execute calculation
     if(type == "elogit") {
-      Avg <- Avg %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = stats::sd(VALUE, na.rm = T) / sqrt(n()))
+      Avg <- Avg %>% summarise(mean = mean(VALUE, na.rm = TRUE), n=n(), se = stats::sd(VALUE, na.rm = TRUE) / sqrt(n()))
       if(CItype=="pointwise") {
         tval <- 1-(((100-ConfLev)/2)/100)
       } else if (CItype=="simultaneous") {
@@ -245,7 +245,7 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
       }
       Avg <- Avg %>% mutate(ci = stats::qt(tval,df=n-1)*se)
     } else if (type=="proportion") {
-      Avg <- Avg %>% summarise(mean = mean(VALUE, na.rm = T), n=n(), se = sqrt((mean(VALUE, na.rm = T)*(1-mean(VALUE, na.rm = T)))/n()))
+      Avg <- Avg %>% summarise(mean = mean(VALUE, na.rm = TRUE), n=n(), se = sqrt((mean(VALUE, na.rm = TRUE)*(1-mean(VALUE, na.rm = TRUE)))/n()))
       if(CItype=="pointwise") {
         zval <- 1-(((100-ConfLev)/2)/100)
       } else if (CItype=="simultaneous") {
@@ -376,7 +376,7 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
     }
     
     # Print message regarding CIs
-    if (ErrorType=="CI" && (ErrorBand==T | ErrorBar==T)) {
+    if (ErrorType=="CI" && (ErrorBand==TRUE | ErrorBar==TRUE)) {
       if(CItype == "pointwise") {
         message(paste0("Plot created with ", CItype, " confindence intervals (set to ", ConfLev, "%)."))
       }
@@ -419,9 +419,9 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
     }
     
     # Set errorbands according to theme and plot grouping
-    if(ErrorBand==T & Theme==T) {
+    if(ErrorBand==TRUE & Theme==TRUE) {
       plt <- plt + aes_string(shape = Col, colour = NULL) +
-        geom_ribbon(aes_string(ymin="error_lower", ymax="error_upper", linetype=NA), fill="grey25", alpha=0.15, show.legend = F) 
+        geom_ribbon(aes_string(ymin="error_lower", ymax="error_upper", linetype=NA), fill="grey25", alpha=0.15, show.legend = FALSE) 
       if(!is.null(Col)) {
         if(Col=="IA") {
           plt <- plt + 
@@ -438,9 +438,9 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
         plt <- plt
       }
     }
-    if(ErrorBand==T & Theme==F) {
+    if(ErrorBand==TRUE & Theme==FALSE) {
       plt <- plt + 
-        geom_ribbon(aes_string(ymin="error_lower", ymax="error_upper", linetype=NA, fill=Col), alpha=0.15, show.legend = F) 
+        geom_ribbon(aes_string(ymin="error_lower", ymax="error_upper", linetype=NA, fill=Col), alpha=0.15, show.legend = FALSE) 
       if(!is.null(Col)) {
         if(Col=="IA") {
           plt <- plt + 
@@ -459,7 +459,7 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
     }
     
     # Set errorbars according to theme and plot grouping
-    if(ErrorBar==T & Theme==T) {
+    if(ErrorBar==TRUE & Theme==TRUE) {
       plt <- plt + 
         geom_errorbar(aes_string(ymin="error_lower", ymax="error_upper"), width = .3) 
       if(!is.null(Col)) {
@@ -478,7 +478,7 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
         plt <- plt
       }
     }
-    if(ErrorBar==T & Theme==F) {
+    if(ErrorBar==TRUE & Theme==FALSE) {
       plt <- plt +
         geom_errorbar(aes_string(ymin="error_lower", ymax="error_upper", color=Col), width = .3)
       if(!is.null(Col)) {
@@ -626,9 +626,9 @@ plot_avg_contour <- function(data, IA = NULL, type = NULL, Var = NULL,
     
     Avg <- data %>% select(!!!sel_names) %>% 
       group_by(!!!group_names1) %>%
-      summarise(Columnmean = mean(UQ(sym(Column)), na.rm = T)) %>% 
+      summarise(Columnmean = mean(UQ(sym(Column)), na.rm = TRUE)) %>% 
       group_by(!!!group_names2) %>% 
-      summarise(mean = mean(Columnmean, na.rm = T))
+      summarise(mean = mean(Columnmean, na.rm = TRUE))
     
     if (type == "proportion") {
       Avg$meanon <- round(Avg$mean*100)
@@ -872,13 +872,13 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
   
   tmpdata <- tmpdata %>% select(!!!sel_names) %>%
     group_by(!!!group_names1) %>% 
-    summarise(DC1 = mean(DC1, na.rm = T), DC2 = mean(DC2, na.rm = T)) %>% 
+    summarise(DC1 = mean(DC1, na.rm = TRUE), DC2 = mean(DC2, na.rm = TRUE)) %>% 
     mutate(Diff = DC1 - DC2) %>% 
     group_by(!!!group_names2)
   
   if(type=="elogit") {
     tmpdata <- tmpdata %>%
-      summarise(meanDiff = mean(Diff, na.rm = T), DC1sd = stats::sd(DC1, na.rm = T), DC2sd = stats::sd(DC2, na.rm = T), n1 = n(), n2 = n()) %>%
+      summarise(meanDiff = mean(Diff, na.rm = TRUE), DC1sd = stats::sd(DC1, na.rm = TRUE), DC2sd = stats::sd(DC2, na.rm = TRUE), n1 = n(), n2 = n()) %>%
       mutate(se = sqrt( ((DC1sd^2)/n1) + ((DC2sd^2)/n2) )) %>%
       mutate(degfree = (((((DC1sd^2)/n1) + ((DC2sd^2)/n2))^2) / (((((DC1sd^2)/n1)^2) / (n1-1)) + ((((DC2sd^2)/n2)^2) / (n2-1)))) )
     if(CItype=="pointwise") {
@@ -889,7 +889,7 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
     tmpdata <- tmpdata %>% mutate(ci = stats::qt(tval,df=degfree)*se)
   } else if (type=="proportion") {
     tmpdata <- tmpdata %>%
-      summarise(meanDiff = mean(Diff, na.rm = T), DC1m = mean(DC1, na.rm = T), DC2m = mean(DC2, na.rm = T), n1 = n(), n2 = n()) %>%
+      summarise(meanDiff = mean(Diff, na.rm = TRUE), DC1m = mean(DC1, na.rm = TRUE), DC2m = mean(DC2, na.rm = TRUE), n1 = n(), n2 = n()) %>%
       mutate(se = sqrt(((DC1m*(1-DC1m))/n1)+((DC2m*(1-DC2m))/n2)))
     if(CItype=="pointwise") {
       zval <- 1-(((100-ConfLev)/2)/100)
@@ -901,7 +901,7 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
   # To be used for pooled variance of Elogit difference
   # if(type=="elogit") {
   #   tmpdata <- tmpdata %>%
-  #     summarise(meanDiff = mean(Diff, na.rm = T), DC1sd = stats::sd(DC1, na.rm = T), DC2sd = stats::sd(DC2, na.rm = T), n1 = n(), n2 = n()) %>%
+  #     summarise(meanDiff = mean(Diff, na.rm = TRUE), DC1sd = stats::sd(DC1, na.rm = TRUE), DC2sd = stats::sd(DC2, na.rm = TRUE), n1 = n(), n2 = n()) %>%
   #     mutate(poolvar = (((n1-1)*(DC1sd^2)) + ((n2-1)*(DC2sd^2))) / (n1+n2-2)) %>%
   #     mutate(se = sqrt( ((poolvar^2)/n1) + ((poolvar^2)/n2) ))
   #   if(CItype=="pointwise") {
@@ -912,7 +912,7 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
   #   tmpdata <- tmpdata %>% mutate(ci = qt(tval,df=(n1+n2-2))*se)
   # } else if (type=="proportion") {
   #   tmpdata <- tmpdata %>%
-  #     summarise(meanDiff = mean(Diff, na.rm = T), DC1m = mean(DC1, na.rm = T), DC2m = mean(DC2, na.rm = T), n1 = n(), n2 = n()) %>%
+  #     summarise(meanDiff = mean(Diff, na.rm = TRUE), DC1m = mean(DC1, na.rm = TRUE), DC2m = mean(DC2, na.rm = TRUE), n1 = n(), n2 = n()) %>%
   #     mutate(se = sqrt(((DC1m*(1-DC1m))/n1)+((DC2m*(1-DC2m))/n2)))
   #   if(CItype=="pointwise") {
   #     zval <- 1-(((100-ConfLev)/2)/100)
@@ -968,7 +968,7 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
       }
       levels(tmpdata$Cond2) <- lev2
     }
-    tmpdata$Condition <- interaction(tmpdata$Cond1, tmpdata$Cond2, drop = T, sep = "_")
+    tmpdata$Condition <- interaction(tmpdata$Cond1, tmpdata$Cond2, drop = TRUE, sep = "_")
     Cond <- TRUE
     CondName <- paste(Condition1, Condition2, sep = "_by_")
   }
@@ -1009,7 +1009,7 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
   }
   
   # Print message regarding CIs
-  if (ErrorType=="CI" && (ErrorBand==T | ErrorBar==T)) {
+  if (ErrorType=="CI" && (ErrorBand==TRUE | ErrorBar==TRUE)) {
     if(CItype == "pointwise") {
       message(paste0("Plot created with ", CItype, " confindence intervals (set to ", ConfLev, "%)."))
     }
@@ -1042,38 +1042,38 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
   }
   
   # Set errorbands according to theme
-  if(ErrorBand==T & Theme==T) {
-    if(Cond==T) {
+  if(ErrorBand==TRUE & Theme==TRUE) {
+    if(Cond==TRUE) {
       plt <- plt + aes(shape = Condition, colour = NULL) +
-        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), fill="grey25", alpha=0.15, show.legend = F)
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), fill="grey25", alpha=0.15, show.legend = FALSE)
       plt <- plt +
         scale_shape_discrete(name=CondName,
                              breaks=unique(tmpdata$Condition),
                              labels=unique(tmpdata$Condition))
     } else {
       plt <- plt + 
-        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), fill="grey25", alpha=0.15, show.legend = F)
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), fill="grey25", alpha=0.15, show.legend = FALSE)
       plt <- plt
     }
   }
-  if(ErrorBand==T & Theme==F) {
-    if(Cond==T) {
+  if(ErrorBand==TRUE & Theme==FALSE) {
+    if(Cond==TRUE) {
       plt <- plt +
-        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA, fill=Condition), alpha=0.15, show.legend = F)
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA, fill=Condition), alpha=0.15, show.legend = FALSE)
       plt <- plt +
         scale_colour_hue(name=CondName,
                          breaks=unique(tmpdata$Condition),
                          labels=unique(tmpdata$Condition))
     } else {
       plt <- plt +
-        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), alpha=0.15, show.legend = F)
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), alpha=0.15, show.legend = FALSE)
       plt <- plt
     }
   }
   
   # Set errorbars according to theme and plot grouping
-  if(ErrorBar==T & Theme==T) {
-    if(Cond==T) {
+  if(ErrorBar==TRUE & Theme==TRUE) {
+    if(Cond==TRUE) {
       plt <- plt + 
         geom_errorbar(aes(ymin=error_lower, ymax=error_upper, colour = Condition), width = .3)
       plt <- plt +
@@ -1086,9 +1086,9 @@ plot_avg_diff <- function(data, DiffCols = NULL, xlim = NA, type = NULL,
       plt <- plt
     }
   }
-  if(ErrorBar==T & Theme==F) {
+  if(ErrorBar==TRUE & Theme==FALSE) {
     
-    if(Cond==T) {
+    if(Cond==TRUE) {
       plt <- plt +
         geom_errorbar(aes(ymin=error_lower, ymax=error_upper, color=Condition), width = .3)
       plt <- plt +
@@ -1288,14 +1288,14 @@ plot_avg_cdiff <- function(data, IAColumn = NULL, xlim = NA, type = NULL,
     if(!is.null(Averaging)) {
       tmpdata <- tmpdata %>% 
         group_by(!!!group_names1) %>% 
-        summarise(Mean = mean(UQ(sym(Column)), na.rm = T)) %>% 
+        summarise(Mean = mean(UQ(sym(Column)), na.rm = TRUE)) %>% 
         group_by(!!!group_names2) %>% 
         tidyr::spread(Cond, Mean) %>% arrange(UQ(sym(Averaging)), Time) %>% 
         mutate(Diff = Lev1 - Lev2)
     } else {
       tmpdata <- tmpdata %>% 
         group_by(!!!group_names2) %>% 
-        summarise(Mean = mean(UQ(sym(Column)), na.rm = T)) %>% 
+        summarise(Mean = mean(UQ(sym(Column)), na.rm = TRUE)) %>% 
         tidyr::spread(Cond, Mean) %>% 
         arrange(Time) %>% 
         mutate(Diff = Lev1 - Lev2)
@@ -1303,11 +1303,11 @@ plot_avg_cdiff <- function(data, IAColumn = NULL, xlim = NA, type = NULL,
     
     if(type != "proportion") {
       tmpdata <- tmpdata %>%
-        summarise(meanDiff = mean(Diff, na.rm = T), 
-                  DC1m = mean(Lev1, na.rm = T), 
-                  DC2m = mean(Lev2, na.rm = T), 
-                  DC1sd = stats::sd(Lev1, na.rm = T), 
-                  DC2sd = stats::sd(Lev2, na.rm = T), 
+        summarise(meanDiff = mean(Diff, na.rm = TRUE), 
+                  DC1m = mean(Lev1, na.rm = TRUE), 
+                  DC2m = mean(Lev2, na.rm = TRUE), 
+                  DC1sd = stats::sd(Lev1, na.rm = TRUE), 
+                  DC2sd = stats::sd(Lev2, na.rm = TRUE), 
                   n1 = n(), n2 = n()) %>%
         mutate(se = sqrt( ((DC1sd^2)/n1) + ((DC2sd^2)/n2) )) %>%
         mutate(degfree = (((((DC1sd^2)/n1) + ((DC2sd^2)/n2))^2) / (((((DC1sd^2)/n1)^2) / (n1-1)) + ((((DC2sd^2)/n2)^2) / (n2-1)))) )
@@ -1319,9 +1319,9 @@ plot_avg_cdiff <- function(data, IAColumn = NULL, xlim = NA, type = NULL,
       tmpdata <- tmpdata %>% mutate(ci = stats::qt(tval,df=degfree)*se)
     } else if (type=="proportion") {
       tmpdata <- tmpdata %>%
-        summarise(meanDiff = mean(Diff, na.rm = T), 
-                  DC1m = mean(Lev1, na.rm = T), 
-                  DC2m = mean(Lev2, na.rm = T), 
+        summarise(meanDiff = mean(Diff, na.rm = TRUE), 
+                  DC1m = mean(Lev1, na.rm = TRUE), 
+                  DC2m = mean(Lev2, na.rm = TRUE), 
                   n1 = n(), n2 = n()) %>%
         mutate(se = sqrt(((DC1m*(1-DC1m))/n1)+((DC2m*(1-DC2m))/n2)))
       if(CItype=="pointwise") {
@@ -1354,7 +1354,7 @@ plot_avg_cdiff <- function(data, IAColumn = NULL, xlim = NA, type = NULL,
     }
     
     # Print message regarding CIs
-    if (ErrorType=="CI" && (ErrorBand==T | ErrorBar==T)) {
+    if (ErrorType=="CI" && (ErrorBand==TRUE | ErrorBar==TRUE)) {
       if(CItype == "pointwise") {
         message(paste0("Plot created with ", CItype, " confindence intervals (set to ", ConfLev, "%)."))
       }
@@ -1378,26 +1378,26 @@ plot_avg_cdiff <- function(data, IAColumn = NULL, xlim = NA, type = NULL,
     }
     
     # Set errorbands according to theme
-    if(ErrorBand==T & Theme==T) {
+    if(ErrorBand==TRUE & Theme==TRUE) {
       plt <- plt + 
-        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), fill="grey25", alpha=0.15, show.legend = F)
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), fill="grey25", alpha=0.15, show.legend = FALSE)
       plt <- plt
     }
     
-    if(ErrorBand==T & Theme==F) {
+    if(ErrorBand==TRUE & Theme==FALSE) {
       plt <- plt +
-        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), alpha=0.15, show.legend = F)
+        geom_ribbon(aes(ymin=error_lower, ymax=error_upper, linetype=NA), alpha=0.15, show.legend = FALSE)
       plt <- plt
     }
     
     # Set errorbars according to theme and plot grouping
-    if(ErrorBar==T & Theme==T) {
+    if(ErrorBar==TRUE & Theme==TRUE) {
       plt <- plt + 
         geom_errorbar(aes(ymin=error_lower, ymax=error_upper), width = .3)
       plt <- plt
     }
     
-    if(ErrorBar==T & Theme==F) {
+    if(ErrorBar==TRUE & Theme==FALSE) {
       plt <- plt +
         geom_errorbar(aes(ymin=error_lower, ymax=error_upper), width = .3)
       plt <- plt

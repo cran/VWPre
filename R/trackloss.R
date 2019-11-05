@@ -73,18 +73,18 @@ mark_trackloss <- function(data,
   
   if (Type == "Blink") {
     data <- data %>% group_by(Event) %>%
-      mutate(Trackloss = ifelse(In_Blink == 1, T, F))
+      mutate(Trackloss = ifelse(In_Blink == 1, TRUE, FALSE))
   } else if (Type == "OffScreen") {
     data <- data %>% group_by(Event) %>%
-      mutate(Trackloss = ifelse(Screen != "OnScreen", T, F))
+      mutate(Trackloss = ifelse(Screen != "OnScreen", TRUE, FALSE))
   } else {
     data <- data %>% group_by(Event) %>%
       mutate(Trackloss = ifelse((Screen != "OnScreen") |
-                                  In_Blink == 1, T, F))
+                                  In_Blink == 1, TRUE, FALSE))
   }
   
   message(paste0("\n", round((
-    nrow(data[data$Trackloss == T,]) / nrow(data)
+    nrow(data[data$Trackloss == TRUE,]) / nrow(data)
   ) * 100, 2), "% of data marked as trackloss"))
   
   return(droplevels(ungroup(data)))
@@ -126,7 +126,7 @@ rm_trackloss_events <- function(data = data, RequiredData = NULL) {
   tmp <- data %>%
     group_by(Event) %>%
     summarise(Present = 100 - (sum(Trackloss) / n() * 100)) %>%
-    filter(Present <= RequiredData) %>% droplevels()
+    filter(Present >= RequiredData) %>% droplevels()
   
   post <- length(unique(tmp$Event))
   

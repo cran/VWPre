@@ -1,5 +1,35 @@
 # -----------------------------------------------
 
+# VWPre 1.2.1
+
+This update is a bug fix.
+
+## Major changes:
+
+### New functions
+
+* None
+
+### Changes to functions
+
+* None
+
+### Vignettes
+
+* None
+
+## Minor changes:
+
+### Changes to functions 
+
+* None
+
+## Bug fixes:
+
+* rm_trackloss_events: The logical operation to remove the bad events was inadvertantly reversed, this removing the good events rather than the bad. This is now corrected. Thank you to Liam Blything for bringing this to our attention.
+
+# -----------------------------------------------
+
 # VWPre 1.2.0
 
 This is a fairly major update, however, it should not break any previous functionality.  The reason for this is that we have modified the functions of the package to operate with a new sister package "PupilPre" which is designed to depend on VWPre in order to prepare pupil size data collected with SR eye-trackers.  To accommodate this functionally and compatibility, there has been some internal reorganization to use helper functions that allow PupilPre to call similar subroutines. If you do not install/load PupilPre, you should not notice any difference in functionality.

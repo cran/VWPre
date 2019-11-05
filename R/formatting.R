@@ -49,7 +49,7 @@ prep_data <- function(data, Subject = NULL, Item = NA,
 								"factor",
 								"numeric", 
 								"numeric"),
-						stringsAsFactors = F)
+						stringsAsFactors = FALSE)
   optcols <- data.frame(Column=c("SAMPLE_MESSAGE", "LEFT_GAZE_X", "LEFT_GAZE_Y", 
                                  "RIGHT_GAZE_X", "RIGHT_GAZE_Y", "LEFT_IN_BLINK", 
                                  "RIGHT_IN_BLINK", "LEFT_IN_SACCADE", 
@@ -65,7 +65,7 @@ prep_data <- function(data, Subject = NULL, Item = NA,
 								"numeric", 
 								"numeric",
 								"factor"),
-						stringsAsFactors = F)
+						stringsAsFactors = FALSE)
   
   {## SHARED CODE BEGINS HERE ## 
     
@@ -113,8 +113,8 @@ prep_data <- function(data, Subject = NULL, Item = NA,
     # Conversion helper function
     .conversionhelper <- function(data, columnname, datamode){
       if(datamode=="numeric"){
-        if (is.numeric(data[, columnname]) == F){
-          if(is.factor(data[, columnname]) == T){
+        if (is.numeric(data[, columnname]) == FALSE){
+          if(is.factor(data[, columnname]) == TRUE){
             data[, columnname] <- lapply(data[, columnname], as.character)
           }
           conv <- lapply(data[, columnname], as.numeric)
@@ -125,7 +125,7 @@ prep_data <- function(data, Subject = NULL, Item = NA,
         } 
       } 
       if(datamode=="factor"){
-        if (is.factor(data[, columnname]) == F){
+        if (is.factor(data[, columnname]) == FALSE){
           conv <- lapply(data[, columnname], factor)
           message(paste0("    ", columnname, " converted to factor."))
         } else {
@@ -468,12 +468,12 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	      
 	      tmp <- data %>%
 	        group_by(Event) %>%
-	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) > 0 &&
-	                                         sum(UQ(sym(eval_tidy(rcol))), na.rm = T) > 0, "Both",
-	                                       ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) > 0 &&
-	                                                sum(UQ(sym(eval_tidy(rcol))), na.rm = T) == 0, "Left",
-	                                              ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) == 0 &&
-	                                                       sum(UQ(sym(eval_tidy(rcol))), na.rm = T) > 0, "Right", "NoData")))) %>%
+	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = TRUE) > 0 &&
+	                                         sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE) > 0, "Both",
+	                                       ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = TRUE) > 0 &&
+	                                                sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE) == 0, "Left",
+	                                              ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = TRUE) == 0 &&
+	                                                       sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE) > 0, "Right", "NoData")))) %>%
 	        do(
 	          mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right",
 	                                         ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
@@ -489,10 +489,10 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	      
 	      tmp <- data %>%
 	        group_by(Event) %>%
-	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) > 0 &
-	                                         sum(UQ(sym(eval_tidy(rcol))), na.rm = T) == 0, "Left",
-	                                       ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = T) == 0 &
-	                                                sum(UQ(sym(eval_tidy(rcol))), na.rm = T) > 0,
+	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = TRUE) > 0 &
+	                                         sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE) == 0, "Left",
+	                                       ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = TRUE) == 0 &
+	                                                sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE) > 0,
 	                                              "Right", "NoData"))) %>%
 	        do(
 	          mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded,
@@ -515,7 +515,7 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	      
 	      tmp <- data %>%
 	        group_by(Event) %>%
-	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(col))), na.rm = T) > 0, quo_name(val), "NoData")) %>%
+	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(col))), na.rm = TRUE) > 0, quo_name(val), "NoData")) %>%
 	        do(
 	          mutate(., EyeSelected = ifelse(EyeRecorded == quo_name(val), EyeRecorded,
 	                                         ifelse(EyeRecorded == "NoData", "Neither")))
@@ -635,7 +635,7 @@ create_time_series <- function (data, Adjust = 0)
   adjust <- enquo(Adjust)
   # print(quo_name(adjust)) convert input expression to a string
   # print(eval_tidy(adjust)) evaluate expression in special environment
-  if (is.numeric(eval_tidy(adjust))==T && !("Align" %in% colnames(data))) {
+  if (is.numeric(eval_tidy(adjust))==TRUE && !("Align" %in% colnames(data))) {
     if (eval_tidy(adjust)==0) {
       message("No adjustment applied.")
     } else {
@@ -644,7 +644,7 @@ create_time_series <- function (data, Adjust = 0)
     data %>% arrange(., Event, TIMESTAMP) %>% group_by(Event) %>% 
       mutate(Time = TIMESTAMP - first(TIMESTAMP) - !! adjust) %>% ungroup()
   } 
-  else if (is.numeric(eval_tidy(adjust))==T && "Align" %in% colnames(data)) {
+  else if (is.numeric(eval_tidy(adjust))==TRUE && "Align" %in% colnames(data)) {
     if (eval_tidy(adjust)==0) {
       message("No adjustment applied.")
     } else {
@@ -653,7 +653,7 @@ create_time_series <- function (data, Adjust = 0)
     data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
       mutate(Time = Align - !! adjust) %>% ungroup()
   } 
-  else if (is.character(eval_tidy(adjust))==T) {
+  else if (is.character(eval_tidy(adjust))==TRUE) {
     message(paste("Adjustment applied using values contained in", quo_name(adjust)))
     data %>% arrange(., Event, Align) %>% group_by(Event) %>% 
       mutate(Time = Align - UQ(sym(eval_tidy(adjust)))) %>% ungroup()

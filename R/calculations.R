@@ -158,14 +158,14 @@ bin_prop <- function(data, NoIA = NULL, BinSize = NULL, SamplingRate = NULL) {
   if(length(unique(data$NSamples)) > 1){
 
     tmp <- data %>%  group_by(Event) %>% 
-        mutate(IsMaxTime = ifelse(Time == max(Time), T, F)) %>%
+        mutate(IsMaxTime = ifelse(Time == max(Time), TRUE, FALSE)) %>%
         filter(NSamples != SamplesPerBin) 
  
     message(paste("There are", nrow(tmp), "data points with less than", SamplesPerBin, "samples per bin."))
     message("These can be examined and/or removed using the column 'NSamples'.")
     message("Subsequent Empirical Logit calculations may be influenced by the number of samples (depending on the number of observations requested).")
 
-  if(all(tmp$IsMaxTime==T)) {
+  if(all(tmp$IsMaxTime==TRUE)) {
     message(paste("These all occur in the last bin of the time series (typical of Data Viewer output)."))
       
     } else {
