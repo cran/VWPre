@@ -422,7 +422,7 @@ rm_extra_DVcols <- function(data, Keep=NULL){
 #' }
 select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
   
-  .check_for_PupilPre(type = "UseOther", suggest = "ppl_select_recorded_eye")
+  #.check_for_PupilPre(type = "UseOther", suggest = "ppl_select_recorded_eye")
   
   # Establish which columns needed
 	lcol <- "LEFT_INTEREST_AREA_ID"
@@ -432,7 +432,7 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	  
 	  if("EYE_TRACKED" %in% names(data)) {
 	    message("Selecting gaze data using Data Viewer column EYE_TRACKED")
-	  } else {
+	   } else {
 	    if(is.null(Recording)){
 	      stop("Please supply the recording eye(s)!")
 	    }
@@ -441,15 +441,17 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	  
 	  if("EYE_TRACKED" %in% names(data)) {	
 	    
-	    if(("Both" %in% unique(data$EYE_TRACKED)) & is.na(WhenLandR)){
+	    # Previous versions of DataViewer output "Both", Newer versions (>=4.1.1) output "Binocular"
+	    # The following code allows for both types of input
+	    if(("Both" %in% unique(data$EYE_TRACKED) | "Binocular" %in% unique(data$EYE_TRACKED)) & is.na(WhenLandR)){
 	      stop("Please specify which eye to use when Recording is set to 'LandR'!")
 	    }
 	    tmp <- data %>%
 	      group_by(Event) %>%
 	      mutate(., EyeRecorded = as.character(EYE_TRACKED)) %>% 
 	      do(
-	        mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right", 
-	                                       ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
+	        mutate(., EyeSelected = ifelse(EyeRecorded %in% c("Both", "Binocular") & WhenLandR == "Right", "Right", 
+	                                       ifelse(EyeRecorded %in% c("Both", "Binocular") & WhenLandR == "Left", "Left",
 	                                              ifelse(EyeRecorded == "Right", EyeRecorded, 
 	                                                     ifelse(EyeRecorded == "Left", EyeRecorded, NA)))))
 	      )
@@ -590,6 +592,8 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
   
   return(droplevels(ungroup(tmp)))
 }
+
+
 
 
 #' Create a time series column
