@@ -1,8 +1,8 @@
 Package: VWPre
 Type: Package
 Title: Tools for Preprocessing Visual World Data
-Version: 1.2.2
-Date: 2019-12-18
+Version: 1.2.3
+Date: 2020-03-08
 Authors@R: c(person("Vincent", "Porretta", role = c("aut", "cre"),
 		     email = "vincentporretta@gmail.com"),
 	      person("Aki-Juhani", "Kyröläinen", role = "aut"),
@@ -37,6 +37,6 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-12-18 18:49:03 UTC; vjp
+Packaged: 2020-03-10 00:44:56 UTC; vjp
 Repository: CRAN
-Date/Publication: 2019-12-18 19:30:02 UTC
+Date/Publication: 2020-03-10 06:50:09 UTC
