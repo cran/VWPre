@@ -4,10 +4,21 @@
 \alias{plot_avg_cdiff}
 \title{Plots average difference between two conditions.}
 \usage{
-plot_avg_cdiff(data, IAColumn = NULL, xlim = NA, type = NULL,
-  Averaging = "Subject", Condition = NULL, CondLabels = NA,
-  ErrorBar = TRUE, VWPreTheme = TRUE, ConfLev = 95,
-  CItype = "simultaneous", ErrorBand = FALSE, ErrorType = "SE")
+plot_avg_cdiff(
+  data,
+  IAColumn = NULL,
+  xlim = NA,
+  type = NULL,
+  Averaging = "Subject",
+  Condition = NULL,
+  CondLabels = NA,
+  ErrorBar = TRUE,
+  VWPreTheme = TRUE,
+  ConfLev = 95,
+  CItype = "simultaneous",
+  ErrorBand = FALSE,
+  ErrorType = "SE"
+)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 

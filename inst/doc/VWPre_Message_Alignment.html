@@ -1,22 +1,34 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Vincent Porretta" />
 
-<meta name="date" content="2020-03-09" />
+<meta name="date" content="2020-11-29" />
 
 <title>Aligning Data to a Specific Sample Message</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -119,9 +131,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -290,7 +299,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -305,7 +315,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Aligning Data to a Specific Sample Message</h1>
 <h4 class="author">Vincent Porretta</h4>
-<h4 class="date">2020-03-09</h4>
+<h4 class="date">2020-11-29</h4>
 
 
 
@@ -317,7 +327,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="aligning-to-a-specific-message" class="section level2">
 <h2>Aligning to a specific message</h2>
 <p>Using the function <code>check_msg_time</code> you can see that the TIMESTAMP values associated with the message are not the same for each event. This indicates that alignment is required. Note that a regular expression (regex) can be used here as the message string.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_msg_time</span>(<span class="at">data =</span> aligndat, <span class="at">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 9 x 2
 ##   SAMPLE_MESSAGE TIMESTAMP
 ##   &lt;fct&gt;              &lt;dbl&gt;
@@ -332,7 +342,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 9 VowelOnset       1207406</code></pre>
 <pre><code>## Set ReturnData to TRUE to output full, event-specific information.</code></pre>
 <p>If you are not sure which messages are in your data set, you can use the function <code>check_all_msgs</code>. This will print all the messages (along with Event, Subject, Trial, and Timestamp). By specifiying <code>ReturnData = TRUE</code>, you can assign the output to a dataframe for further sorting, etc.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">check_all_msgs</span>(<span class="dt">data =</span> aligndat)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_all_msgs</span>(<span class="at">data =</span> aligndat)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 1
 ##   SAMPLE_MESSAGE
 ##   &lt;fct&gt;         
@@ -342,16 +352,16 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 4 TIMER_search</code></pre>
 <pre><code>## Set ReturnData to TRUE to output full, event-specific information.</code></pre>
 <p>The function <code>align_msg</code> is used to perform the alignment. To do this you must specify the message text as a string to the parameter <code>Msg</code>. Again, this string can contain a regular expression (regex) on which to locate the message. The function finds the instance of the message for each event and sets that sample as the zero point. Consequently, this creates a new column called <code>Align</code>, which represents the time sequence relative to the message.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>aligned1 &lt;-<span class="st"> </span><span class="kw">align_msg</span>(<span class="dt">data =</span> aligndat, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>aligned1 <span class="ot">&lt;-</span> <span class="fu">align_msg</span>(<span class="at">data =</span> aligndat, <span class="at">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
 <p>If we check the message time again, we now see that the message occurs at time 0 in the <code>Align</code> column.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_msg_time</span>(<span class="at">data =</span> aligned1, <span class="at">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 2
 ##   SAMPLE_MESSAGE Align
 ##   &lt;fct&gt;          &lt;dbl&gt;
 ## 1 VowelOnset         0</code></pre>
 <pre><code>## Set ReturnData to TRUE to output full, event-specific information.</code></pre>
 <p>To fully examine all events, you can include the parameter <code>ReturnData=TRUE</code> and assign the output to an object in your environment.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>MSGTime &lt;-<span class="st"> </span><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned1, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>, <span class="dt">ReturnData =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>MSGTime <span class="ot">&lt;-</span> <span class="fu">check_msg_time</span>(<span class="at">data =</span> aligned1, <span class="at">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>, <span class="at">ReturnData =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="creating-the-time-series-column" class="section level2">
 <h2>Creating the Time series column</h2>
@@ -482,10 +492,10 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>aligned2 &lt;-<span class="st"> </span><span class="kw">create_time_series</span>(<span class="dt">data =</span> aligned1, <span class="dt">Adjust =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>aligned2 <span class="ot">&lt;-</span> <span class="fu">create_time_series</span>(<span class="at">data =</span> aligned1, <span class="at">Adjust =</span> <span class="dv">0</span>)</span></code></pre></div>
 <pre><code>## No adjustment applied.</code></pre>
 <p>The function <code>check_time_series</code> can be used to verify that the time series was created. The function outputs a list of the unique start values present in the data. In this example, we do not expect all events to start with the same Time value, given that we performed our own alignment without a relative interest period defined in Data Viewer. As with <code>check_msg_time</code>, the list of Events and Start Times can be returned as a data frame using the parameter <code>ReturnData</code>.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">check_time_series</span>(<span class="dt">data =</span> aligned2)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_time_series</span>(<span class="at">data =</span> aligned2)</span></code></pre></div>
 <pre><code>## # A tibble: 9 x 1
 ##   Start_Time
 ##        &lt;dbl&gt;
@@ -500,7 +510,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 9       -211</code></pre>
 <pre><code>## Set ReturnData to TRUE to output full, event-specific information.</code></pre>
 <p>Perhaps more meaningfully, we can check the message time again. We can see that our message is still the zero point in the Time series column.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">check_msg_time</span>(<span class="dt">data =</span> aligned2, <span class="dt">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_msg_time</span>(<span class="at">data =</span> aligned2, <span class="at">Msg =</span> <span class="st">&quot;VowelOnset&quot;</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 2
 ##   SAMPLE_MESSAGE  Time
 ##   &lt;fct&gt;          &lt;dbl&gt;

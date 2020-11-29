@@ -4,8 +4,12 @@
 \alias{prep_data}
 \title{Check the classes of specific columns and re-assigns as necessary.}
 \usage{
-prep_data(data, Subject = NULL, Item = NA,
-  EventColumns = c("Subject", "TRIAL_INDEX"))
+prep_data(
+  data,
+  Subject = NULL,
+  Item = NA,
+  EventColumns = c("Subject", "TRIAL_INDEX")
+)
 }
 \arguments{
 \item{data}{A data frame object created from an Eyelink Sample Report.}

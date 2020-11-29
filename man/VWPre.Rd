@@ -3,7 +3,6 @@
 \docType{package}
 \name{VWPre}
 \alias{VWPre}
-\alias{VWPre-package}
 \title{VWPre: Tools for Preprocessing Visual World Data.}
 \description{
 The VWPre package provides a set of functions for preparing Visual World data 

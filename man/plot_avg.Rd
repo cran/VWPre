@@ -4,11 +4,23 @@
 \alias{plot_avg}
 \title{Plots average looks to interest areas.}
 \usage{
-plot_avg(data, type = NULL, xlim = NA, IAColumns = NULL,
-  Averaging = "Event", Condition1 = NULL, Condition2 = NULL,
-  Cond1Labels = NA, Cond2Labels = NA, ErrorBar = TRUE,
-  VWPreTheme = TRUE, ConfLev = 95, CItype = "simultaneous",
-  ErrorBand = FALSE, ErrorType = "SE")
+plot_avg(
+  data,
+  type = NULL,
+  xlim = NA,
+  IAColumns = NULL,
+  Averaging = "Event",
+  Condition1 = NULL,
+  Condition2 = NULL,
+  Cond1Labels = NA,
+  Cond2Labels = NA,
+  ErrorBar = TRUE,
+  VWPreTheme = TRUE,
+  ConfLev = 95,
+  CItype = "simultaneous",
+  ErrorBand = FALSE,
+  ErrorType = "SE"
+)
 }
 \arguments{
 \item{data}{A data table object output by either \code{\link{bin_prop}}. 

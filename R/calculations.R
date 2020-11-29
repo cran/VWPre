@@ -451,10 +451,11 @@ create_binomial <- function(data, NoIA = NULL, ObsPerBin = NULL,
   
   
   if (!(is.null(CustomBinom))) {
-    newcol <- enquo(newcol)
     bindcol1 <- paste("IA_", CustomBinom[1], "_Looks", sep="")
     bindcol2 <- paste("IA_", CustomBinom[2], "_Looks", sep="")
     newcol <- paste("IA_", CustomBinom[1], "_V_", CustomBinom[2], "_Looks", sep="")
+    message(paste("Custom binomial column created:", newcol))
+    newcol <- enquo(newcol)
     tmp$Custom <- cbind(tmp[[bindcol1]][,1], tmp[[bindcol2]][,1])
     tmp <- rename(tmp, !!newcol := Custom)
   }

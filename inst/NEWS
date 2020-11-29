@@ -1,5 +1,35 @@
 # -----------------------------------------------
 
+# VWPre 1.2.4
+
+This is a minor bug fix.
+
+## Major changes:
+
+### New functions
+
+* None
+
+### Changes to functions
+
+* None
+
+### Vignettes
+
+* None
+
+## Minor changes:
+
+### Changes to functions 
+
+* None 
+
+## Bug fixes:
+
+* create_binomial: This function has been updated to fix a bug related to the creation of a custom binomial column. Thanks to David Lobina for bringing this to our attention. 
+
+# -----------------------------------------------
+
 # VWPre 1.2.3
 
 This is a minor maintenance update related to the upcoming release of R version 4.0.0

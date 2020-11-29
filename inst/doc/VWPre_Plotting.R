@@ -1,10 +1,10 @@
-## ----global_options, include=FALSE---------------------------------------
+## ----global_options, include=FALSE--------------------------------------------
 library(ggplot2)
 library(gridExtra)
 library(itsadug)
 knitr::opts_chunk$set(fig.width=6, fig.height=4, fig.align="center", warning=FALSE)
 
-## ---- eval = TRUE, echo=FALSE, results='hide', message=FALSE-------------
+## ---- eval = TRUE, echo=FALSE, results='hide', message=FALSE------------------
 library(VWPre)
 # data(VWdat)
 # dat <- fasttrack(data = VWdat, Subject = "RECORDING_SESSION_LABEL", Item = "itemid",
@@ -14,21 +14,21 @@ library(VWPre)
 # save(dat, file = "plotdat.rda", compress = "xz")
 load("plotdat.rda")
 
-## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE---------
+## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE--------------
 plot_avg(data = dat, type = "proportion", xlim = c(0, 1000), 
     IAColumns = c(IA_1_P = "Target", IA_2_P = "Rhyme", IA_3_P = "OnsetComp", 
                   IA_4_P = "Distractor"),
     Condition1 = NULL, Condition2 = NULL, Cond1Labels = NA, Cond2Labels = NA,
     ErrorBar = TRUE, VWPreTheme = TRUE) 
 
-## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE---------
+## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE--------------
 plot_avg(data = dat, type = "proportion", xlim = c(0, 1000), 
     IAColumns = c(IA_1_P = "Target", IA_2_P = "Rhyme", IA_3_P = "OnsetComp", 
                   IA_4_P = "Distractor"),
     Condition1 = NULL, Condition2 = NULL, Cond1Labels = NA, Cond2Labels = NA,
     ErrorBar = TRUE, VWPreTheme = TRUE) + ggtitle("Averaged Data")
 
-## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE---------
+## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE--------------
 plot_avg(data = dat, type = "proportion", xlim = c(0, 1000), 
     IAColumns = c(IA_1_P = "Target", IA_2_P = "Rhyme", IA_3_P = "OnsetComp", 
                   IA_4_P = "Distractor"),
@@ -105,7 +105,7 @@ plot_avg(data = dat, type = "proportion", xlim = c(0, 1000),
                                      CH9 = "Chinese 2", EN3 = "English 1"),
     Cond2Labels = NA, ErrorBar = TRUE, VWPreTheme = TRUE)
 
-## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE---------
+## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE--------------
 plot_avg(data = dat, type = "proportion", xlim = c(0, 1000), 
     IAColumns = c(IA_1_P = "Target", IA_2_P = "Rhyme", IA_3_P = "OnsetComp", 
                   IA_4_P = "Distractor"),
@@ -134,41 +134,41 @@ plot_avg_cdiff(data = dat, type = "proportion", xlim = c(0, 1000),
               CondLabels = c(CH1 = "Chinese 1", EN3 = "English 1"),
               ErrorBar = TRUE, VWPreTheme = TRUE, Averaging = "Subject")
 
-## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE---------
+## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE--------------
 plot_avg_contour(data = dat, IA = "IA_1_P", type = "proportion", Var = "Rating", 
 VarLabel = "Accent Rating", xlim = c(0,1000), VWPreTheme = TRUE, 
 Colors = c("gray20", "gray90"))
 
-## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE---------
+## ---- eval= TRUE, fig.show='hold', results='asis', message=FALSE--------------
 plot_avg_contour(data = dat, IA = "IA_1_P", type = "proportion", Var = "Rating", 
 VarLabel = "Accent Rating", xlim = c(0,1000), VWPreTheme = TRUE, 
 Colors = c("red", "green")) + ggtitle("Looks to target")
 
-## ---- eval= TRUE, results='asis', message=FALSE--------------------------
+## ---- eval= TRUE, results='asis', message=FALSE-------------------------------
 plt <- plot_avg(data = dat, type = "proportion", xlim = c(0, 1000), 
                 IAColumns = c(IA_1_P = "Target", IA_2_P = "Rhyme", IA_3_P = "OnsetComp", 
                               IA_4_P = "Distractor"),
                 Condition1 = NULL, Condition2 = NULL, Cond1Labels = NA, Cond2Labels = NA,
                 ErrorBar = TRUE, VWPreTheme = TRUE) 
 
-## ---- eval= TRUE, results='asis', message=FALSE--------------------------
+## ---- eval= TRUE, results='asis', message=FALSE-------------------------------
 df <- plt$data
 
-## ---- eval= TRUE, echo=FALSE, results='asis', message=FALSE--------------
+## ---- eval= TRUE, echo=FALSE, results='asis', message=FALSE-------------------
 knitr::kable(head(df))
 
-## ---- eval= FALSE, results='asis', message=FALSE-------------------------
+## ---- eval= FALSE, results='asis', message=FALSE------------------------------
 #  model <- mgcv::bam(IA_1_ELogit ~ s(Time), data = dat)
 
-## ---- eval = TRUE, echo = FALSE, results='hide', message=FALSE-----------
+## ---- eval = TRUE, echo = FALSE, results='hide', message=FALSE----------------
 # save(model, file = "model.rda", compress = "xz")
 load(file = "model.rda")
 
-## ---- eval= TRUE, results='asis', message=FALSE--------------------------
+## ---- eval= TRUE, results='asis', message=FALSE-------------------------------
 pelogit <- make_pelogit_fnc(ObsPerBin=50, Constant=0.5)
 df <- data.frame(Fitted = fitted(model), Backtransformed = pelogit(fitted(model)))
 
-## ---- eval= TRUE, echo=FALSE, results='asis', message=FALSE--------------
+## ---- eval= TRUE, echo=FALSE, results='asis', message=FALSE-------------------
 knitr::kable(df[10:20,])
 
 ## ---- eval= TRUE, results='hide', fig.width=7, fig.height=8, message=FALSE----
@@ -176,12 +176,12 @@ par(mfrow=c(2,1))
 itsadug::plot_smooth(model, view = "Time")
 itsadug::plot_smooth(model, view = "Time", transform = pelogit)
 
-## ---- eval=FALSE, echo=TRUE, results='asis'------------------------------
+## ---- eval=FALSE, echo=TRUE, results='asis'-----------------------------------
 #  plot_transformation_app()
 
-## ---- eval=FALSE, echo=TRUE, results='asis'------------------------------
+## ---- eval=FALSE, echo=TRUE, results='asis'-----------------------------------
 #  plot_var_app(dat)
 
-## ---- eval=FALSE, echo=TRUE, results='asis'------------------------------
+## ---- eval=FALSE, echo=TRUE, results='asis'-----------------------------------
 #  plot_indiv_app(dat)
 

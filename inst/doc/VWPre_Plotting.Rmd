@@ -35,7 +35,7 @@ In some cases it is even necessary to visualize the trend in the data over a con
 So, the functions `plot_avg` and `plot_avg_contour` provide straightforward plotting options for such cases.
 These functions internally calculate the average(s) and plot the results.
 The plotting is powered by `ggplot2`, so further customization (plot titles, custom themes, etc.) is still possible.
-For more information about [ggplot2](http://ggplot2.tidyverse.org/reference/), please refer to its reference manual and extensive documentation.
+For more information about [ggplot2](https://ggplot2.tidyverse.org/reference/), please refer to its reference manual and extensive documentation.
 
 ### Averaged data
 
@@ -63,7 +63,7 @@ plot_avg(data = dat, type = "proportion", xlim = c(0, 1000),
 
 To customize the appearance of a plot (e.g., font, size, color, margins, etc.), the `VWPreTheme` parameter can be set to `FALSE`, which reverts to the default theming in `gglpot2`. 
 In this way, the user can apply a custom theme to the plot. 
-Detailed information about creating themes can be found at [ggplot2 Theme Vignette](http://ggplot2.tidyverse.org/reference/theme.html).
+Detailed information about creating themes can be found at [ggplot2 Theme Vignette](https://ggplot2.tidyverse.org/reference/theme.html).
 For the purpose of illustration, the default ggplot2 theme has been applied, with the axis text elements increased in size.
 
 ```{r, eval= TRUE, fig.show='hold', results='asis', message=FALSE}
