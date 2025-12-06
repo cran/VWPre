@@ -39,7 +39,7 @@ calculate the grand mean by that factor.}
 \item{VWPreTheme}{A logical indicating whether the theme included with the 
 function, or ggplot2's base theme (which any other custom theme could be added).}
 
-\item{Colors}{A vector of two strings specifying the colrs of the contour shading - The default values represent grayscale.}
+\item{Colors}{A vector of two strings specifying the colors of the contour shading - The default values represent grayscale.}
 }
 \description{
 \code{plot_avg_contour} calculates the conditional average of proportions or 

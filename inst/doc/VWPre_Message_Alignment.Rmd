@@ -54,7 +54,7 @@ check_msg_time(data = aligndat, Msg = "VowelOnset")
 
 If you are not sure which messages are in your data set, you can use the function `check_all_msgs`. 
 This will print all the messages (along with Event, Subject, Trial, and Timestamp).
-By specifiying `ReturnData = TRUE`, you can assign the output to a dataframe for further sorting, etc.
+By specifying `ReturnData = TRUE`, you can assign the output to a dataframe for further sorting, etc.
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
 check_all_msgs(data = aligndat)

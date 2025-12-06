@@ -120,8 +120,7 @@
 #'
 #' Maintainer: Vincent Porretta (\email{vincentporretta@@gmail.com})
 #'
-#' University of Windsor, Canada
 #' 
-#' @docType package
+#' @aliases _PACKAGE
 #' @name VWPre
 NULL

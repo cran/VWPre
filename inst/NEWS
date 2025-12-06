@@ -1,5 +1,36 @@
 # -----------------------------------------------
 
+# VWPre 1.2.5
+
+This is a minor bug fix.
+
+## Major changes:
+
+### New functions
+
+* None
+
+### Changes to functions
+
+* None
+
+### Vignettes
+
+* Removal of reference to itsadug package which is no longer available on CRAN.
+
+## Minor changes:
+
+### Changes to functions 
+
+* None 
+
+## Bug fixes:
+
+* Minor change to prep_data and select_recorded_eye related to data type handling.  A special thanks to Anton Malko for spotting this and providing a fix. 
+
+
+# -----------------------------------------------
+
 # VWPre 1.2.4
 
 This is a minor bug fix.

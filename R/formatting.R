@@ -113,8 +113,8 @@ prep_data <- function(data, Subject = NULL, Item = NA,
     # Conversion helper function
     .conversionhelper <- function(data, columnname, datamode){
       if(datamode=="numeric"){
-        if (is.numeric(data[, columnname]) == FALSE){
-          if(is.factor(data[, columnname]) == TRUE){
+        if (is.numeric(data[[columnname]]) == FALSE){
+          if(is.factor(data[[columnname]]) == TRUE){
             data[, columnname] <- lapply(data[, columnname], as.character)
           }
           conv <- lapply(data[, columnname], as.numeric)
@@ -125,7 +125,7 @@ prep_data <- function(data, Subject = NULL, Item = NA,
         } 
       } 
       if(datamode=="factor"){
-        if (is.factor(data[, columnname]) == FALSE){
+        if (is.factor(data[[columnname]]) == FALSE){
           conv <- lapply(data[, columnname], factor)
           message(paste0("    ", columnname, " converted to factor."))
         } else {
@@ -159,9 +159,9 @@ prep_data <- function(data, Subject = NULL, Item = NA,
       item <- enquo(item)
       data <- rename(data, Item = !!item)
       message(paste("   ", quo_name(item), "renamed to Item."))
-      reqcols <- rbind(reqcols, c("Item", "factor", 1))
+      reqcols <- rbind(reqcols, c("Item", 1, "factor"))
     } else {
-      reqcols <- rbind(reqcols, c("Item", "factor", 0))
+      reqcols <- rbind(reqcols, c("Item", 0, "factor"))
       message("    No Item column specified.")
     }
     
@@ -448,7 +448,6 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	      stop("Please specify which eye to use when Recording is set to 'LandR'!")
 	    }
 	    tmp <- data %>%
-	      group_by(Event) %>%
 	      mutate(., EyeRecorded = as.character(EYE_TRACKED)) %>% 
 	      do(
 	        mutate(., EyeSelected = ifelse(EyeRecorded %in% c("Both", "Binocular") & WhenLandR == "Right", "Right", 
@@ -477,12 +476,13 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	                                                sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE) == 0, "Left",
 	                                              ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = TRUE) == 0 &&
 	                                                       sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE) > 0, "Right", "NoData")))) %>%
+	        ungroup() %>%
 	        do(
 	          mutate(., EyeSelected = ifelse(EyeRecorded == "Both" & WhenLandR == "Right", "Right",
 	                                         ifelse(EyeRecorded == "Both" & WhenLandR == "Left", "Left",
 	                                                ifelse(EyeRecorded == "Right", EyeRecorded,
 	                                                       ifelse(EyeRecorded == "Left", EyeRecorded,
-	                                                              ifelse(EyeRecorded == "NoData", "Neither"))))))
+	                                                              ifelse(EyeRecorded == "NoData", "Neither", NA))))))
 	        )
 	      
 	      
@@ -497,10 +497,11 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	                                       ifelse(sum(UQ(sym(eval_tidy(lcol))), na.rm = TRUE) == 0 &
 	                                                sum(UQ(sym(eval_tidy(rcol))), na.rm = TRUE) > 0,
 	                                              "Right", "NoData"))) %>%
+	        ungroup() %>%
 	        do(
 	          mutate(., EyeSelected = ifelse(EyeRecorded == "Right", EyeRecorded,
 	                                         ifelse(EyeRecorded == "Left", EyeRecorded,
-	                                                ifelse(EyeRecorded == "NoData", "Neither"))))
+	                                                ifelse(EyeRecorded == "NoData", "Neither", NA))))
 	        )
 	      
 	    }
@@ -519,9 +520,10 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 	      tmp <- data %>%
 	        group_by(Event) %>%
 	        mutate(., EyeRecorded = ifelse(sum(UQ(sym(eval_tidy(col))), na.rm = TRUE) > 0, quo_name(val), "NoData")) %>%
+	        ungroup() %>%
 	        do(
 	          mutate(., EyeSelected = ifelse(EyeRecorded == quo_name(val), EyeRecorded,
-	                                         ifelse(EyeRecorded == "NoData", "Neither")))
+	                                         ifelse(EyeRecorded == "NoData", "Neither", NA)))
 	        ) %>% ungroup()
 	    }
 	    
@@ -532,7 +534,7 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 
   # Transfer columns
 
-	  tmp <- tmp %>% group_by(Event) %>%
+	  tmp <- tmp %>%
 		do(
 		mutate(., IA_ID = ifelse(EyeSelected == "Right", RIGHT_INTEREST_AREA_ID,
                                ifelse(EyeSelected == "Left", LEFT_INTEREST_AREA_ID,
@@ -544,7 +546,7 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 		
 		if(all(c("RIGHT_GAZE_X", "RIGHT_GAZE_Y", "RIGHT_IN_BLINK", "RIGHT_IN_SACCADE") %in% colnames(tmp)) | 
 		all(c("LEFT_GAZE_X", "LEFT_GAZE_Y", "LEFT_IN_BLINK", "LEFT_IN_SACCADE") %in% colnames(tmp))) {
-		tmp <- tmp %>% group_by(Event) %>%
+		tmp <- tmp %>%
         mutate(., Gaze_X = ifelse(EyeSelected == "Right", RIGHT_GAZE_X,
                                ifelse(EyeSelected == "Left", LEFT_GAZE_X, NA)),
                Gaze_Y = ifelse(EyeSelected == "Right", RIGHT_GAZE_Y,
@@ -565,6 +567,7 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
 		tmp$IA_ID <- as.numeric(as.character(tmp$IA_ID))
 		tmp$IA_LABEL <- as.factor(as.character(tmp$IA_LABEL))
 		tmp <- tmp %>%
+		  group_by(Event) %>%
 			mutate(IA_Data = ifelse(sum(IA_ID) > 0, "Contains_IA_Looks", "No_IA_Looks"))
 		tmp$IA_Data <- as.factor(as.character(tmp$IA_Data))
 
@@ -574,7 +577,7 @@ select_recorded_eye <- function(data, Recording = NULL, WhenLandR = NA) {
   message(paste("Gaze data summary for", length(unique(levels(tmp$Event))), "events:"))
 
   if (!(is.na(WhenLandR))) {
-    n <- tmp %>% group_by(Event) %>% summarise(T1 = min(Time), Eye = EyeSelected[1]) %>% filter(Eye=="Both") %>% droplevels()
+    n <- tmp %>% group_by(Event) %>% summarise(T1 = min(Time), Eye = EyeRecorded[1]) %>% filter(Eye == "Both" | Eye == "Binocular") %>% droplevels()
     message(paste(nrow(n), "event(s) contained gaze data for both eyes, for which the", WhenLandR, "eye has been selected." ))
   }
 

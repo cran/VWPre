@@ -13,7 +13,6 @@ vignette: >
 ```{r global_options, include=FALSE}
 library(ggplot2)
 library(gridExtra)
-library(itsadug)
 knitr::opts_chunk$set(fig.width=6, fig.height=4, fig.align="center", warning=FALSE)
 ```
 
@@ -313,12 +312,6 @@ Here we see the backtransformed values.
 knitr::kable(df[10:20,])
 ```
 
-Here we see how the function can be included in the plotting functions of other packages.
-```{r, eval= TRUE, results='hide', fig.width=7, fig.height=8, message=FALSE}
-par(mfrow=c(2,1))
-itsadug::plot_smooth(model, view = "Time")
-itsadug::plot_smooth(model, view = "Time", transform = pelogit)
-```
 
 ## Interactive/Utility plotting apps
 

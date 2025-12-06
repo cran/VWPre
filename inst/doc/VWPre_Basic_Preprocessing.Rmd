@@ -154,7 +154,7 @@ The function `check_time_series` can be used to verify the time series.
 It outputs the unique start times present in the data.
 These will be the same standardized time point relative to the stimulus if you have exported your data from Data Viewer with pre-defined interest period relative to a message.
 By specifying the parameter `ReturnData = T`, the function can return a summary data frame that can be used to inspect the start time of each event.
-As you can see below, by providing `Adjust` with a postive value, we have effectively shifted the zero point forward along the number line, causing the first sample to have a negative time value. 
+As you can see below, by providing `Adjust` with a positive value, we have effectively shifted the zero point forward along the number line, causing the first sample to have a negative time value. 
 
 ```{r, eval= TRUE, echo=TRUE, results='asis'}
 check_time_series(data = dat2)
@@ -219,7 +219,7 @@ Prior to binning the data, some researchers might prefer to remove trials with e
 Because Data Viewer does not provide a specific column for trackloss, it is possible to determine this using a combination of information, namely, the column `In_Blink` and/or the X and Y coordinates (`Gaze_X` and `Gaze_Y`).  
 The function `mark_trackloss` uses this information to determine the status of a given sample.
 The argument `Type` can be set to "Blink", "OffScreen", or "Both".
-When set to "OffScreen" or "Both", `ScreenSize` must be supplied as a numeric vector of the X and Y dimensions of the computer sceen used during the experiment.
+When set to "OffScreen" or "Both", `ScreenSize` must be supplied as a numeric vector of the X and Y dimensions of the computer screen used during the experiment.
 
 ```{r, eval= FALSE, echo=TRUE, results='asis'}
 dat3 <- mark_trackloss(dat3, Type = "Both", ScreenSize = c(1920, 1080))
@@ -348,7 +348,7 @@ This is done by specifying the parameter `CustomBinom` with a vector of two inte
 
 
 
-## Fastrack function
+## Fasttrack function
 
 For advanced users who have worked with the package functions before and who are familiar with the required steps and output, there is a meta-function, called `fasttrack`, which runs through the previous functions and outputs a dataframe with either empirical logits or binomial data. 
 Note that using this function will still require the user to manually remove unneeded columns (see above).

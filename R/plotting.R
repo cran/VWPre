@@ -535,7 +535,7 @@ plot_avg <- function(data, type = NULL, xlim = NA, IAColumns = NULL,
 #' @param VarLabel A string specifying the axis label to use for \code{Var}.
 #' @param VWPreTheme A logical indicating whether the theme included with the 
 #' function, or ggplot2's base theme (which any other custom theme could be added).
-#' @param Colors A vector of two strings specifying the colrs of the contour shading - The default values represent grayscale.
+#' @param Colors A vector of two strings specifying the colors of the contour shading - The default values represent grayscale.
 #' @examples
 #' \dontrun{
 #' library(VWPre)
